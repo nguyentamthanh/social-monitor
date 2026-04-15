@@ -1,0 +1,203 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1776269459075,
+  "projectRoot": "C:\\Users\\ADMIN\\Desktop\\social-monitor",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "next",
+        "version": "latest",
+        "category": "fullstack"
+      },
+      {
+        "name": "react",
+        "version": "18.3.0",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "18.3.0",
+        "category": "frontend"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": null,
+    "lintCommand": "npm run lint",
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "next dev",
+      "build": "next build",
+      "start": "next start",
+      "lint": "next lint"
+    }
+  },
+  "conventions": {
+    "namingStyle": "camelCase",
+    "importStyle": "ES modules",
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "app",
+      "components",
+      "lib"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "app": {
+      "path": "app",
+      "purpose": "Application code",
+      "fileCount": 3,
+      "lastAccessed": 1776269459044,
+      "keyFiles": [
+        "globals.css",
+        "layout.tsx",
+        "page.tsx"
+      ]
+    },
+    "apps": {
+      "path": "apps",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1776269459045,
+      "keyFiles": []
+    },
+    "components": {
+      "path": "components",
+      "purpose": "UI components",
+      "fileCount": 1,
+      "lastAccessed": 1776269459050,
+      "keyFiles": [
+        "Providers.tsx"
+      ]
+    },
+    "lib": {
+      "path": "lib",
+      "purpose": "Library code",
+      "fileCount": 2,
+      "lastAccessed": 1776269459050,
+      "keyFiles": [
+        "auth.ts",
+        "mongodb.ts"
+      ]
+    },
+    "types": {
+      "path": "types",
+      "purpose": "Type definitions",
+      "fileCount": 1,
+      "lastAccessed": 1776269459051,
+      "keyFiles": [
+        "index.ts"
+      ]
+    },
+    "app\\api": {
+      "path": "app\\api",
+      "purpose": "API routes",
+      "fileCount": 0,
+      "lastAccessed": 1776269459051,
+      "keyFiles": []
+    },
+    "apps\\api": {
+      "path": "apps\\api",
+      "purpose": "API routes",
+      "fileCount": 0,
+      "lastAccessed": 1776269459052,
+      "keyFiles": []
+    },
+    "lib\\models": {
+      "path": "lib\\models",
+      "purpose": "Data models",
+      "fileCount": 4,
+      "lastAccessed": 1776269459052,
+      "keyFiles": [
+        "Keyword.ts",
+        "Mention.ts",
+        "TrendData.ts"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": ".env.local",
+      "accessCount": 9,
+      "lastAccessed": 1776273846504,
+      "type": "file"
+    },
+    {
+      "path": "app\\layout.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1776270399755,
+      "type": "file"
+    },
+    {
+      "path": "app\\dashboard\\page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1776273749297,
+      "type": "file"
+    },
+    {
+      "path": "app\\api\\auth\\register\\route.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776270294207,
+      "type": "file"
+    },
+    {
+      "path": "lib\\models\\User.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776270299009,
+      "type": "file"
+    },
+    {
+      "path": "lib\\mongodb.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776270299063,
+      "type": "file"
+    },
+    {
+      "path": "lib\\auth.ts",
+      "accessCount": 1,
+      "lastAccessed": 1776273733089,
+      "type": "file"
+    },
+    {
+      "path": "app\\(auth)\\login\\page.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1776273742922,
+      "type": "file"
+    },
+    {
+      "path": "components\\Providers.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1776273754429,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

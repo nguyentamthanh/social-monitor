@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"sleep 5 && cat C:/Users/ADMIN/AppData/Local/Temp/claude/C--Users-ADMIN-Desktop-bfb52989-b359-43ae-a9d8-62bf2b42c011-tasks-bv40d6snh.output\"}",
+  "error": "Exit code 1\ncat: 'C:/Users/ADMIN/AppData/Local/Temp/claude/C--Users-ADMIN-Desktop-bfb52989-b359-43ae-a9d8-62bf2b42c011-tasks-bv40d6snh.output': No such file or directory",
+  "timestamp": "2026-04-15T16:03:45.076Z",
+  "retry_count": 1
+}
