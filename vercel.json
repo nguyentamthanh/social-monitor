@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "app/api/scans/route.ts": { "maxDuration": 60 },
+    "app/api/scans/[id]/route.ts": { "maxDuration": 30 },
+    "app/api/assets/route.ts": { "maxDuration": 30 },
+    "app/api/text-check/route.ts": { "maxDuration": 30 }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ]
+}

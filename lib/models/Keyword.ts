@@ -1,24 +1,40 @@
-import mongoose, { Schema, Document, Model } from 'mongoose'
+import { query, queryOne } from '@/lib/neon'
 import { Platform } from '@/types'
 
-export interface IKeyword extends Document {
-  userId: string
+export interface Keyword {
+  id: number
+  user_id: string
   term: string
-  platforms: Platform[]
-  status: 'active' | 'paused' | 'error'
-  refreshInterval: number
-  lastFetchedAt?: Date
-  createdAt: Date
+  platforms: string[]
+  status: string
+  refresh_interval: number
+  last_fetched_at: Date | null
+  created_at: Date
 }
 
-const KeywordSchema = new Schema<IKeyword>({
-  userId: { type: String, required: true },
-  term: { type: String, required: true },
-  platforms: [{ type: String, enum: ['facebook', 'google', 'youtube', 'tiktok'] }],
-  status: { type: String, enum: ['active', 'paused', 'error'], default: 'active' },
-  refreshInterval: { type: Number, default: 3600000 },
-  lastFetchedAt: { type: Date },
-  createdAt: { type: Date, default: Date.now }
-})
+export async function findKeywordsByUserId(userId: string): Promise<Keyword[]> {
+  return query<Keyword>('SELECT * FROM keywords WHERE user_id = $1 ORDER BY created_at DESC', [userId])
+}
 
-export const Keyword: Model<IKeyword> = mongoose.models.Keyword || mongoose.model<IKeyword>('Keyword', KeywordSchema)
+export async function findKeywordById(id: number): Promise<Keyword | null> {
+  return queryOne<Keyword>('SELECT * FROM keywords WHERE id = $1', [id])
+}
+
+export async function createKeyword(
+  userId: string,
+  term: string,
+  platforms: Platform[],
+  refreshInterval: number = 3600000
+): Promise<Keyword> {
+  const result = await queryOne<Keyword>(
+    `INSERT INTO keywords (user_id, term, platforms, status, refresh_interval, last_fetched_at)
+     VALUES ($1, $2, $3, 'active', $4, NOW())
+     RETURNING *`,
+    [userId, term, platforms, refreshInterval]
+  )
+  return result!
+}
+
+export async function updateKeywordLastFetched(id: number): Promise<void> {
+  await query('UPDATE keywords SET last_fetched_at = NOW() WHERE id = $1', [id])
+}

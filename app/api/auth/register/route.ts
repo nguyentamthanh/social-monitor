@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import bcrypt from 'bcryptjs'
-import { connectDB } from '@/lib/mongodb'
-import { User } from '@/lib/models/User'
+import { findUserByEmail, createUser } from '@/lib/models/User'
+import { initializeDatabase } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
+    await initializeDatabase()
+
     const body = await request.json()
     const { email, name, password } = body
 
@@ -14,23 +15,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    await connectDB()
-
-    const existingUser = await User.findOne({ email })
+    const existingUser = await findUserByEmail(email)
     if (existingUser) {
       return NextResponse.json({ error: 'User already exists' }, { status: 409 })
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12)
-
-    const user = await User.create({
-      email,
-      name,
-      password: hashedPassword
-    })
+    const user = await createUser(email, name, password)
 
     return NextResponse.json({
-      id: user._id.toString(),
+      id: user.id.toString(),
       email: user.email,
       name: user.name
     }, { status: 201 })

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { connectDB } from '@/lib/mongodb'
-import { Mention } from '@/lib/models/Mention'
+import { findMentions } from '@/lib/models/Mention'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,35 +20,35 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50')
     const skip = parseInt(searchParams.get('skip') || '0')
 
-    await connectDB()
-
-    const query: any = {}
+    const filters: {
+      keywordId?: number
+      platform?: string
+      startDate?: Date
+      endDate?: Date
+      limit: number
+      offset: number
+    } = {
+      limit,
+      offset: skip
+    }
 
     if (keywordId) {
-      query.keywordId = keywordId
+      filters.keywordId = parseInt(keywordId)
     }
 
     if (platform) {
-      query.platform = platform
+      filters.platform = platform
     }
 
-    if (startDate || endDate) {
-      query.publishedAt = {}
-      if (startDate) {
-        query.publishedAt.$gte = new Date(startDate)
-      }
-      if (endDate) {
-        query.publishedAt.$lte = new Date(endDate)
-      }
+    if (startDate) {
+      filters.startDate = new Date(startDate)
     }
 
-    const [mentions, total] = await Promise.all([
-      Mention.find(query)
-        .sort({ publishedAt: -1 })
-        .skip(skip)
-        .limit(limit),
-      Mention.countDocuments(query)
-    ])
+    if (endDate) {
+      filters.endDate = new Date(endDate)
+    }
+
+    const { mentions, total } = await findMentions(filters)
 
     return NextResponse.json({
       mentions,

@@ -153,7 +153,7 @@ export default function MentionsPage() {
           <Table
             columns={columns}
             dataSource={mentions}
-            rowKey="_id"
+            rowKey="id"
             pagination={{
               current: page,
               pageSize,

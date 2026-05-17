@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { connectDB } from '@/lib/mongodb'
-import { Keyword } from '@/lib/models/Keyword'
-import { Mention } from '@/lib/models/Mention'
-import { TrendData } from '@/lib/models/TrendData'
+import { findKeywordsByUserId } from '@/lib/models/Keyword'
+import { findRecentMentions, countMentionsByKeywordIds } from '@/lib/models/Mention'
+import { aggregateTrendData } from '@/lib/models/TrendData'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,51 +14,37 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    await connectDB()
-
     const userId = (session.user as any).id || session.user?.email
 
-    const keywords = await Keyword.find({ userId })
-    const keywordIds = keywords.map(k => k._id.toString())
+    const keywords = await findKeywordsByUserId(userId)
+    const keywordIds = keywords.map(k => k.id)
 
-    const [totalMentions, recentMentions] = await Promise.all([
-      Mention.countDocuments({ keywordId: { $in: keywordIds } }),
-      Mention.find({ keywordId: { $in: keywordIds } })
-        .sort({ publishedAt: -1 })
-        .limit(10)
-        .populate('keywordId', 'term')
-    ])
+    const totalMentions = await countMentionsByKeywordIds(keywordIds)
+    const recentMentions = await findRecentMentions(keywordIds, 10)
 
     const activeKeywords = keywords.filter(k => k.status === 'active').length
 
-    const platformStats = await TrendData.aggregate([
-      {
-        $match: {
-          keywordId: { $in: keywordIds }
-        }
-      },
-      {
-        $group: {
-          _id: '$platform',
-          totalMentions: { $sum: '$mentionCount' },
-          totalEngagement: { $sum: '$engagement' }
-        }
-      }
-    ])
+    const dateFrom = new Date()
+    dateFrom.setDate(dateFrom.getDate() - 30)
+
+    const platformStats = await aggregateTrendData({
+      keywordIds,
+      startDate: dateFrom
+    })
 
     let avgEngagement = 0
     let topPlatform = 'N/A'
     let maxEngagement = 0
 
     for (const stat of platformStats) {
-      if (stat.totalEngagement > maxEngagement) {
-        maxEngagement = stat.totalEngagement
-        topPlatform = stat._id
+      if (stat.total_engagement > maxEngagement) {
+        maxEngagement = stat.total_engagement
+        topPlatform = stat.platform
       }
     }
 
     if (totalMentions > 0) {
-      const totalEngagement = platformStats.reduce((sum, s) => sum + s.totalEngagement, 0)
+      const totalEngagement = platformStats.reduce((sum, s) => sum + s.total_engagement, 0)
       avgEngagement = Math.round(totalEngagement / totalMentions)
     }
 
@@ -71,19 +56,19 @@ export async function GET() {
         topPlatform
       },
       platformBreakdown: platformStats.map(s => ({
-        platform: s._id,
-        mentions: s.totalMentions,
-        engagement: s.totalEngagement
+        platform: s.platform,
+        mentions: s.total_mentions,
+        engagement: s.total_engagement
       })),
       recentMentions: recentMentions.map(m => ({
-        _id: m._id,
+        id: m.id,
         content: m.content,
         platform: m.platform,
         author: m.author,
         url: m.url,
         metrics: m.metrics,
-        publishedAt: m.publishedAt,
-        keyword: (m.keywordId as any)?.term || 'Unknown'
+        publishedAt: m.published_at,
+        keyword: m.keyword_term || 'Unknown'
       }))
     })
   } catch (error) {

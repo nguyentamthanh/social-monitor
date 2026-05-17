@@ -1,3 +1,1 @@
-import { googleAdapter } from './index'
-
-export { googleAdapter }
+export { googleAdapter } from './index'

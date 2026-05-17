@@ -144,7 +144,7 @@ export default function KeywordsPage() {
           <Table
             columns={columns}
             dataSource={keywords}
-            rowKey="_id"
+            rowKey="id"
             pagination={{ pageSize: 10 }}
           />
 

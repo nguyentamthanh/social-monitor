@@ -1,3 +1,1 @@
-import { facebookAdapter } from './index'
-
-export { facebookAdapter }
+export { facebookAdapter } from './index'

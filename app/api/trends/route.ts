@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { connectDB } from '@/lib/mongodb'
-import { TrendData } from '@/lib/models/TrendData'
-import { Keyword } from '@/lib/models/Keyword'
+import { findTrendsByKeywordIds } from '@/lib/models/TrendData'
+import { findKeywordsByUserId } from '@/lib/models/Keyword'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,50 +18,29 @@ export async function GET(request: NextRequest) {
     const platform = searchParams.get('platform')
     const days = parseInt(searchParams.get('days') || '30')
 
-    await connectDB()
-
     const userId = (session.user as any).id || session.user?.email
 
-    const keywordQuery: any = { userId }
-    if (keywordId) {
-      keywordQuery._id = keywordId
-    }
+    const keywords = await findKeywordsByUserId(userId)
+    const keywordIds = keywords.map(k => k.id)
 
-    const keywords = await Keyword.find(keywordQuery)
-    const keywordIds = keywords.map(k => k._id.toString())
+    if (keywordIds.length === 0) {
+      return NextResponse.json([])
+    }
 
     const dateFrom = new Date()
     dateFrom.setDate(dateFrom.getDate() - days)
 
-    const query: any = {
-      keywordId: { $in: keywordIds },
-      date: { $gte: dateFrom }
-    }
-
-    if (platform) {
-      query.platform = platform
-    }
-
-    const trends = await TrendData.aggregate([
-      { $match: query },
-      {
-        $group: {
-          _id: {
-            date: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
-            platform: '$platform'
-          },
-          totalMentions: { $sum: '$mentionCount' },
-          totalEngagement: { $sum: '$engagement' }
-        }
-      },
-      { $sort: { '_id.date': 1 } }
-    ])
+    const trends = await findTrendsByKeywordIds(
+      keywordIds,
+      platform || undefined,
+      dateFrom
+    )
 
     const formattedTrends = trends.map(t => ({
-      date: t._id.date,
-      platform: t._id.platform,
-      mentionCount: t.totalMentions,
-      engagement: t.totalEngagement
+      date: t.date,
+      platform: t.platform,
+      mentionCount: t.mention_count,
+      engagement: t.engagement
     }))
 
     return NextResponse.json(formattedTrends)

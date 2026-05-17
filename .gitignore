@@ -1,3 +1,12 @@
 node_modules
 .next
 .env*.local
+public/uploads
+tsconfig.tsbuildinfo
+
+.vercel
+
+.omc/
+.playwright-cli/
+scripts/seed-admin.ts
+scripts/check-db.ts
