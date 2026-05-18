@@ -14,6 +14,7 @@ import {
   WarningOutlined,
   FileSearchOutlined,
   LinkOutlined,
+  SearchOutlined,
   SafetyCertificateOutlined
 } from '@ant-design/icons'
 import { useRouter, usePathname } from 'next/navigation'
@@ -45,6 +46,7 @@ export default function Sidebar() {
     { key: '/findings', icon: <WarningOutlined />, label: t('nav.findings') },
     { key: '/text-check', icon: <FileSearchOutlined />, label: t('nav.textCheck') },
     { key: '/url-check', icon: <LinkOutlined />, label: t('nav.urlCheck') },
+    { key: '/find-copies', icon: <SearchOutlined />, label: t('nav.findCopies') },
     { key: '/keywords', icon: <TagsOutlined />, label: t('nav.keywords') },
     { key: '/mentions', icon: <MessageOutlined />, label: t('nav.mentions') },
     { key: '/trends', icon: <LineChartOutlined />, label: t('nav.trends') },
