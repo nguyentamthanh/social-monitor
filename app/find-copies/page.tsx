@@ -51,7 +51,7 @@ interface BatchEntry {
   error?: string
 }
 
-const MAX_URLS = 2
+const MAX_URLS = 5
 const SAMPLE_URLS = [
   'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   'https://www.youtube.com/watch?v=9bZkp7q19f0'
@@ -92,27 +92,27 @@ export default function FindCopiesPage() {
     const initial: BatchEntry[] = urls.map(url => ({ url, status: 'pending' }))
     setEntries(initial)
 
-    const results = await Promise.all(
-      urls.map(async (url): Promise<BatchEntry> => {
-        try {
-          const res = await fetch('/api/find-copies', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url })
-          })
-          const data = await res.json()
-          if (!res.ok) {
-            return { url, status: 'error', error: data.message || data.error || 'Lỗi' }
-          }
-          return { url, status: 'success', data }
-        } catch (err) {
-          const msg = err instanceof Error ? err.message : 'Network error'
-          return { url, status: 'error', error: msg }
+    const results: BatchEntry[] = [...initial]
+    for (let i = 0; i < urls.length; i++) {
+      try {
+        const res = await fetch('/api/find-copies', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: urls[i] })
+        })
+        const data = await res.json()
+        if (!res.ok) {
+          results[i] = { url: urls[i], status: 'error', error: data.message || data.error || 'Lỗi' }
+        } else {
+          results[i] = { url: urls[i], status: 'success', data }
         }
-      })
-    )
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Network error'
+        results[i] = { url: urls[i], status: 'error', error: msg }
+      }
+      setEntries([...results])
+    }
 
-    setEntries(results)
     setLoading(false)
 
     const totalMatches = results.reduce((sum, r) => sum + (r.data?.candidates.length || 0), 0)
@@ -172,7 +172,7 @@ export default function FindCopiesPage() {
             <div style={{ marginTop: 16, color: '#71717a', fontSize: 12, lineHeight: 1.6 }}>
               <div>{t('findCopies.help')}</div>
               <div style={{ marginTop: 6 }}>
-                Mỗi link tốn ~101 unit. Check {MAX_URLS} link/lần = {MAX_URLS * 101} unit / 10,000 free quota.
+                Tối đa {MAX_URLS} link/lần, chạy tuần tự (queue). Tốn {MAX_URLS * 101} unit / 10,000 free quota. Mất ~{MAX_URLS * 10}s tổng.
               </div>
             </div>
           </div>
