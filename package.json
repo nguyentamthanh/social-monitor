@@ -2,11 +2,11 @@
   "name": "social-monitor",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "bun@1.3.13",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test:copyright": "tsx --test scripts/copyright-scoring.test.ts"
   },

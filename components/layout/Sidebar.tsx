@@ -13,6 +13,7 @@ import {
   SecurityScanOutlined,
   WarningOutlined,
   FileSearchOutlined,
+  LinkOutlined,
   SafetyCertificateOutlined
 } from '@ant-design/icons'
 import { useRouter, usePathname } from 'next/navigation'
@@ -43,6 +44,7 @@ export default function Sidebar() {
     { key: '/scans', icon: <SecurityScanOutlined />, label: t('nav.scans') },
     { key: '/findings', icon: <WarningOutlined />, label: t('nav.findings') },
     { key: '/text-check', icon: <FileSearchOutlined />, label: t('nav.textCheck') },
+    { key: '/url-check', icon: <LinkOutlined />, label: t('nav.urlCheck') },
     { key: '/keywords', icon: <TagsOutlined />, label: t('nav.keywords') },
     { key: '/mentions', icon: <MessageOutlined />, label: t('nav.mentions') },
     { key: '/trends', icon: <LineChartOutlined />, label: t('nav.trends') },

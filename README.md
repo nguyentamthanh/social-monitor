@@ -23,10 +23,10 @@ Stack: Next.js 16 · React 19 · Neon Postgres · NextAuth · Ant Design · Type
 ## Setup local
 
 ```bash
-npm install
+bun install
 cp .env.example .env.local
 # Điền NEON_DATABASE_URL, NEXTAUTH_SECRET, NEXTAUTH_URL=http://localhost:3000
-npm run dev
+bun run dev
 ```
 
 Mở http://localhost:3000.
@@ -94,10 +94,9 @@ lib/
 ## Testing
 
 ```bash
-npm run test:copyright   # Scoring unit tests
-npm run typecheck        # tsc --noEmit
-npm run lint             # next lint
-npm run build            # next build
+bun run test:copyright   # Scoring unit tests
+bun run typecheck        # tsc --noEmit
+bun run build            # next build
 ```
 
 ## Notes

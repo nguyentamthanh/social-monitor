@@ -3,6 +3,9 @@ node_modules
 .env*.local
 public/uploads
 tsconfig.tsbuildinfo
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
 .vercel
 
