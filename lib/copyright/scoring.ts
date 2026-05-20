@@ -33,6 +33,12 @@ export function scoreCandidate(asset: BrandAsset, candidate: RawCandidate): Scor
 
   if (assetName && candidateText.includes(assetName)) {
     reasons.push(reason('brand_name_match', 35))
+  } else if (assetName) {
+    // Fuzzy fallback: bigram Jaccard between asset name and candidate text
+    const sim = textSimilarity(assetName, candidateText)
+    if (sim >= 0.4) {
+      reasons.push(reason('brand_name_match', Math.max(15, Math.round(30 * sim))))
+    }
   }
 
   const keywordHits = keywords.filter(keyword => candidateText.includes(keyword))

@@ -11,7 +11,7 @@ import { createNotification } from '@/lib/models/Notification'
 import { ConnectorStatus, Platform, ScanRun } from '@/types'
 
 const DEFAULT_PLATFORMS: Platform[] = ['youtube', 'google', 'facebook', 'tiktok']
-const MIN_FINDING_SCORE = 30
+const MIN_FINDING_SCORE = 22
 
 export async function runCopyrightScan(input: {
   userId: string

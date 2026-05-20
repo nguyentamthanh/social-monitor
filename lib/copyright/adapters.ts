@@ -8,11 +8,49 @@ interface CopyrightAdapter {
   search(asset: BrandAsset): Promise<RawCandidate[]>
 }
 
+// Strip common YouTube/MV decorations so the search query is broad enough
+// to surface re-uploads, covers, lyric videos, reactions, etc.
+function trimDecorations(name: string): string {
+  return name
+    .replace(/\(([^)]*)\)/g, ' ')           // (Official MV), (Lyrics)
+    .replace(/\[([^\]]*)\]/g, ' ')          // [OFFICIAL], [HD]
+    .replace(/\|[^|]*$/g, ' ')              // strip trailing "| Official MV"
+    .replace(/\b(official\s+mv|official\s+(music\s+)?video|lyrics?\s+video|audio\s+only|hd|4k|mv|m\/v)\b/gi, ' ')
+    .replace(/\bft\.?\s+[^|\-–]+/gi, ' ')   // ft. Snoop Dogg
+    .replace(/\bfeat\.?\s+[^|\-–]+/gi, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+}
+
 function queryForAsset(asset: BrandAsset): string {
   if (asset.asset_type === 'audio') {
     return buildAudioQuery(asset)
   }
-  return [asset.name, ...asset.keywords].filter(Boolean).join(' ')
+  const cleaned = trimDecorations(asset.name || '')
+  const base = cleaned || asset.name || ''
+  return [base, ...asset.keywords].filter(Boolean).join(' ').slice(0, 120)
+}
+
+// Multi-query expansion: generate variants to maximize re-upload coverage.
+// Each YouTube search call costs ~100 quota units — keep total ≤ 6 queries.
+function buildYoutubeQueries(asset: BrandAsset): string[] {
+  if (asset.asset_type === 'audio') {
+    return [buildAudioQuery(asset)]
+  }
+  const cleaned = trimDecorations(asset.name || '') || asset.name || ''
+  const base = cleaned.trim()
+  if (!base) return [queryForAsset(asset)]
+
+  const queries = new Set<string>()
+  queries.add(base)
+  // Variants targeting common re-upload categories
+  for (const suffix of ['cover', 'karaoke', 'remix', 'lyrics', 'live']) {
+    queries.add(`${base} ${suffix}`)
+  }
+  // Add keywords-only query if user explicitly tracks keywords distinct from name
+  const kw = asset.keywords.filter(k => k && !base.toLowerCase().includes(k.toLowerCase())).join(' ')
+  if (kw) queries.add(kw)
+  return Array.from(queries).slice(0, 6)
 }
 
 const youtubeAdapter: CopyrightAdapter = {
@@ -30,34 +68,39 @@ const youtubeAdapter: CopyrightAdapter = {
     if (status.capability !== 'ready') return []
 
     const apiKey = process.env.YOUTUBE_API_KEY!
-    const params = new URLSearchParams({
-      part: 'snippet',
-      type: 'video',
-      maxResults: '10',
-      q: queryForAsset(asset),
-      key: apiKey
-    })
-
-    // For audio assets, scope to Music category
-    if (asset.asset_type === 'audio') {
-      params.set('videoCategoryId', '10')
-    }
-
-    const response = await fetch(`https://www.googleapis.com/youtube/v3/search?${params}`)
-    if (!response.ok) {
-      throw new Error(`YouTube API error: ${response.status}`)
-    }
-
-    const data = await response.json()
-    const items = Array.isArray(data.items) ? data.items : []
+    const queries = buildYoutubeQueries(asset)
+    const seenVideoIds = new Set<string>()
     const candidates: RawCandidate[] = []
 
-    for (const item of items) {
+    // Run query variants in parallel for speed
+    const responses = await Promise.all(queries.map(async (q) => {
+      const params = new URLSearchParams({
+        part: 'snippet',
+        type: 'video',
+        maxResults: '15',
+        q,
+        key: apiKey
+      })
+      if (asset.asset_type === 'audio') params.set('videoCategoryId', '10')
+      try {
+        const res = await fetch(`https://www.googleapis.com/youtube/v3/search?${params}`)
+        if (!res.ok) return []
+        const data = await res.json()
+        return Array.isArray(data.items) ? data.items : []
+      } catch {
+        return []
+      }
+    }))
+
+    const allItems = responses.flat()
+
+    for (const item of allItems) {
       const videoId = item.id?.videoId
+      if (videoId && seenVideoIds.has(videoId)) continue
+      if (videoId) seenVideoIds.add(videoId)
+
       const thumbnailUrl = item.snippet?.thumbnails?.high?.url || item.snippet?.thumbnails?.default?.url
       let perceptualHash: string | undefined
-
-      // Compute pHash for thumbnails when matching image/video/logo assets
       if (thumbnailUrl && ['image', 'logo', 'video'].includes(asset.asset_type) && asset.perceptual_hash) {
         const hash = await computePHashFromUrl(thumbnailUrl)
         if (hash) perceptualHash = hash
