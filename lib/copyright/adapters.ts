@@ -234,33 +234,195 @@ const googleAdapter: CopyrightAdapter = {
   }
 }
 
-const facebookAdapter: CopyrightAdapter = {
-  platform: 'facebook',
-  status() {
-    return limited(
-      'facebook',
-      'access_required',
-      'Meta public content search cần app review hoặc Content Library API'
-    )
-  },
-  async search() {
-    return []
+function formatDateUTC(date: Date): string {
+  const y = date.getUTCFullYear()
+  const m = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const d = String(date.getUTCDate()).padStart(2, '0')
+  return `${y}${m}${d}`
+}
+
+const SEA_REGION_CODES = ['VN', 'TH', 'ID', 'PH', 'MY', 'SG']
+
+function createTikTokResearchAdapter(getToken: () => string): CopyrightAdapter {
+  return {
+    platform: 'tiktok',
+    status() {
+      const token = getToken()
+      if (!token || token === 'your_tiktok_access_token_here') {
+        return limited('tiktok', 'config_missing', 'Chưa cấu hình TIKTOK_ACCESS_TOKEN (TikTok Research API)')
+      }
+      return ready('tiktok', 'TikTok Research API đã sẵn sàng')
+    },
+    async search(asset) {
+      const status = this.status()
+      if (status.capability !== 'ready') return []
+
+      const token = getToken()
+      const keyword = queryForAsset(asset).trim()
+      if (!keyword) return []
+
+      // Research API giới hạn end_date - start_date ≤ 30 ngày.
+      const end = new Date()
+      const start = new Date(Date.now() - 29 * 24 * 60 * 60 * 1000)
+
+      const fields = [
+        'id',
+        'video_description',
+        'create_time',
+        'username',
+        'region_code',
+        'share_count',
+        'view_count',
+        'like_count',
+        'comment_count',
+        'hashtag_names',
+        'music_id'
+      ].join(',')
+
+      const body = {
+        query: {
+          and: [
+            { operation: 'IN', field_name: 'region_code', field_values: SEA_REGION_CODES },
+            { operation: 'EQ', field_name: 'keyword', field_values: [keyword] }
+          ]
+        },
+        max_count: 30,
+        cursor: 0,
+        start_date: formatDateUTC(start),
+        end_date: formatDateUTC(end),
+        is_random: false
+      }
+
+      const res = await fetch(`https://open.tiktokapis.com/v2/research/video/query/?fields=${encodeURIComponent(fields)}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      })
+
+      if (!res.ok) {
+        throw new Error(`TikTok Research API error: ${res.status}`)
+      }
+
+      const data = await res.json()
+      const videos: any[] = Array.isArray(data?.data?.videos) ? data.data.videos : []
+
+      const candidates: RawCandidate[] = []
+      for (const video of videos) {
+        const id = String(video.id ?? video.video_id ?? '').trim()
+        if (!id) continue
+        const username = String(video.username ?? '').trim()
+        const desc = String(video.video_description ?? '').trim()
+        const createTime = Number(video.create_time ?? 0)
+
+        candidates.push({
+          platform: 'tiktok',
+          source: 'tiktok_research_api',
+          externalId: id,
+          title: desc.slice(0, 140) || 'TikTok video',
+          content: desc,
+          url: username ? `https://www.tiktok.com/@${username}/video/${id}` : `https://www.tiktok.com`,
+          author: {
+            id: username || 'unknown',
+            name: username || 'TikTok',
+            handle: username ? `@${username}` : 'tiktok'
+          },
+          publishedAt: createTime ? new Date(createTime * 1000) : null,
+          metadata: {
+            region_code: video.region_code,
+            like_count: video.like_count,
+            view_count: video.view_count,
+            share_count: video.share_count,
+            comment_count: video.comment_count,
+            hashtag_names: video.hashtag_names,
+            music_id: video.music_id
+          }
+        })
+      }
+
+      return candidates
+    }
   }
 }
 
-const tiktokAdapter: CopyrightAdapter = {
-  platform: 'tiktok',
-  status() {
-    return limited(
-      'tiktok',
-      'access_required',
-      'TikTok public video search cần Research API/VCE access'
-    )
-  },
-  async search() {
-    return []
+// Export cho unit test (inject token)
+export function createTikTokResearchAdapterForTest(getToken: () => string): CopyrightAdapter {
+  return createTikTokResearchAdapter(getToken)
+}
+
+function googleSiteSearchAdapter(
+  platform: Platform,
+  site: string,
+  readyMessage: string
+): CopyrightAdapter {
+  return {
+    platform,
+    status() {
+      const apiKey = process.env.GOOGLE_SEARCH_API_KEY || process.env.GOOGLE_API_KEY || ''
+      const engineId = process.env.GOOGLE_SEARCH_ENGINE_ID || ''
+      if (!apiKey || !engineId) {
+        return limited(platform, 'config_missing', `Cần GOOGLE_SEARCH_API_KEY + GOOGLE_SEARCH_ENGINE_ID để quét ${site}`)
+      }
+      return ready(platform, readyMessage)
+    },
+    async search(asset) {
+      const apiKey = process.env.GOOGLE_SEARCH_API_KEY || process.env.GOOGLE_API_KEY!
+      const engineId = process.env.GOOGLE_SEARCH_ENGINE_ID!
+      const q = queryForAsset(asset)
+
+      const params = new URLSearchParams({
+        key: apiKey,
+        cx: engineId,
+        num: '10',
+        q,
+        siteSearch: site,
+        siteSearchFilter: 'i'
+      })
+
+      let data: any
+      try {
+        const res = await fetch(`https://www.googleapis.com/customsearch/v1?${params}`)
+        if (!res.ok) return []
+        data = await res.json()
+      } catch {
+        return []
+      }
+
+      const items: any[] = Array.isArray(data.items) ? data.items : []
+      return items.map(item => ({
+        platform,
+        source: `${platform}_via_google_search`,
+        externalId: item.cacheId || item.link || crypto.randomUUID(),
+        title: item.title || '',
+        content: item.snippet || '',
+        url: item.link || '',
+        author: {
+          id: item.displayLink || platform,
+          name: item.displayLink || platform,
+          handle: item.displayLink || platform
+        },
+        publishedAt: null,
+        metadata: { displayLink: item.displayLink, formattedUrl: item.formattedUrl },
+        media: {
+          thumbnailUrl:
+            item.pagemap?.cse_thumbnail?.[0]?.src ||
+            item.pagemap?.cse_image?.[0]?.src ||
+            undefined
+        }
+      }))
+    }
   }
 }
+
+const facebookAdapter: CopyrightAdapter = googleSiteSearchAdapter(
+  'facebook',
+  'facebook.com',
+  'Facebook search qua Google Custom Search đã sẵn sàng'
+)
+
+const tiktokAdapter: CopyrightAdapter = createTikTokResearchAdapter(() => process.env.TIKTOK_ACCESS_TOKEN || '')
 
 export const copyrightAdapters: Record<Platform, CopyrightAdapter> = {
   facebook: facebookAdapter,

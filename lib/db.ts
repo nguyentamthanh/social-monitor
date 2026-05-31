@@ -169,6 +169,15 @@ export async function initializeDatabase(): Promise<void> {
     await query(`CREATE INDEX IF NOT EXISTS idx_evidence_items_finding_id ON evidence_items(finding_id)`)
     await query(`CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id, created_at DESC)`)
 
+    await query(`
+      CREATE TABLE IF NOT EXISTS extension_api_keys (
+        key_hash VARCHAR PRIMARY KEY,
+        user_id VARCHAR NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `)
+    await query(`CREATE INDEX IF NOT EXISTS idx_extension_api_keys_user_id ON extension_api_keys(user_id)`)
+
     initialized = true
   })()
 

@@ -7,7 +7,7 @@ import { YouTubeLookupError } from '@/lib/copyright/youtubeVideoLookup'
 import { findCopies } from '@/lib/copyright/findCopies'
 
 export const dynamic = 'force-dynamic'
-export const maxDuration = 60
+export const maxDuration = 300
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json().catch(() => ({}))
     const rawUrl: string = typeof body.url === 'string' ? body.url : ''
+    const deepMediaCheck = body.deepMediaCheck === true
 
     const videoId = extractYouTubeVideoId(rawUrl)
     if (!videoId) {
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const result = await findCopies(videoId)
+    const result = await findCopies(videoId, { deepMediaCheck })
     return NextResponse.json(result)
   } catch (error) {
     if (error instanceof YouTubeLookupError) {

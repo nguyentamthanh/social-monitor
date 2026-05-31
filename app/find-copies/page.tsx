@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Layout, Input, Button, Spin, Empty, Tag, message } from 'antd'
+import { Layout, Input, Button, Spin, Empty, Tag, message, Checkbox } from 'antd'
 import { SearchOutlined, LinkOutlined, YoutubeOutlined } from '@ant-design/icons'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
@@ -27,6 +27,23 @@ interface Candidate {
   publishedAt: string | null
   riskScore: number
   reasons: Reason[]
+  mediaCheck?: {
+    available: boolean
+    skippedReason?: string
+    audio?: {
+      checked: boolean
+      similarity: number
+      matched: boolean
+      skippedReason?: string
+    }
+    video?: {
+      checked: boolean
+      bestFrameSimilarity: number
+      matched: boolean
+      matchedFrames: number
+      skippedReason?: string
+    }
+  }
 }
 
 interface FindCopiesResponse {
@@ -41,6 +58,9 @@ interface FindCopiesResponse {
   candidates: Candidate[]
   searched: number
   transcriptChecked: number
+  mediaChecked: number
+  mediaCheckEnabled: boolean
+  mediaCheckStatus?: string
   query: string
 }
 
@@ -62,6 +82,7 @@ export default function FindCopiesPage() {
   const router = useRouter()
   const { t } = useTranslation()
   const [urlsText, setUrlsText] = useState('')
+  const [deepMediaCheck, setDeepMediaCheck] = useState(false)
   const [loading, setLoading] = useState(false)
   const [entries, setEntries] = useState<BatchEntry[]>([])
 
@@ -98,7 +119,7 @@ export default function FindCopiesPage() {
         const res = await fetch('/api/find-copies', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: urls[i] })
+          body: JSON.stringify({ url: urls[i], deepMediaCheck })
         })
         const data = await res.json()
         if (!res.ok) {
@@ -169,11 +190,25 @@ export default function FindCopiesPage() {
               {t('findCopies.run')}
             </Button>
 
+            <Checkbox
+              checked={deepMediaCheck}
+              onChange={(event) => setDeepMediaCheck(event.target.checked)}
+              disabled={loading}
+              style={{ marginTop: 12, color: '#d4d4d8' }}
+            >
+              Deep check âm thanh + frame video
+            </Checkbox>
+
             <div style={{ marginTop: 16, color: '#71717a', fontSize: 12, lineHeight: 1.6 }}>
               <div>{t('findCopies.help')}</div>
               <div style={{ marginTop: 6 }}>
                 Tối đa {MAX_URLS} link/lần, chạy tuần tự (queue). Tốn {MAX_URLS * 101} unit / 10,000 free quota. Mất ~{MAX_URLS * 10}s tổng.
               </div>
+              {deepMediaCheck && (
+                <div style={{ marginTop: 6, color: '#fbbf24' }}>
+                  Deep check cần yt-dlp, ffmpeg và fpcalc trên server; thời gian chạy sẽ lâu hơn.
+                </div>
+              )}
             </div>
           </div>
 
@@ -272,10 +307,16 @@ function BatchEntryView({
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
               <Tag>Quét {data.searched}</Tag>
               <Tag>Transcript {data.transcriptChecked}</Tag>
+              {data.mediaCheckEnabled && <Tag>Media {data.mediaChecked}</Tag>}
               <Tag style={{ background: 'rgba(139, 92, 246, 0.15)', color: '#c4b5fd' }}>
                 {data.candidates.length} reup
               </Tag>
             </div>
+            {data.mediaCheckStatus && (
+              <div style={{ color: '#fbbf24', fontSize: 12, marginTop: 8 }}>
+                {data.mediaCheckStatus}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -344,6 +385,21 @@ function BatchEntryView({
                       {r.label} {r.points >= 0 ? `+${r.points}` : r.points}
                     </Tag>
                   ))}
+                  {c.mediaCheck?.audio?.checked && (
+                    <Tag style={{ fontSize: 10, background: 'rgba(16, 185, 129, 0.1)', color: '#86efac' }}>
+                      Audio {(c.mediaCheck.audio.similarity * 100).toFixed(0)}%
+                    </Tag>
+                  )}
+                  {c.mediaCheck?.video?.checked && (
+                    <Tag style={{ fontSize: 10, background: 'rgba(59, 130, 246, 0.1)', color: '#93c5fd' }}>
+                      Frame {(c.mediaCheck.video.bestFrameSimilarity * 100).toFixed(0)}% · {c.mediaCheck.video.matchedFrames} frame
+                    </Tag>
+                  )}
+                  {c.mediaCheck && !c.mediaCheck.available && (
+                    <Tag style={{ fontSize: 10, background: 'rgba(251, 191, 36, 0.1)', color: '#fde68a' }}>
+                      Media unavailable
+                    </Tag>
+                  )}
                 </div>
               </div>
             </div>

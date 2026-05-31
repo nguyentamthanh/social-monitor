@@ -1,0 +1,225 @@
+$ next dev --hostname "127.0.0.1" --port "3001"
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+(node:27876) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[browser] Warning: [antd: message] Static function can not consume context like dynamic theme. Please use 'App' component instead. 
+    at runQuickScan (app/scans/page.tsx:233:15)
+  231 |       setQuickFindings(data.findings || [])
+  232 |       setScanProgress({ status: 'completed', findings: data.findingsCreated || 0 })
+> 233 |       message.success(`Hoàn tất: ${data.findingsCreated || 0} kết quả nghi vấn`)
+      |               ^
+  234 |     } catch (err: any) {
+  235 |       message.error(err?.message || 'Quét thất bại')
+  236 |       setScanProgress({ status: 'failed', findings: 0 }) (app/scans/page.tsx:233:15)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[browser] Error restoring session i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161) (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:4:10741)
+[browser] ⨯ unhandledRejection: i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161)
+[browser] Warning: [antd: message] Static function can not consume context like dynamic theme. Please use 'App' component instead. 
+    at runQuickScan (app/scans/page.tsx:236:15)
+  234 |       setQuickScanMeta(data)
+  235 |       setScanProgress({ status: 'completed', findings: data.findingsCreated || 0 })
+> 236 |       message.success(`Hoàn tất: ${data.findingsCreated || 0} kết quả nghi vấn`)
+      |               ^
+  237 |     } catch (err: any) {
+  238 |       message.error(err?.message || 'Quét thất bại')
+  239 |       setScanProgress({ status: 'failed', findings: 0 }) (app/scans/page.tsx:236:15)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[browser] Error restoring session i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161) (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:4:10741)
+[browser] ⨯ unhandledRejection: i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161)
+[browser] Error restoring session i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161) (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:4:10741)
+[browser] ⨯ unhandledRejection: i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161)
+[browser] Warning: [antd: message] Static function can not consume context like dynamic theme. Please use 'App' component instead. 
+    at runQuickScan (file://C:/Users/ADMIN/Desktop/social-monitor/.next/dev/static/chunks/_0g7b_-8._.js:1463:208) (file://C:/Users/ADMIN/Desktop/social-monitor/.next/dev/static/chunks/_0g7b_-8._.js:1463:208)
+[browser] Error restoring session i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161) (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:4:10741)
+[browser] ⨯ unhandledRejection: i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161)
+[browser] Error restoring session i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161) (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:4:10741)
+[browser] ⨯ unhandledRejection: i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[browser] Warning: [antd: message] Static function can not consume context like dynamic theme. Please use 'App' component instead. 
+    at runQuickScan (app/scans/page.tsx:212:15)
+  210 |       setQuickScanMeta(data)
+  211 |       setScanProgress({ status: 'completed', findings: data.findingsCreated || 0 })
+> 212 |       message.success(`Hoàn tất: ${data.findingsCreated || 0} kết quả nghi vấn`)
+      |               ^
+  213 |     } catch (err: any) {
+  214 |       message.error(err?.message || 'Quét thất bại')
+  215 |       setScanProgress({ status: 'failed', findings: 0 }) (app/scans/page.tsx:212:15)
+[browser] Error restoring session i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161) (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:4:10741)
+[browser] ⨯ unhandledRejection: i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161)
+[browser] Warning: [antd: message] Static function can not consume context like dynamic theme. Please use 'App' component instead. 
+    at typeOpen (file://C:/Users/ADMIN/Desktop/social-monitor/.next/dev/static/chunks/node_modules_antd_es_0~palw4._.js:12284:201)
+    at staticMethods.<computed> [as success] (file://C:/Users/ADMIN/Desktop/social-monitor/.next/dev/static/chunks/node_modules_antd_es_0~palw4._.js:12333:38)
+    at runQuickScan (app/scans/page.tsx:232:15)
+  230 |       setQuickScanMeta(data)
+  231 |       setScanProgress({ status: 'completed', findings: data.findingsCreated || 0 })
+> 232 |       message.success(`Hoàn tất: ${data.findingsCreated || 0} kết quả nghi vấn`)
+      |               ^
+  233 |     } catch (err: any) {
+  234 |       message.error(err?.message || 'Quét thất bại')
+  235 |       setScanProgress({ status: 'failed', findings: 0 }) (file://C:/Users/ADMIN/Desktop/social-monitor/.next/dev/static/chunks/node_modules_antd_es_0~palw4._.js:12284:201)
+[browser] Warning: [antd: message] Static function can not consume context like dynamic theme. Please use 'App' component instead. 
+    at runQuickScan (app/scans/page.tsx:232:15)
+  230 |       setQuickScanMeta(data)
+  231 |       setScanProgress({ status: 'completed', findings: data.findingsCreated || 0 })
+> 232 |       message.success(`Hoàn tất: ${data.findingsCreated || 0} kết quả nghi vấn`)
+      |               ^
+  233 |     } catch (err: any) {
+  234 |       message.error(err?.message || 'Quét thất bại')
+  235 |       setScanProgress({ status: 'failed', findings: 0 }) (app/scans/page.tsx:232:15)
+[browser] Error restoring session i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161) (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:4:10741)
+[browser] ⨯ unhandledRejection: i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161)
+[browser] Error restoring session i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161) (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:4:10741)
+[browser] ⨯ unhandledRejection: i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161)
+[browser] Error restoring session i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161) (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:4:10741)
+[browser] ⨯ unhandledRejection: i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161)
+[browser] Warning: [antd: message] Static function can not consume context like dynamic theme. Please use 'App' component instead. 
+    at runQuickScan (app/scans/page.tsx:232:15)
+  230 |       setQuickScanMeta(data)
+  231 |       setScanProgress({ status: 'completed', findings: data.findingsCreated || 0 })
+> 232 |       message.success(`Hoàn tất: ${data.findingsCreated || 0} kết quả nghi vấn`)
+      |               ^
+  233 |     } catch (err: any) {
+  234 |       message.error(err?.message || 'Quét thất bại')
+  235 |       setScanProgress({ status: 'failed', findings: 0 }) (app/scans/page.tsx:232:15)
+[browser] Error restoring session i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161) (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:4:10741)
+[browser] ⨯ unhandledRejection: i: Failed to connect to MetaMask
+    at Object.connect (chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js:7:81161)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+Notifications GET error: Error: getaddrinfo ENOTFOUND ep-mute-unit-a10c54ic-pooler.ap-southeast-1.aws.neon.tech
+    at async query (lib\neon.ts:17:18)
+    at async listNotifications (lib\models\Notification.ts:27:17)
+    at async GET (app\api\notifications\route.ts:17:18)
+  15 |
+  16 | export async function query<T = any>(text: string, params?: any[]): Promise<T[]> {
+> 17 |   const result = await pool.query(text, params)
+     |                  ^
+  18 |   return result.rows as T[]
+  19 | }
+  20 | {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'ep-mute-unit-a10c54ic-pooler.ap-southeast-1.aws.neon.tech'
+}
+Notifications GET error: Error: getaddrinfo ENOTFOUND ep-mute-unit-a10c54ic-pooler.ap-southeast-1.aws.neon.tech
+    at async query (lib\neon.ts:17:18)
+    at async listNotifications (lib\models\Notification.ts:27:17)
+    at async GET (app\api\notifications\route.ts:17:18)
+  15 |
+  16 | export async function query<T = any>(text: string, params?: any[]): Promise<T[]> {
+> 17 |   const result = await pool.query(text, params)
+     |                  ^
+  18 |   return result.rows as T[]
+  19 | }
+  20 | {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'ep-mute-unit-a10c54ic-pooler.ap-southeast-1.aws.neon.tech'
+}
+Notifications GET error: Error: getaddrinfo ENOTFOUND ep-mute-unit-a10c54ic-pooler.ap-southeast-1.aws.neon.tech
+    at async query (lib\neon.ts:17:18)
+    at async listNotifications (lib\models\Notification.ts:27:17)
+    at async GET (app\api\notifications\route.ts:17:18)
+  15 |
+  16 | export async function query<T = any>(text: string, params?: any[]): Promise<T[]> {
+> 17 |   const result = await pool.query(text, params)
+     |                  ^
+  18 |   return result.rows as T[]
+  19 | }
+  20 | {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'ep-mute-unit-a10c54ic-pooler.ap-southeast-1.aws.neon.tech'
+}
+Notifications GET error: Error: getaddrinfo ENOTFOUND ep-mute-unit-a10c54ic-pooler.ap-southeast-1.aws.neon.tech
+    at async query (lib\neon.ts:17:18)
+    at async listNotifications (lib\models\Notification.ts:27:17)
+    at async GET (app\api\notifications\route.ts:17:18)
+  15 |
+  16 | export async function query<T = any>(text: string, params?: any[]): Promise<T[]> {
+> 17 |   const result = await pool.query(text, params)
+     |                  ^
+  18 |   return result.rows as T[]
+  19 | }
+  20 | {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'ep-mute-unit-a10c54ic-pooler.ap-southeast-1.aws.neon.tech'
+}
+Notifications GET error: Error: getaddrinfo ENOTFOUND ep-mute-unit-a10c54ic-pooler.ap-southeast-1.aws.neon.tech
+    at async query (lib\neon.ts:17:18)
+    at async listNotifications (lib\models\Notification.ts:27:17)
+    at async GET (app\api\notifications\route.ts:17:18)
+  15 |
+  16 | export async function query<T = any>(text: string, params?: any[]): Promise<T[]> {
+> 17 |   const result = await pool.query(text, params)
+     |                  ^
+  18 |   return result.rows as T[]
+  19 | }
+  20 | {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'ep-mute-unit-a10c54ic-pooler.ap-southeast-1.aws.neon.tech'
+}
+Notifications GET error: Error: getaddrinfo ENOTFOUND ep-mute-unit-a10c54ic-pooler.ap-southeast-1.aws.neon.tech
+    at async query (lib\neon.ts:17:18)
+    at async listNotifications (lib\models\Notification.ts:27:17)
+    at async GET (app\api\notifications\route.ts:17:18)
+  15 |
+  16 | export async function query<T = any>(text: string, params?: any[]): Promise<T[]> {
+> 17 |   const result = await pool.query(text, params)
+     |                  ^
+  18 |   return result.rows as T[]
+  19 | }
+  20 | {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'ep-mute-unit-a10c54ic-pooler.ap-southeast-1.aws.neon.tech'
+}
+Notifications GET error: Error: getaddrinfo ENOTFOUND ep-mute-unit-a10c54ic-pooler.ap-southeast-1.aws.neon.tech
+    at async query (lib\neon.ts:17:18)
+    at async listNotifications (lib\models\Notification.ts:27:17)
+    at async GET (app\api\notifications\route.ts:17:18)
+  15 |
+  16 | export async function query<T = any>(text: string, params?: any[]): Promise<T[]> {
+> 17 |   const result = await pool.query(text, params)
+     |                  ^
+  18 |   return result.rows as T[]
+  19 | }
+  20 | {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'ep-mute-unit-a10c54ic-pooler.ap-southeast-1.aws.neon.tech'
+}

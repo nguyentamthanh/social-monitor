@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Layout, Card, Form, Input, Button, message, Switch, Tabs } from 'antd'
-import { KeyOutlined, SaveOutlined, GlobalOutlined } from '@ant-design/icons'
+import { Layout, Card, Form, Input, Button, message, Switch, Tabs, Alert, Tooltip } from 'antd'
+import { KeyOutlined, SaveOutlined, GlobalOutlined, ChromeOutlined, CopyOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/layout/Sidebar'
@@ -27,6 +27,44 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false)
   const [autoRefresh, setAutoRefresh] = useState(false)
 
+  const [extKeyState, setExtKeyState] = useState<{ hasKey: boolean; createdAt: string | null }>({ hasKey: false, createdAt: null })
+  const [extKeyPlain, setExtKeyPlain] = useState<string | null>(null)
+  const [extKeyLoading, setExtKeyLoading] = useState(false)
+
+  const loadExtKeyState = async () => {
+    const res = await fetch('/api/extension/keygen')
+    if (res.ok) setExtKeyState(await res.json())
+  }
+
+  const generateExtKey = async () => {
+    setExtKeyLoading(true)
+    setExtKeyPlain(null)
+    try {
+      const res = await fetch('/api/extension/keygen', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      setExtKeyPlain(data.key)
+      setExtKeyState({ hasKey: true, createdAt: new Date().toISOString() })
+      message.success('API key đã được tạo — hãy copy và lưu ngay!')
+    } catch {
+      message.error('Không thể tạo key')
+    } finally {
+      setExtKeyLoading(false)
+    }
+  }
+
+  const revokeExtKey = async () => {
+    setExtKeyLoading(true)
+    try {
+      await fetch('/api/extension/keygen', { method: 'DELETE' })
+      setExtKeyState({ hasKey: false, createdAt: null })
+      setExtKeyPlain(null)
+      message.success('Đã revoke API key')
+    } finally {
+      setExtKeyLoading(false)
+    }
+  }
+
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/login')
     else if (status === 'authenticated') {
@@ -34,6 +72,7 @@ export default function SettingsPage() {
         if (data?.apiKeys) form.setFieldsValue(data.apiKeys)
         if (data?.preferences?.autoRefresh !== undefined) setAutoRefresh(!!data.preferences.autoRefresh)
       })
+      loadExtKeyState()
     }
   }, [status, router, form])
 
@@ -94,6 +133,84 @@ export default function SettingsPage() {
                         {t('common.save')}
                       </Button>
                     </Form>
+                  </Card>
+                )
+              },
+              {
+                key: 'extension',
+                label: <span><ChromeOutlined /> Extension Key</span>,
+                children: (
+                  <Card>
+                    <div style={{ maxWidth: 520 }}>
+                      <h3 style={{ color: '#fafafa', fontWeight: 600, marginBottom: 6 }}>Chrome Extension API Key</h3>
+                      <p style={{ color: '#71717a', fontSize: 13, marginBottom: 20 }}>
+                        Dùng key này để kết nối Chrome Extension với tài khoản của bạn.
+                        Key chỉ hiển thị một lần — hãy lưu lại ngay sau khi tạo.
+                      </p>
+
+                      {extKeyPlain && (
+                        <Alert
+                          type="success"
+                          style={{ marginBottom: 16 }}
+                          message="Copy key này ngay — sẽ không hiển thị lại!"
+                          description={
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                              <Input
+                                value={extKeyPlain}
+                                readOnly
+                                style={{ fontFamily: 'monospace', fontSize: 12, flex: 1 }}
+                              />
+                              <Tooltip title="Copy">
+                                <Button
+                                  icon={<CopyOutlined />}
+                                  size="small"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(extKeyPlain)
+                                    message.success('Đã copy!')
+                                  }}
+                                />
+                              </Tooltip>
+                            </div>
+                          }
+                        />
+                      )}
+
+                      <div style={{ padding: 16, background: '#13131a', borderRadius: 10, marginBottom: 20 }}>
+                        {extKeyState.hasKey ? (
+                          <div>
+                            <div style={{ color: '#10b981', fontSize: 13, marginBottom: 4 }}>✓ Đã có API key đang hoạt động</div>
+                            {extKeyState.createdAt && (
+                              <div style={{ color: '#71717a', fontSize: 12 }}>
+                                Tạo lúc: {new Date(extKeyState.createdAt).toLocaleString('vi-VN')}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div style={{ color: '#71717a', fontSize: 13 }}>Chưa có API key nào.</div>
+                        )}
+                      </div>
+
+                      <div style={{ display: 'flex', gap: 10 }}>
+                        <Button
+                          type="primary"
+                          icon={extKeyState.hasKey ? <ReloadOutlined /> : <KeyOutlined />}
+                          loading={extKeyLoading}
+                          onClick={generateExtKey}
+                        >
+                          {extKeyState.hasKey ? 'Tạo key mới (revoke key cũ)' : 'Tạo API Key'}
+                        </Button>
+                        {extKeyState.hasKey && (
+                          <Button
+                            danger
+                            icon={<DeleteOutlined />}
+                            loading={extKeyLoading}
+                            onClick={revokeExtKey}
+                          >
+                            Revoke
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                   </Card>
                 )
               },

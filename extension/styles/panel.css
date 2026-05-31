@@ -1,0 +1,125 @@
+#sm-panel {
+  margin-bottom: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.sm-panel-inner {
+  background: #13131a;
+  border: 1px solid rgba(139, 92, 246, 0.22);
+  border-radius: 12px;
+  padding: 14px 16px;
+  color: #fafafa;
+}
+
+.sm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fafafa;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.sm-score {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid;
+  margin-left: auto;
+}
+
+.sm-meta {
+  font-size: 11px;
+  color: #71717a;
+  margin-bottom: 8px;
+}
+
+.sm-loading {
+  font-size: 12px;
+  color: #a1a1aa;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.sm-loading::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(139, 92, 246, 0.3);
+  border-top-color: #8b5cf6;
+  border-radius: 50%;
+  animation: sm-spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes sm-spin {
+  to { transform: rotate(360deg); }
+}
+
+.sm-clean {
+  font-size: 12px;
+  color: #10b981;
+  padding: 6px 0;
+}
+
+.sm-match {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  margin-bottom: 4px;
+  gap: 8px;
+}
+
+.sm-match-name {
+  font-size: 12px;
+  color: #e4e4e7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.sm-match-score {
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.sm-link {
+  display: block;
+  margin-top: 10px;
+  font-size: 11px;
+  color: #8b5cf6;
+  text-decoration: none;
+}
+
+.sm-link:hover {
+  color: #a78bfa;
+  text-decoration: underline;
+}
+
+.sm-warning,
+.sm-error,
+.sm-info {
+  font-size: 12px;
+  padding: 4px 0;
+}
+
+.sm-warning { color: #f59e0b; }
+.sm-error   { color: #ef4444; }
+.sm-info    { color: #a1a1aa; }
+
+.sm-warning a,
+.sm-info a {
+  color: #8b5cf6;
+  text-decoration: none;
+  cursor: pointer;
+}

@@ -2,6 +2,7 @@ import { fetchYouTubeVideoById } from '@/lib/copyright/youtubeVideoLookup'
 import { computePHashFromUrl, hammingDistance } from '@/lib/copyright/imageHash'
 import { fetchTranscript } from '@/lib/copyright/transcriptFetcher'
 import { normalizeText } from '@/lib/copyright/scoring'
+import { MediaDeepCheckResult, checkYouTubeMediaSimilarity } from '@/lib/copyright/mediaDeepCheck'
 
 export interface CopyCandidate {
   videoId: string
@@ -13,6 +14,7 @@ export interface CopyCandidate {
   publishedAt: string | null
   riskScore: number
   reasons: Array<{ code: string; label: string; points: number }>
+  mediaCheck?: MediaDeepCheckResult
 }
 
 export interface FindCopiesResult {
@@ -28,30 +30,44 @@ export interface FindCopiesResult {
   candidates: CopyCandidate[]
   searched: number
   transcriptChecked: number
+  mediaChecked: number
+  mediaCheckEnabled: boolean
+  mediaCheckStatus?: string
   query: string
 }
 
 const MIN_REPORT_SCORE = 30
 const MAX_CANDIDATES = 50
 const TRANSCRIPT_TOP_N = 5
+const MEDIA_DEEP_CHECK_TOP_N = 3
 const REASON_LABELS: Record<string, string> = {
   title_match: 'Trùng tên video',
   tag_overlap: 'Trùng tags',
   description_match: 'Trùng description',
   thumbnail_match: 'Thumbnail tương đồng',
   transcript_match: 'Transcript trùng nội dung',
+  audio_fingerprint_match: 'Âm thanh fingerprint tương đồng',
+  video_frame_match: 'Frame video tương đồng',
   same_channel: 'Cùng channel (loại trừ)',
   newer_than_original: 'Đăng sau video gốc',
   older_than_original: 'Đăng trước video gốc (có thể video gốc copy lại)'
 }
 
-export async function findCopies(videoId: string): Promise<FindCopiesResult> {
+// Helper cho unit test (tránh phải mock fetch/youtube).
+export function buildFindCopiesInternalsForTest(options: { thumbnailMatch?: boolean }) {
+  return { wantPHash: options.thumbnailMatch !== false }
+}
+
+export async function findCopies(
+  videoId: string,
+  options: { deepMediaCheck?: boolean; mediaCheckTopN?: number; thumbnailMatch?: boolean } = {}
+): Promise<FindCopiesResult> {
   const apiKey = process.env.YOUTUBE_API_KEY
   if (!apiKey || apiKey === 'your_youtube_api_key_here') {
     throw new Error('config_missing: YOUTUBE_API_KEY chưa cấu hình')
   }
 
-  const wantPHash = true
+  const wantPHash = options.thumbnailMatch !== false
   const original = await fetchYouTubeVideoById(videoId, { computeThumbnailHash: wantPHash })
 
   const originalThumbHash = original.candidate.media?.perceptualHash
@@ -125,7 +141,7 @@ export async function findCopies(videoId: string): Promise<FindCopiesResult> {
       }
 
       let thumbHash: string | null = null
-      if (originalThumbHash && cand.thumbnailUrl) {
+      if (options.thumbnailMatch !== false && originalThumbHash && cand.thumbnailUrl) {
         thumbHash = await computePHashFromUrl(cand.thumbnailUrl)
         if (thumbHash) {
           const distance = hammingDistance(originalThumbHash, thumbHash)
@@ -184,6 +200,48 @@ export async function findCopies(videoId: string): Promise<FindCopiesResult> {
     }
   }
 
+  const mediaCheckTargets = new Set(
+    options.deepMediaCheck
+      ? [...preScored]
+          .sort((a, b) => b.reasons.reduce((sum, r) => sum + r.points, 0) - a.reasons.reduce((sum, r) => sum + r.points, 0))
+          .slice(0, options.mediaCheckTopN ?? MEDIA_DEEP_CHECK_TOP_N)
+          .map(entry => entry.cand.videoId)
+      : []
+  )
+  const mediaChecks = new Map<string, MediaDeepCheckResult>()
+  let mediaChecked = 0
+  let mediaCheckStatus: string | undefined
+
+  if (options.deepMediaCheck && mediaCheckTargets.size > 0) {
+    for (const entry of preScored) {
+      if (!mediaCheckTargets.has(entry.cand.videoId)) continue
+
+      const mediaCheck = await checkYouTubeMediaSimilarity(videoId, entry.cand.videoId)
+      mediaChecks.set(entry.cand.videoId, mediaCheck)
+
+      if (!mediaCheck.available) {
+        mediaCheckStatus = mediaCheck.skippedReason || 'Không thể chạy deep media check.'
+        continue
+      }
+
+      mediaChecked += 1
+      if (mediaCheck.audio?.matched) {
+        entry.reasons.push({
+          code: 'audio_fingerprint_match',
+          label: REASON_LABELS.audio_fingerprint_match,
+          points: Math.round(45 * mediaCheck.audio.similarity)
+        })
+      }
+      if (mediaCheck.video?.matched) {
+        entry.reasons.push({
+          code: 'video_frame_match',
+          label: REASON_LABELS.video_frame_match,
+          points: Math.round(35 * mediaCheck.video.bestFrameSimilarity)
+        })
+      }
+    }
+  }
+
   const candidates: CopyCandidate[] = preScored
     .map(({ cand, reasons }) => {
       const score = Math.max(0, Math.min(100, reasons.reduce((sum, r) => sum + r.points, 0)))
@@ -196,7 +254,8 @@ export async function findCopies(videoId: string): Promise<FindCopiesResult> {
         url: `https://www.youtube.com/watch?v=${cand.videoId}`,
         publishedAt: cand.publishedAt,
         riskScore: score,
-        reasons
+        reasons,
+        mediaCheck: mediaChecks.get(cand.videoId)
       }
     })
     .filter(c => c.riskScore >= MIN_REPORT_SCORE)
@@ -215,6 +274,9 @@ export async function findCopies(videoId: string): Promise<FindCopiesResult> {
     candidates,
     searched: rawCandidates.length,
     transcriptChecked,
+    mediaChecked,
+    mediaCheckEnabled: !!options.deepMediaCheck,
+    mediaCheckStatus,
     query
   }
 }

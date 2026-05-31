@@ -12,6 +12,7 @@ import {
   Input,
   Select,
   Checkbox,
+  Segmented,
   Row,
   Col,
   message,
@@ -46,6 +47,7 @@ import RiskPill from '@/components/ui/RiskPill'
 import UploadDropzone from '@/components/ui/UploadDropzone'
 import { ConnectorStatus, Platform, ScanRun, BrandAsset } from '@/types'
 import { useTranslation } from '@/lib/i18n/context'
+import { detectScanInput, type DetectedInput } from '@/lib/scans/detectScanInput'
 
 const { Content } = Layout
 
@@ -65,31 +67,9 @@ const PLATFORM_ICONS: Record<Platform, React.ReactNode> = {
 
 const PLATFORM_LIST: Platform[] = ['youtube', 'google', 'facebook', 'tiktok']
 const LS_PLATFORMS = 'scan.platforms'
+const LS_YT_MODE = 'scan.youtubeMode'
 
-const YOUTUBE_RE = /(youtube\.com|youtu\.be)/i
-const DOMAIN_RE = /^[\w-]+(\.[\w-]+)+(\/.*)?$/i
-
-type DetectedInput = {
-  assetType: 'video' | 'brand_name'
-  name: string
-  youtubeUrl?: string
-  officialDomains?: string
-  keywords?: string
-}
-
-function detectScanInput(raw: string): DetectedInput | null {
-  const q = raw.trim()
-  if (!q) return null
-  if (YOUTUBE_RE.test(q)) {
-    // Leave name empty so backend auto-fills from YouTube snippet (title/channel)
-    return { assetType: 'video', name: '', youtubeUrl: q }
-  }
-  if (!q.includes(' ') && DOMAIN_RE.test(q)) {
-    const host = q.replace(/^https?:\/\//, '').split('/')[0]
-    return { assetType: 'brand_name', name: host, officialDomains: host, keywords: host.split('.')[0] }
-  }
-  return { assetType: 'brand_name', name: q.slice(0, 80), keywords: q }
-}
+type YouTubeMode = 'fast' | 'deep'
 
 export default function ScansPage() {
   const { status } = useSession()
@@ -105,7 +85,9 @@ export default function ScansPage() {
   const [scanning, setScanning] = useState(false)
   const [scanProgress, setScanProgress] = useState<{ status: 'idle' | 'running' | 'completed' | 'failed'; findings: number }>({ status: 'idle', findings: 0 })
   const [quickFindings, setQuickFindings] = useState<any[]>([])
+  const [quickScanMeta, setQuickScanMeta] = useState<any>(null)
   const [rescanningId, setRescanningId] = useState<number | null>(null)
+  const [youtubeMode, setYoutubeMode] = useState<YouTubeMode>('fast')
 
   // Advanced section state
   const [assets, setAssets] = useState<BrandAsset[]>([])
@@ -167,6 +149,20 @@ export default function ScansPage() {
     } catch {}
   }, [selectedPlatforms])
 
+  // Restore YouTube scan mode preference
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(LS_YT_MODE)
+      if (saved === 'fast' || saved === 'deep') setYoutubeMode(saved)
+    } catch {}
+  }, [])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(LS_YT_MODE, youtubeMode)
+    } catch {}
+  }, [youtubeMode])
+
   // Drop platforms that aren't ready (e.g. saved selection includes a connector
   // whose API key was removed) so the user doesn't accidentally scan with 0 active platforms
   useEffect(() => {
@@ -212,6 +208,7 @@ export default function ScansPage() {
     setScanning(true)
     setScanProgress({ status: 'running', findings: 0 })
     setQuickFindings([])
+    setQuickScanMeta(null)
     try {
       const fd = new FormData()
       if (payload) {
@@ -224,11 +221,13 @@ export default function ScansPage() {
       if (extra) for (const [k, v] of Object.entries(extra)) if (v) fd.append(k, v)
       if (file) fd.append('file', file)
       fd.append('platforms', selectedPlatforms.join(','))
+      if (payload?.youtubeUrl) fd.append('mode', youtubeMode)
 
       const res = await fetch('/api/scans/quick', { method: 'POST', body: fd })
       const data = await res.json()
       if (!res.ok) throw new Error(data?.error || 'Quick scan failed')
       setQuickFindings(data.findings || [])
+      setQuickScanMeta(data)
       setScanProgress({ status: 'completed', findings: data.findingsCreated || 0 })
       message.success(`Hoàn tất: ${data.findingsCreated || 0} kết quả nghi vấn`)
     } catch (err: any) {
@@ -362,7 +361,7 @@ export default function ScansPage() {
   const inputHint = useMemo(() => {
     const d = detectScanInput(query)
     if (!d) return 'Mẹo: dán link YouTube để hệ thống tự lấy metadata, hoặc gõ domain (vd: nike.com).'
-    if (d.assetType === 'video') return 'Đã nhận diện link YouTube — sẽ tự fetch metadata & thumbnail.'
+    if (d.assetType === 'video') return 'Đã nhận diện link YouTube — sẽ tìm video tương tự và deep check âm thanh + frame video.'
     if (d.officialDomains) return `Sẽ quét tên miền chính thức: ${d.officialDomains}`
     return `Sẽ quét theo từ khóa: "${d.keywords}"`
   }, [query])
@@ -435,6 +434,20 @@ export default function ScansPage() {
                     </Tooltip>
                   )
                 })}
+                <Tooltip title="Chỉ áp dụng khi dán link YouTube. Fast nhanh hơn (tắt check âm thanh + hình ảnh), Deep đầy đủ.">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 10 }}>
+                    <span style={{ color: '#71717a', fontSize: 11 }}>YouTube mode:</span>
+                    <Segmented
+                      size="small"
+                      value={youtubeMode}
+                      onChange={(v) => setYoutubeMode(v as YouTubeMode)}
+                      options={[
+                        { label: 'Fast', value: 'fast' },
+                        { label: 'Deep', value: 'deep' }
+                      ]}
+                    />
+                  </div>
+                </Tooltip>
               </div>
             </div>
           </div>
@@ -470,6 +483,16 @@ export default function ScansPage() {
                   </div>
                   <Link href="/findings"><Button size="small">Xem tất cả Findings →</Button></Link>
                 </div>
+                {(quickScanMeta?.mode === 'youtube_deep_url' || quickScanMeta?.mode === 'youtube_deep_fallback') && (
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+                    <Tag>Quét YouTube: {quickScanMeta.searched || 0}</Tag>
+                    <Tag>Transcript: {quickScanMeta.transcriptChecked || 0}</Tag>
+                    <Tag>Media deep check: {quickScanMeta.mediaChecked || 0}</Tag>
+                    {quickScanMeta.mediaCheckStatus && (
+                      <Tag color="warning">{quickScanMeta.mediaCheckStatus}</Tag>
+                    )}
+                  </div>
+                )}
                 {quickFindings.length > 0 && (
                   <Table
                     dataSource={quickFindings}
@@ -482,6 +505,20 @@ export default function ScansPage() {
                         title: 'Tiêu đề', dataIndex: 'title', key: 'title',
                         render: (title: string, record: any) => (
                           <a href={record.url} target="_blank" rel="noreferrer" style={{ color: '#a78bfa', fontWeight: 500, fontSize: 13 }}>{title}</a>
+                        )
+                      },
+                      {
+                        title: 'Bằng chứng',
+                        dataIndex: 'reasons',
+                        key: 'reasons',
+                        render: (reasons: any[]) => (
+                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                            {(reasons || []).slice(0, 4).map((reason, idx) => (
+                              <Tag key={idx} style={{ fontSize: 10 }}>
+                                {reason.label}
+                              </Tag>
+                            ))}
+                          </div>
                         )
                       },
                       { title: 'Rủi ro', dataIndex: 'riskScore', key: 'riskScore', width: 90, render: (score: number) => <RiskPill score={score} /> }
