@@ -687,6 +687,7 @@ function ScansPageInner() {
                 <span className="scan-option-label">Chế độ YouTube</span>
                 <Segmented
                   size="small"
+                  className="scan-mode-switch"
                   value={youtubeMode}
                   onChange={(v) => setYoutubeMode(v as YouTubeMode)}
                   options={[
@@ -694,7 +695,7 @@ function ScansPageInner() {
                     { label: '🔍 Deep', value: 'deep' }
                   ]}
                 />
-                <Tooltip title="Fast: quét nhanh, bỏ qua check âm thanh + hình ảnh. Deep: đầy đủ, chậm hơn.">
+                <Tooltip title="Cả hai đều đối chiếu tiêu đề, thumbnail và khung hình. Deep quét thêm fingerprint âm thanh — chậm hơn, cần hạ tầng hỗ trợ.">
                   <span className="scan-mode-help">?</span>
                 </Tooltip>
               </div>
