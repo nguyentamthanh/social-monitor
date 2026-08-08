@@ -113,6 +113,8 @@ export interface Finding {
   risk_score: number
   reasons: FindingReason[]
   status: FindingStatus
+  /** Ảnh đại diện lấy từ evidence_items mới nhất (LATERAL trong findFindings). */
+  thumbnail_url?: string | null
   published_at?: Date | null
   found_at: Date
   updated_at: Date

@@ -9,6 +9,7 @@ import Sidebar from '@/components/layout/Sidebar'
 import Header from '@/components/layout/Header'
 import CheckSwitch from '@/components/ui/CheckSwitch'
 import { useTranslation } from '@/lib/i18n/context'
+import { riskCssVar, riskLevel, RISK_MESSAGE_KEY } from '@/lib/copyright/risk'
 
 const { Content } = Layout
 
@@ -145,8 +146,9 @@ export default function FindCopiesPage() {
     }
   }
 
-  const scoreColor = (s: number) => (s >= 70 ? 'var(--danger)' : s >= 45 ? 'var(--warning)' : 'var(--success)')
-  const scoreLabel = (s: number) => (s >= 70 ? 'CAO' : s >= 45 ? 'TRUNG BÌNH' : 'THẤP')
+  // Ngưỡng và nhãn lấy từ nguồn chung `lib/copyright/risk.ts`.
+  const scoreColor = riskCssVar
+  const scoreLabel = (s: number) => t(RISK_MESSAGE_KEY[riskLevel(s)])
 
   return (
     <Layout style={{ minHeight: '100vh' }}>

@@ -143,7 +143,17 @@ export default function FindingsPage() {
               {findings.map(f => (
                 <div key={f.id} className="finding-card" onClick={() => setSelected(f)}>
                   <div className="finding-thumb">
-                    <span style={{ fontSize: 40, color: 'var(--text-muted)' }}>⚠</span>
+                    {f.thumbnail_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={f.thumbnail_url}
+                        alt=""
+                        loading="lazy"
+                        onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
+                      />
+                    ) : (
+                      <span style={{ fontSize: 40, color: 'var(--text-muted)' }}>⚠</span>
+                    )}
                     <div style={{ position: 'absolute', top: 10, left: 10 }}><RiskPill score={f.risk_score} /></div>
                     <div style={{ position: 'absolute', top: 10, right: 10 }}><PlatformBadge platform={f.platform as Platform} showLabel={false} /></div>
                   </div>

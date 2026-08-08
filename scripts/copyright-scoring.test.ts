@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { scoreCandidate } from '../lib/copyright/scoring'
+import { EVIDENCE_CAP } from '../lib/copyright/reasons'
 import { BrandAsset, RawCandidate } from '../types'
 
 const baseAsset: BrandAsset = {
@@ -28,7 +29,7 @@ function candidate(overrides: Partial<RawCandidate>): RawCandidate {
   }
 }
 
-test('scores exact brand and keyword matches with explainable reasons', () => {
+test('name/keyword matches alone stay capped as weak, unverified evidence', () => {
   const result = scoreCandidate(
     baseAsset,
     candidate({
@@ -37,10 +38,56 @@ test('scores exact brand and keyword matches with explainable reasons', () => {
     })
   )
 
-  assert.equal(result.riskScore >= 50, true)
   assert.equal(result.reasons.some(reason => reason.code === 'brand_name_match'), true)
   assert.equal(result.reasons.some(reason => reason.code === 'keyword_match'), true)
-  assert.equal(result.reasons.some(reason => reason.code === 'official_domain_missing'), true)
+
+  // Trùng tên + keyword là khớp chuỗi thuần, chưa đối chiếu media nào: phải bị
+  // chặn ở trần `weak` (35) chứ không được vượt ngưỡng "trung bình" (45).
+  assert.equal(result.riskScore <= EVIDENCE_CAP.weak, true, `expected <= 35, got ${result.riskScore}`)
+  assert.equal(result.needsVerification, true)
+
+  // `official_domain_missing` đã bị bỏ: "không nằm trên domain chính thức"
+  // đúng với gần như toàn bộ internet nên không phải bằng chứng.
+  assert.equal(result.reasons.some(reason => reason.code === 'official_domain_missing'), false)
+})
+
+test('verified media evidence lifts the score past the weak/medium caps', () => {
+  const imageAsset: BrandAsset = {
+    ...baseAsset,
+    asset_type: 'image',
+    perceptual_hash: 'ffffffffffffffff'
+  }
+
+  const result = scoreCandidate(
+    imageAsset,
+    candidate({
+      title: 'Acme Coffee deal',
+      content: 'Try the Acme Latte today.',
+      media: { perceptualHash: 'ffffffffffffffff' }
+    })
+  )
+
+  assert.equal(result.reasons.some(reason => reason.code === 'image_phash_match'), true)
+  assert.equal(result.needsVerification, false)
+  assert.equal(result.riskScore > EVIDENCE_CAP.weak, true, `expected > 35, got ${result.riskScore}`)
+})
+
+test('a bare thumbnail no longer counts as evidence on its own', () => {
+  const videoAsset: BrandAsset = { ...baseAsset, asset_type: 'video' }
+
+  const result = scoreCandidate(
+    videoAsset,
+    candidate({
+      title: 'Totally unrelated cooking stream',
+      content: 'No mention of the brand here.',
+      media: { thumbnailUrl: 'https://i.ytimg.com/vi/abc/hq.jpg' }
+    })
+  )
+
+  // Trước đây nhánh `media_candidate` cộng 15 điểm chỉ vì có thumbnail.
+  assert.equal(result.reasons.some(reason => reason.code === 'media_candidate'), false)
+  assert.equal(result.reasons.some(reason => reason.code === 'logo_candidate'), false)
+  assert.equal(result.riskScore, 0)
 })
 
 test('reduces score for official domains', () => {

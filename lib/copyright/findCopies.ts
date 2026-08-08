@@ -3,6 +3,8 @@ import { computePHashFromUrl, hammingDistance } from '@/lib/copyright/imageHash'
 import { fetchTranscript } from '@/lib/copyright/transcriptFetcher'
 import { normalizeText } from '@/lib/copyright/scoring'
 import { MediaDeepCheckResult, checkYouTubeMediaSimilarity } from '@/lib/copyright/mediaDeepCheck'
+import { mapWithConcurrency } from '@/lib/util/pool'
+import { capRiskScore, reasonLabel } from '@/lib/copyright/reasons'
 
 export interface CopyCandidate {
   videoId: string
@@ -13,6 +15,8 @@ export interface CopyCandidate {
   url: string
   publishedAt: string | null
   riskScore: number
+  /** True khi chưa có bằng chứng media hạng `strong` (chưa fingerprint/frame). */
+  needsVerification?: boolean
   reasons: Array<{ code: string; label: string; points: number }>
   mediaCheck?: MediaDeepCheckResult
 }
@@ -44,20 +48,19 @@ export const FIND_COPIES_QUOTA_UNITS = 101
 
 const MIN_REPORT_SCORE = 30
 const MAX_CANDIDATES = 50
+/** Mỗi ứng viên vừa tải thumbnail vừa tính DCT — mở cả 50 cùng lúc là cách
+ *  nhanh nhất để vượt giới hạn 60s của Vercel. */
+const THUMBNAIL_HASH_CONCURRENCY = 6
 const TRANSCRIPT_TOP_N = 5
 const MEDIA_DEEP_CHECK_TOP_N = 3
-const REASON_LABELS: Record<string, string> = {
-  title_match: 'Trùng tên video',
-  tag_overlap: 'Trùng tags',
-  description_match: 'Trùng description',
-  thumbnail_match: 'Thumbnail tương đồng',
-  transcript_match: 'Transcript trùng nội dung',
-  audio_fingerprint_match: 'Âm thanh fingerprint tương đồng',
-  video_frame_match: 'Frame video tương đồng',
-  same_channel: 'Cùng channel (loại trừ)',
-  newer_than_original: 'Đăng sau video gốc',
-  older_than_original: 'Đăng trước video gốc (có thể video gốc copy lại)'
-}
+/**
+ * Nhãn lấy từ registry dùng chung (`reasons.ts`) thay vì bảng riêng — trước
+ * đây file này và `scoring.ts` giữ hai từ điển độc lập nên cùng một khái niệm
+ * hiện ra với chữ khác nhau tuỳ màn hình.
+ */
+const REASON_LABELS = new Proxy({} as Record<string, string>, {
+  get: (_target, code: string) => reasonLabel(code)
+})
 
 // Helper cho unit test (tránh phải mock fetch/youtube).
 export function buildFindCopiesInternalsForTest(options: { thumbnailMatch?: boolean }) {
@@ -116,8 +119,10 @@ export async function findCopies(
 
   let transcriptChecked = 0
 
-  const preScored = await Promise.all(
-    rawCandidates.map(async (cand) => {
+  const preScored = await mapWithConcurrency(
+    rawCandidates,
+    THUMBNAIL_HASH_CONCURRENCY,
+    async (cand) => {
       const reasons: Array<{ code: string; label: string; points: number }> = []
       const titleNorm = normalizeText(cand.title)
       const descNorm = normalizeText(cand.description)
@@ -176,7 +181,7 @@ export async function findCopies(
 
       const preliminary = reasons.reduce((sum, r) => sum + r.points, 0)
       return { cand, reasons, preliminary }
-    })
+    }
   )
 
   const sortedPre = [...preScored].sort((a, b) => b.preliminary - a.preliminary)
@@ -250,7 +255,10 @@ export async function findCopies(
 
   const candidates: CopyCandidate[] = preScored
     .map(({ cand, reasons }) => {
-      const score = Math.max(0, Math.min(100, reasons.reduce((sum, r) => sum + r.points, 0)))
+      // Chặn trần theo hạng bằng chứng: chỉ trùng tiêu đề/tag thì tối đa 35,
+      // phải có transcript/thumbnail mới lên 70, và chỉ khi fingerprint audio
+      // hoặc frame video khớp mới được chạm 100.
+      const { riskScore, needsVerification } = capRiskScore(reasons)
       return {
         videoId: cand.videoId,
         title: cand.title,
@@ -259,7 +267,8 @@ export async function findCopies(
         thumbnailUrl: cand.thumbnailUrl,
         url: `https://www.youtube.com/watch?v=${cand.videoId}`,
         publishedAt: cand.publishedAt,
-        riskScore: score,
+        riskScore,
+        needsVerification,
         reasons,
         mediaCheck: mediaChecks.get(cand.videoId)
       }

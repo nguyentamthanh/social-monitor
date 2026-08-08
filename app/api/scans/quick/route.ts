@@ -16,7 +16,9 @@ import { resolveFindCopiesOptions } from './resolveFindCopiesOptions'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
-export const maxDuration = 300
+// Vercel Hobby giới hạn cứng 60s; khai 300 chỉ khiến function bị cắt giữa
+// chừng thành 504 thay vì trả lỗi tử tế.
+export const maxDuration = 60
 
 function formDataString(formData: FormData, key: string): string {
   const value = formData.get(key)
@@ -67,7 +69,6 @@ export async function POST(request: NextRequest) {
     const platforms = input.platforms as Platform[]
     const youtubeUrl = input.youtubeUrl || null
     const youtubeVideoId = youtubeUrl ? extractYouTubeVideoId(youtubeUrl) : null
-    let youtubeDeepSummary: Record<string, unknown> | null = null
 
     // Chặn trước khi gọi YouTube: hết quota thì nói rõ thay vì để Google trả 403.
     const usesYoutube = platforms.includes('youtube')
@@ -110,7 +111,7 @@ export async function POST(request: NextRequest) {
         }
       }))
 
-      youtubeDeepSummary = {
+      const youtubeDeepSummary = {
         original: result.original,
         searched: result.searched,
         transcriptChecked: result.transcriptChecked,
@@ -119,15 +120,17 @@ export async function POST(request: NextRequest) {
         mediaCheckStatus: result.mediaCheckStatus
       }
 
-      if (findings.length > 0) {
-        return NextResponse.json({
-          success: true,
-          mode: mode === 'fast' ? 'youtube_fast_url' : 'youtube_deep_url',
-          findingsCreated: findings.length,
-          findings,
-          ...youtubeDeepSummary
-        })
-      }
+      // Trả về vô điều kiện: findCopies đã là câu trả lời đầy đủ cho một link
+      // YouTube. Trước đây khi không tìm thấy reup nào (kết quả PHỔ BIẾN NHẤT)
+      // hàm rơi xuống nhánh adapter và tiêu thêm ~600 unit quota nữa — tức là
+      // trường hợp "không có gì" lại tốn 700 unit thay vì 101.
+      return NextResponse.json({
+        success: true,
+        mode: mode === 'fast' ? 'youtube_fast_url' : 'youtube_deep_url',
+        findingsCreated: findings.length,
+        findings,
+        ...youtubeDeepSummary
+      })
     }
 
     let name = input.name || ''
@@ -261,10 +264,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      mode: youtubeDeepSummary ? 'youtube_deep_fallback' : 'quick_scan',
+      mode: 'quick_scan',
       findingsCreated: findings.length,
-      findings,
-      ...(youtubeDeepSummary || {})
+      findings
     })
   } catch (error) {
     console.error('Quick scan POST error:', error)

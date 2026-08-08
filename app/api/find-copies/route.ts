@@ -11,7 +11,9 @@ import { getQuota, recordUsage } from '@/lib/copyright/quota'
 import { getUserSettings } from '@/lib/models/UserSettings'
 
 export const dynamic = 'force-dynamic'
-export const maxDuration = 300
+// Vercel Hobby giới hạn cứng 60s; khai 300 chỉ khiến function bị cắt giữa
+// chừng thành 504 thay vì trả lỗi tử tế.
+export const maxDuration = 60
 
 export async function POST(request: NextRequest) {
   try {

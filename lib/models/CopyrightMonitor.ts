@@ -244,9 +244,17 @@ export async function createEvidenceItem(input: {
   thumbnailUrl?: string
   fileHash?: string
 }): Promise<void> {
+  // Upsert theo (finding_id, evidence_type): quét lại cùng một finding phải
+  // cập nhật bằng chứng chứ không chèn thêm hàng mới mỗi lần.
   await query(
     `INSERT INTO evidence_items (finding_id, evidence_type, excerpt, metadata, thumbnail_url, file_hash)
-     VALUES ($1, $2, $3, $4, $5, $6)`,
+     VALUES ($1, $2, $3, $4, $5, $6)
+     ON CONFLICT (finding_id, evidence_type) DO UPDATE SET
+       excerpt = EXCLUDED.excerpt,
+       metadata = EXCLUDED.metadata,
+       thumbnail_url = COALESCE(EXCLUDED.thumbnail_url, evidence_items.thumbnail_url),
+       file_hash = EXCLUDED.file_hash,
+       fetched_at = NOW()`,
     [
       input.findingId,
       input.evidenceType,
@@ -288,10 +296,20 @@ export async function findFindings(filters: {
     params
   )
 
+  // LATERAL lấy thumbnail mới nhất từ evidence_items: trước đây query không hề
+  // select ảnh nên UI luôn phải vẽ placeholder — thiếu dữ liệu chứ không phải
+  // thiếu component.
   const findings = await query<Finding>(
-    `SELECT f.*, a.name as asset_name, a.asset_type
+    `SELECT f.*, a.name as asset_name, a.asset_type, ev.thumbnail_url
      FROM findings f
      LEFT JOIN brand_assets a ON a.id = f.asset_id
+     LEFT JOIN LATERAL (
+       SELECT e.thumbnail_url
+       FROM evidence_items e
+       WHERE e.finding_id = f.id AND e.thumbnail_url IS NOT NULL
+       ORDER BY e.fetched_at DESC
+       LIMIT 1
+     ) ev ON TRUE
      WHERE ${whereClause}
      ORDER BY f.risk_score DESC, f.found_at DESC
      LIMIT $${paramIndex++} OFFSET $${paramIndex++}`,

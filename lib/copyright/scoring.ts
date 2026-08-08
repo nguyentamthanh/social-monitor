@@ -1,26 +1,13 @@
 import { BrandAsset, FindingReason, RawCandidate } from '@/types'
 import { hammingDistance } from '@/lib/copyright/imageHash'
 import { detectAudioCandidate } from '@/lib/copyright/audioMatcher'
+import { capRiskScore, reasonLabel } from '@/lib/copyright/reasons'
 
 export interface ScoreResult {
   riskScore: number
   reasons: FindingReason[]
-}
-
-const REASON_LABELS: Record<string, string> = {
-  brand_name_match: 'Trùng tên thương hiệu',
-  keyword_match: 'Trùng keyword theo dõi',
-  tag_overlap: 'Trùng tags',
-  text_similarity_high: 'Nội dung giống văn bản gốc',
-  official_domain_missing: 'Nguồn không nằm trong domain chính thức',
-  official_domain_match: 'Nguồn thuộc domain chính thức',
-  logo_candidate: 'Có dấu hiệu dùng tài sản hình ảnh/logo',
-  media_candidate: 'Có dấu hiệu dùng tài sản media',
-  image_phash_match: 'Ảnh có perceptual hash tương đồng',
-  video_thumbnail_match: 'Thumbnail video tương đồng tài sản',
-  audio_title_match: 'Trùng tên bài hát/audio',
-  audio_artist_match: 'Trùng nghệ sĩ/ngãi phát',
-  audio_streaming_host: 'Xuất hiện trên dịch vụ streaming'
+  /** True khi chưa có bằng chứng hạng `strong` (chưa đối chiếu media thật). */
+  needsVerification: boolean
 }
 
 export function scoreCandidate(asset: BrandAsset, candidate: RawCandidate): ScoreResult {
@@ -68,7 +55,9 @@ export function scoreCandidate(asset: BrandAsset, candidate: RawCandidate): Scor
     }
   }
 
-  // Image / logo perceptual hash matching
+  // Image / logo perceptual hash matching.
+  // Bỏ nhánh `logo_candidate` cũ: nó cộng 18 điểm chỉ vì ứng viên CÓ thumbnail,
+  // mà mọi kết quả đều có thumbnail — đó không phải bằng chứng.
   if (['image', 'logo'].includes(asset.asset_type)) {
     if (asset.perceptual_hash && candidate.media?.perceptualHash) {
       const distance = hammingDistance(asset.perceptual_hash, candidate.media.perceptualHash)
@@ -76,20 +65,18 @@ export function scoreCandidate(asset: BrandAsset, candidate: RawCandidate): Scor
         const points = Math.round(30 * (1 - distance / 14))
         reasons.push(reason('image_phash_match', Math.max(15, points)))
       }
-    } else if (candidate.media?.thumbnailUrl || candidate.media?.hash) {
-      reasons.push(reason('logo_candidate', 18))
     }
   }
 
-  // Video thumbnail perceptual matching when asset is a video
+  // Video thumbnail perceptual matching when asset is a video.
+  // Tương tự, bỏ `media_candidate` (15 điểm cho việc "có thumbnail hoặc có
+  // duration").
   if (asset.asset_type === 'video') {
     if (asset.perceptual_hash && candidate.media?.perceptualHash) {
       const distance = hammingDistance(asset.perceptual_hash, candidate.media.perceptualHash)
       if (distance <= 12) {
         reasons.push(reason('video_thumbnail_match', Math.round(25 * (1 - distance / 16))))
       }
-    } else if (candidate.media?.thumbnailUrl || candidate.metadata?.duration) {
-      reasons.push(reason('media_candidate', 15))
     }
   }
 
@@ -107,17 +94,19 @@ export function scoreCandidate(asset: BrandAsset, candidate: RawCandidate): Scor
     }
   }
 
+  // Chỉ giữ chiều loại trừ. `official_domain_missing` (+15) cũ mô tả gần như
+  // toàn bộ internet — nó là sự VẮNG MẶT của một loại trừ, không phải bằng
+  // chứng vi phạm, mà lại đủ để đẩy một trùng tên đơn thuần lên 50 điểm.
   if (isOfficialDomain) {
     reasons.push(reason('official_domain_match', -40))
-  } else if (sourceHost) {
-    reasons.push(reason('official_domain_missing', 15))
   }
 
-  const riskScore = Math.max(0, Math.min(100, reasons.reduce((sum, item) => sum + item.points, 0)))
+  const { riskScore, needsVerification } = capRiskScore(reasons)
 
   return {
     riskScore,
-    reasons
+    reasons,
+    needsVerification
   }
 }
 
@@ -189,7 +178,7 @@ function jaccard(a: Set<string>, b: Set<string>): number {
 function reason(code: string, points: number): FindingReason {
   return {
     code,
-    label: REASON_LABELS[code] || code,
+    label: reasonLabel(code),
     points
   }
 }

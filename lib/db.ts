@@ -124,6 +124,16 @@ export async function initializeDatabase(): Promise<void> {
     await query(`CREATE INDEX IF NOT EXISTS idx_findings_asset_id ON findings(asset_id)`)
     await query(`CREATE UNIQUE INDEX IF NOT EXISTS idx_findings_unique_source ON findings(user_id, asset_id, platform, external_id)`)
     await query(`CREATE INDEX IF NOT EXISTS idx_evidence_items_finding_id ON evidence_items(finding_id)`)
+    // Không có unique key thì mỗi lần quét lại chèn thêm một hàng evidence
+    // trùng lặp vĩnh viễn. Dọn trùng trước rồi mới tạo index.
+    await query(`
+      DELETE FROM evidence_items e
+      USING evidence_items dup
+      WHERE e.finding_id = dup.finding_id
+        AND e.evidence_type = dup.evidence_type
+        AND e.id < dup.id
+    `)
+    await query(`CREATE UNIQUE INDEX IF NOT EXISTS idx_evidence_unique ON evidence_items(finding_id, evidence_type)`)
     await query(`CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id, created_at DESC)`)
 
     await query(`

@@ -9,6 +9,7 @@ import Sidebar from '@/components/layout/Sidebar'
 import Header from '@/components/layout/Header'
 import CheckSwitch from '@/components/ui/CheckSwitch'
 import { useTranslation } from '@/lib/i18n/context'
+import { riskCssVar } from '@/lib/copyright/risk'
 import { Platform } from '@/types'
 
 const { Content } = Layout
@@ -72,7 +73,7 @@ export default function TextCheckPage() {
   }
 
   const severityColor = (s: string) => (s === 'high' ? 'var(--danger)' : s === 'medium' ? 'var(--warning)' : 'var(--success)')
-  const scoreColor = (s: number) => (s >= 70 ? 'var(--danger)' : s >= 45 ? 'var(--warning)' : 'var(--success)')
+  const scoreColor = riskCssVar
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
