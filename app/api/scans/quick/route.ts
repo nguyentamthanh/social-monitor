@@ -9,7 +9,7 @@ import { getQuota, recordUsage, YOUTUBE_COST } from '@/lib/copyright/quota'
 import { getUserSettings } from '@/lib/models/UserSettings'
 import { scoreCandidate } from '@/lib/copyright/scoring'
 import { computePHash } from '@/lib/copyright/imageHash'
-import { findCopies, FIND_COPIES_QUOTA_UNITS } from '@/lib/copyright/findCopies'
+import { findCopies } from '@/lib/copyright/findCopies'
 import { extractYouTubeVideoId } from '@/lib/copyright/urlParser'
 import { BrandAsset, Platform, CopyrightAssetType } from '@/types'
 import { resolveFindCopiesOptions } from './resolveFindCopiesOptions'
@@ -89,7 +89,9 @@ export async function POST(request: NextRequest) {
 
     if (youtubeVideoId && platforms.includes('youtube')) {
       const result = await findCopies(youtubeVideoId, { ...resolveFindCopiesOptions(mode), apiKey: keys.youtubeApiKey })
-      await recordUsage(userId, FIND_COPIES_QUOTA_UNITS)
+      // Ghi đúng số unit đã tiêu: 101 cho một truy vấn, 201 khi phải tìm thêm
+      // theo transcript.
+      await recordUsage(userId, result.quotaUnits)
       const findings = result.candidates.map(candidate => ({
         platform: 'youtube',
         source: 'youtube_find_copies_deep',

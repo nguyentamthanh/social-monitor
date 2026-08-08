@@ -37,7 +37,7 @@ interface PricingTier {
 const FEATURES: Feature[] = [
   { icon: '🛡️', titleKey: 'landing.feature.assets.title', descKey: 'landing.feature.assets.desc' },
   { icon: '🔍', titleKey: 'landing.feature.batchScan.title', descKey: 'landing.feature.batchScan.desc' },
-  { icon: '🔗', titleKey: 'landing.feature.urlCheck.title', descKey: 'landing.feature.urlCheck.desc' },
+  { icon: '🔗', titleKey: 'landing.feature.transcript.title', descKey: 'landing.feature.transcript.desc' },
   { icon: '⚡', titleKey: 'landing.feature.scoring.title', descKey: 'landing.feature.scoring.desc' },
   { icon: '🖼️', titleKey: 'landing.feature.phash.title', descKey: 'landing.feature.phash.desc' },
   { icon: '🌐', titleKey: 'landing.feature.multiPlatform.title', descKey: 'landing.feature.multiPlatform.desc' }

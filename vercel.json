@@ -4,10 +4,7 @@
     "app/api/scans/route.ts": { "maxDuration": 60 },
     "app/api/scans/[id]/route.ts": { "maxDuration": 30 },
     "app/api/scans/quick/route.ts": { "maxDuration": 60 },
-    "app/api/find-copies/route.ts": { "maxDuration": 60 },
-    "app/api/check-url/route.ts": { "maxDuration": 60 },
-    "app/api/assets/route.ts": { "maxDuration": 30 },
-    "app/api/text-check/route.ts": { "maxDuration": 30 }
+    "app/api/assets/route.ts": { "maxDuration": 30 }
   },
   "headers": [
     {

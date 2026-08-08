@@ -5,6 +5,7 @@ import { normalizeText } from '@/lib/copyright/scoring'
 import { MediaDeepCheckResult, checkYouTubeMediaSimilarity } from '@/lib/copyright/mediaDeepCheck'
 import { mapWithConcurrency } from '@/lib/util/pool'
 import { capRiskScore, reasonLabel } from '@/lib/copyright/reasons'
+import { extractDistinctivePhrase, buildTranscriptSearchQuery } from '@/lib/copyright/transcriptQuery'
 
 export interface CopyCandidate {
   videoId: string
@@ -38,6 +39,10 @@ export interface FindCopiesResult {
   mediaCheckEnabled: boolean
   mediaCheckStatus?: string
   query: string
+  /** Truy vấn theo câu trong transcript, chỉ có khi vòng 2 thực sự chạy. */
+  transcriptQuery?: string
+  /** Quota YouTube đã tiêu thật cho lần chạy này (101 hoặc 201). */
+  quotaUnits: number
 }
 
 /**
@@ -53,6 +58,60 @@ const MAX_CANDIDATES = 50
 const THUMBNAIL_HASH_CONCURRENCY = 6
 const TRANSCRIPT_TOP_N = 5
 const MEDIA_DEEP_CHECK_TOP_N = 3
+/** Giá một lần `search.list`. */
+export const YOUTUBE_SEARCH_UNITS = 100
+/**
+ * Ở chế độ `auto`, chỉ chi thêm 100 unit cho truy vấn theo transcript khi
+ * truy vấn theo tiêu đề không moi ra được ứng viên nào đạt mức này. Đúng
+ * bằng ngưỡng "rủi ro trung bình" — tức là "chưa tìm được gì đáng tin".
+ */
+const TRANSCRIPT_DISCOVERY_TRIGGER = 45
+
+interface RawSearchCandidate {
+  videoId: string
+  title: string
+  description: string
+  channelId: string
+  channelTitle: string
+  thumbnailUrl?: string
+  publishedAt: string | null
+}
+
+/** Một lần `search.list` → danh sách ứng viên đã loại chính video gốc. */
+async function searchYouTube(
+  query: string,
+  apiKey: string,
+  excludeVideoId: string
+): Promise<RawSearchCandidate[]> {
+  const searchParams = new URLSearchParams({
+    part: 'snippet',
+    type: 'video',
+    maxResults: String(MAX_CANDIDATES),
+    q: query,
+    key: apiKey
+  })
+
+  const searchRes = await fetch(`https://www.googleapis.com/youtube/v3/search?${searchParams}`)
+  if (!searchRes.ok) {
+    throw new Error(`youtube_search_failed: ${searchRes.status}`)
+  }
+  const searchJson = await searchRes.json()
+  const items: any[] = Array.isArray(searchJson.items) ? searchJson.items : []
+
+  return items
+    .filter(item => item.id?.videoId && item.id.videoId !== excludeVideoId)
+    .map(item => ({
+      videoId: item.id.videoId as string,
+      title: (item.snippet?.title || '') as string,
+      description: (item.snippet?.description || '') as string,
+      channelId: (item.snippet?.channelId || '') as string,
+      channelTitle: (item.snippet?.channelTitle || '') as string,
+      thumbnailUrl: (item.snippet?.thumbnails?.high?.url ||
+        item.snippet?.thumbnails?.default?.url ||
+        undefined) as string | undefined,
+      publishedAt: (item.snippet?.publishedAt || null) as string | null
+    }))
+}
 /**
  * Nhãn lấy từ registry dùng chung (`reasons.ts`) thay vì bảng riêng — trước
  * đây file này và `scoring.ts` giữ hai từ điển độc lập nên cùng một khái niệm
@@ -69,7 +128,18 @@ export function buildFindCopiesInternalsForTest(options: { thumbnailMatch?: bool
 
 export async function findCopies(
   videoId: string,
-  options: { deepMediaCheck?: boolean; mediaCheckTopN?: number; thumbnailMatch?: boolean; apiKey?: string } = {}
+  options: {
+    deepMediaCheck?: boolean
+    mediaCheckTopN?: number
+    thumbnailMatch?: boolean
+    apiKey?: string
+    /**
+     * Tìm ứng viên theo câu nói trong transcript — bắt được video đổi hẳn tiêu
+     * đề nhưng giữ nguyên audio. `auto` (mặc định) chỉ chi thêm quota khi truy
+     * vấn theo tiêu đề trắng tay.
+     */
+    transcriptDiscovery?: 'auto' | 'always' | 'off'
+  } = {}
 ): Promise<FindCopiesResult> {
   const apiKey = options.apiKey
   if (!apiKey) {
@@ -87,111 +157,110 @@ export async function findCopies(
   const originalPublishedAt = original.candidate.publishedAt ? new Date(original.candidate.publishedAt) : null
 
   const query = buildSearchQuery(original.candidate.title, originalTags)
-
-  const searchParams = new URLSearchParams({
-    part: 'snippet',
-    type: 'video',
-    maxResults: String(MAX_CANDIDATES),
-    q: query,
-    key: apiKey
-  })
-
-  const searchRes = await fetch(`https://www.googleapis.com/youtube/v3/search?${searchParams}`)
-  if (!searchRes.ok) {
-    throw new Error(`youtube_search_failed: ${searchRes.status}`)
-  }
-  const searchJson = await searchRes.json()
-  const items: any[] = Array.isArray(searchJson.items) ? searchJson.items : []
-
-  const rawCandidates = items
-    .filter(item => item.id?.videoId && item.id.videoId !== videoId)
-    .map(item => ({
-      videoId: item.id.videoId as string,
-      title: (item.snippet?.title || '') as string,
-      description: (item.snippet?.description || '') as string,
-      channelId: (item.snippet?.channelId || '') as string,
-      channelTitle: (item.snippet?.channelTitle || '') as string,
-      thumbnailUrl: (item.snippet?.thumbnails?.high?.url ||
-        item.snippet?.thumbnails?.default?.url ||
-        undefined) as string | undefined,
-      publishedAt: (item.snippet?.publishedAt || null) as string | null
-    }))
+  const rawCandidates = await searchYouTube(query, apiKey, videoId)
 
   let transcriptChecked = 0
+  let quotaUnits = FIND_COPIES_QUOTA_UNITS
 
-  const preScored = await mapWithConcurrency(
-    rawCandidates,
-    THUMBNAIL_HASH_CONCURRENCY,
-    async (cand) => {
-      const reasons: Array<{ code: string; label: string; points: number }> = []
-      const titleNorm = normalizeText(cand.title)
-      const descNorm = normalizeText(cand.description)
+  const scoreOne = async (cand: RawSearchCandidate) => {
+    const reasons: Array<{ code: string; label: string; points: number }> = []
+    const titleNorm = normalizeText(cand.title)
+    const descNorm = normalizeText(cand.description)
 
-      const titleSim = jaccardSimilarity(originalTitleNorm, titleNorm)
-      if (titleSim >= 0.3) {
-        reasons.push({ code: 'title_match', label: REASON_LABELS.title_match, points: Math.round(35 * titleSim) })
+    const titleSim = jaccardSimilarity(originalTitleNorm, titleNorm)
+    if (titleSim >= 0.3) {
+      reasons.push({ code: 'title_match', label: REASON_LABELS.title_match, points: Math.round(35 * titleSim) })
+    }
+
+    if (originalTags.length > 0) {
+      const candTokens = new Set([...titleNorm.split(' '), ...descNorm.split(' ')].filter(Boolean))
+      const tagHits = originalTags.filter(tag => tagInCandidate(tag, candTokens, titleNorm + ' ' + descNorm))
+      if (tagHits.length > 0) {
+        reasons.push({
+          code: 'tag_overlap',
+          label: REASON_LABELS.tag_overlap,
+          points: Math.min(25, 5 + tagHits.length * 4)
+        })
       }
+    }
 
-      if (originalTags.length > 0) {
-        const candTokens = new Set([...titleNorm.split(' '), ...descNorm.split(' ')].filter(Boolean))
-        const tagHits = originalTags.filter(tag => tagInCandidate(tag, candTokens, titleNorm + ' ' + descNorm))
-        if (tagHits.length > 0) {
+    if (originalDescNorm && descNorm) {
+      const descSim = jaccardSimilarity(originalDescNorm, descNorm)
+      if (descSim >= 0.4) {
+        reasons.push({ code: 'description_match', label: REASON_LABELS.description_match, points: Math.round(15 * descSim) })
+      }
+    }
+
+    let thumbHash: string | null = null
+    if (options.thumbnailMatch !== false && originalThumbHash && cand.thumbnailUrl) {
+      thumbHash = await computePHashFromUrl(cand.thumbnailUrl)
+      if (thumbHash) {
+        const distance = hammingDistance(originalThumbHash, thumbHash)
+        if (distance <= 14) {
           reasons.push({
-            code: 'tag_overlap',
-            label: REASON_LABELS.tag_overlap,
-            points: Math.min(25, 5 + tagHits.length * 4)
+            code: 'thumbnail_match',
+            label: REASON_LABELS.thumbnail_match,
+            points: Math.max(10, Math.round(25 * (1 - distance / 18)))
           })
         }
       }
-
-      if (originalDescNorm && descNorm) {
-        const descSim = jaccardSimilarity(originalDescNorm, descNorm)
-        if (descSim >= 0.4) {
-          reasons.push({ code: 'description_match', label: REASON_LABELS.description_match, points: Math.round(15 * descSim) })
-        }
-      }
-
-      let thumbHash: string | null = null
-      if (options.thumbnailMatch !== false && originalThumbHash && cand.thumbnailUrl) {
-        thumbHash = await computePHashFromUrl(cand.thumbnailUrl)
-        if (thumbHash) {
-          const distance = hammingDistance(originalThumbHash, thumbHash)
-          if (distance <= 14) {
-            reasons.push({
-              code: 'thumbnail_match',
-              label: REASON_LABELS.thumbnail_match,
-              points: Math.max(10, Math.round(25 * (1 - distance / 18)))
-            })
-          }
-        }
-      }
-
-      if (cand.channelId && originalChannelId && cand.channelId === originalChannelId) {
-        reasons.push({ code: 'same_channel', label: REASON_LABELS.same_channel, points: -50 })
-      }
-
-      const candPublishedAt = cand.publishedAt ? new Date(cand.publishedAt) : null
-      if (originalPublishedAt && candPublishedAt) {
-        if (candPublishedAt > originalPublishedAt) {
-          reasons.push({ code: 'newer_than_original', label: REASON_LABELS.newer_than_original, points: 5 })
-        } else if (candPublishedAt < originalPublishedAt) {
-          reasons.push({ code: 'older_than_original', label: REASON_LABELS.older_than_original, points: -10 })
-        }
-      }
-
-      const preliminary = reasons.reduce((sum, r) => sum + r.points, 0)
-      return { cand, reasons, preliminary }
     }
-  )
+
+    if (cand.channelId && originalChannelId && cand.channelId === originalChannelId) {
+      reasons.push({ code: 'same_channel', label: REASON_LABELS.same_channel, points: -50 })
+    }
+
+    const candPublishedAt = cand.publishedAt ? new Date(cand.publishedAt) : null
+    if (originalPublishedAt && candPublishedAt) {
+      if (candPublishedAt > originalPublishedAt) {
+        reasons.push({ code: 'newer_than_original', label: REASON_LABELS.newer_than_original, points: 5 })
+      } else if (candPublishedAt < originalPublishedAt) {
+        reasons.push({ code: 'older_than_original', label: REASON_LABELS.older_than_original, points: -10 })
+      }
+    }
+
+    const preliminary = reasons.reduce((sum, r) => sum + r.points, 0)
+    return { cand, reasons, preliminary }
+  }
+
+  const preScored = await mapWithConcurrency(rawCandidates, THUMBNAIL_HASH_CONCURRENCY, scoreOne)
+
+  // Transcript video gốc lấy MỘT lần rồi dùng cho cả hai việc: tìm kiếm theo
+  // nội dung (bên dưới) và đối chiếu transcript (phía sau). Bước này scrape
+  // trang watch, không tốn quota.
+  const originalTranscript = await fetchTranscript(videoId)
+  const originalTranscriptNorm = normalizeText(originalTranscript)
+
+  // --- Tìm kiếm vòng 2: theo nội dung nói, không theo tiêu đề ---
+  // Chỉ chi thêm 100 unit khi vòng 1 KHÔNG tìm ra gì đáng tin. Nếu tiêu đề đã
+  // lôi ra được ứng viên điểm cao thì tiêu thêm quota là lãng phí; còn khi
+  // vòng 1 trắng tay thì đó đúng là lúc kẻ reup đã đổi tiêu đề — và là lúc
+  // truy vấn theo transcript đáng giá nhất.
+  const bestPreliminary = preScored.reduce((max, e) => Math.max(max, e.preliminary), 0)
+  const discoveryMode = options.transcriptDiscovery ?? 'auto'
+  const wantDiscovery =
+    discoveryMode === 'always' ||
+    (discoveryMode === 'auto' && bestPreliminary < TRANSCRIPT_DISCOVERY_TRIGGER)
+
+  let transcriptQueryUsed: string | undefined
+
+  if (wantDiscovery && originalTranscriptNorm) {
+    const phrase = extractDistinctivePhrase(originalTranscript, original.candidate.title)
+    if (phrase) {
+      const seen = new Set([videoId, ...rawCandidates.map(c => c.videoId)])
+      transcriptQueryUsed = buildTranscriptSearchQuery(phrase.phrase)
+      const extra = (await searchYouTube(transcriptQueryUsed, apiKey, videoId)).filter(c => !seen.has(c.videoId))
+      quotaUnits += YOUTUBE_SEARCH_UNITS
+
+      if (extra.length > 0) {
+        const extraScored = await mapWithConcurrency(extra, THUMBNAIL_HASH_CONCURRENCY, scoreOne)
+        preScored.push(...extraScored)
+      }
+    }
+  }
 
   const sortedPre = [...preScored].sort((a, b) => b.preliminary - a.preliminary)
   const transcriptTargets = new Set(sortedPre.slice(0, TRANSCRIPT_TOP_N).map(s => s.cand.videoId))
-
-  let originalTranscript = ''
-  if (transcriptTargets.size > 0) {
-    originalTranscript = await fetchTranscript(videoId)
-  }
-  const originalTranscriptNorm = normalizeText(originalTranscript)
 
   if (originalTranscriptNorm) {
     for (const entry of sortedPre) {
@@ -287,12 +356,14 @@ export async function findCopies(
       publishedAt: originalPublishedAt ? originalPublishedAt.toISOString() : null
     },
     candidates,
-    searched: rawCandidates.length,
+    searched: preScored.length,
     transcriptChecked,
     mediaChecked,
     mediaCheckEnabled: !!options.deepMediaCheck,
     mediaCheckStatus,
-    query
+    query,
+    transcriptQuery: transcriptQueryUsed,
+    quotaUnits
   }
 }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Layout,
   Table,
@@ -41,14 +41,13 @@ import {
   HistoryOutlined
 } from '@ant-design/icons'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Sidebar from '@/components/layout/Sidebar'
 import Header from '@/components/layout/Header'
 import PlatformBadge from '@/components/ui/PlatformBadge'
 import RiskPill from '@/components/ui/RiskPill'
 import UploadDropzone from '@/components/ui/UploadDropzone'
-import CheckSwitch from '@/components/ui/CheckSwitch'
 import { ConnectorStatus, Platform, ScanRun, BrandAsset } from '@/types'
 import { useTranslation } from '@/lib/i18n/context'
 import { detectScanInput, type DetectedInput } from '@/lib/scans/detectScanInput'
@@ -90,16 +89,32 @@ function assetTypeFromFile(file: File): 'image' | 'video' | 'audio' | null {
   return null
 }
 
+/**
+ * useSearchParams bắt buộc phải nằm trong Suspense boundary ở App Router,
+ * nếu không `next build` sẽ báo lỗi prerender.
+ */
 export default function ScansPage() {
+  return (
+    <Suspense fallback={null}>
+      <ScansPageInner />
+    </Suspense>
+  )
+}
+
+function ScansPageInner() {
   const { status } = useSession()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { t } = useTranslation()
 
   const [scans, setScans] = useState<ScanRun[]>([])
   const [connectorStatus, setConnectorStatus] = useState<ConnectorStatus[]>([])
   const [loadingScans, setLoadingScans] = useState(true)
 
-  const [query, setQuery] = useState('')
+  // Cho phép mở sẵn với link: /scans?url=... (ô quick-check ở Dashboard dùng
+  // đường này). Trước đây /url-check nhận param nhưng không hề đọc nên link
+  // người dùng gõ bị nuốt mất.
+  const [query, setQuery] = useState(() => searchParams.get('url') || '')
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>(['youtube', 'google'])
   const [scanning, setScanning] = useState(false)
   const [scanProgress, setScanProgress] = useState<{ status: 'idle' | 'running' | 'completed' | 'failed'; findings: number }>({ status: 'idle', findings: 0 })
@@ -479,8 +494,6 @@ export default function ScansPage() {
               Làm mới lịch sử
             </Button>
           </div>
-
-          <CheckSwitch />
 
           {/* ===== SCAN DECK — hero control surface ===== */}
           <div

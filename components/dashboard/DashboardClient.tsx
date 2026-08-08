@@ -84,7 +84,8 @@ export default function DashboardClient() {
   const submitUrlCheck = () => {
     const url = checkUrl.trim()
     if (!url) return
-    router.push(`/url-check?url=${encodeURIComponent(url)}`)
+    // Trang /scans đọc `url` qua useSearchParams và tự điền vào ô nhập.
+    router.push(`/scans?url=${encodeURIComponent(url)}`)
   }
 
   if (status === 'loading' || loading) {
@@ -138,10 +139,10 @@ export default function DashboardClient() {
           <div className="cm-card dash-check-bar">
             <div className="dash-check-icon"><LinkOutlined /></div>
             <div className="dash-check-body">
-              <div className="dash-check-title">{t('urlCheck.sub')}</div>
+              <div className="dash-check-title">{t('scans.quickBar.title')}</div>
               <div className="dash-check-row">
                 <Input
-                  placeholder={t('urlCheck.placeholder')}
+                  placeholder={t('scans.quickBar.placeholder')}
                   value={checkUrl}
                   onChange={e => setCheckUrl(e.target.value)}
                   onPressEnter={submitUrlCheck}
@@ -149,7 +150,7 @@ export default function DashboardClient() {
                   allowClear
                 />
                 <Button type="primary" icon={<PlayCircleOutlined />} onClick={submitUrlCheck}>
-                  {t('urlCheck.run')}
+                  {t('scans.quickBar.run')}
                 </Button>
               </div>
             </div>

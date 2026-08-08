@@ -9,9 +9,6 @@ import {
   FileProtectOutlined,
   SecurityScanOutlined,
   WarningOutlined,
-  FileSearchOutlined,
-  LinkOutlined,
-  SearchOutlined,
   SafetyCertificateOutlined,
   MenuOutlined,
   MenuUnfoldOutlined
@@ -47,9 +44,6 @@ export default function Sidebar() {
     { key: '/assets', icon: <FileProtectOutlined />, label: t('nav.assets') },
     { key: '/scans', icon: <SecurityScanOutlined />, label: t('nav.scans') },
     { key: '/findings', icon: <WarningOutlined />, label: t('nav.findings') },
-    { key: '/url-check', icon: <LinkOutlined />, label: t('nav.urlCheck') },
-    { key: '/find-copies', icon: <SearchOutlined />, label: t('nav.findCopies') },
-    { key: '/text-check', icon: <FileSearchOutlined />, label: t('nav.textCheck') },
     { key: '/settings', icon: <SettingOutlined />, label: t('nav.settings') }
   ]
 
