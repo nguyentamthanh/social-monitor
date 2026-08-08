@@ -6,6 +6,7 @@ import { MediaDeepCheckResult, checkYouTubeMediaSimilarity } from '@/lib/copyrig
 import { mapWithConcurrency } from '@/lib/util/pool'
 import { capRiskScore, reasonLabel } from '@/lib/copyright/reasons'
 import { extractDistinctivePhrase, buildTranscriptSearchQuery } from '@/lib/copyright/transcriptQuery'
+import { fetchStoryboardHashes, compareFrameHashes } from '@/lib/copyright/storyboard'
 
 export interface CopyCandidate {
   videoId: string
@@ -35,6 +36,8 @@ export interface FindCopiesResult {
   candidates: CopyCandidate[]
   searched: number
   transcriptChecked: number
+  /** Số ứng viên đã được so khung hình qua storyboard. */
+  frameChecked: number
   mediaChecked: number
   mediaCheckEnabled: boolean
   mediaCheckStatus?: string
@@ -51,7 +54,14 @@ export interface FindCopiesResult {
  */
 export const FIND_COPIES_QUOTA_UNITS = 101
 
-const MIN_REPORT_SCORE = 30
+/**
+ * Đặt TRÊN trần hạng `weak` (35) để ứng viên chỉ trùng tiêu đề/tag không lọt
+ * vào báo cáo. Trước đây ngưỡng 30 nằm dưới trần weak nên mọi trùng tên đều
+ * qua — một lần quét Despacito trả về 45 kết quả mà gần như toàn bộ là nhiễu.
+ * Muốn được báo cáo thì phải có ít nhất bằng chứng hạng `medium`
+ * (transcript / thumbnail / mô tả) hoặc `strong` (khung hình).
+ */
+const MIN_REPORT_SCORE = 40
 const MAX_CANDIDATES = 50
 /** Mỗi ứng viên vừa tải thumbnail vừa tính DCT — mở cả 50 cùng lúc là cách
  *  nhanh nhất để vượt giới hạn 60s của Vercel. */
@@ -66,6 +76,14 @@ export const YOUTUBE_SEARCH_UNITS = 100
  * bằng ngưỡng "rủi ro trung bình" — tức là "chưa tìm được gì đáng tin".
  */
 const TRANSCRIPT_DISCOVERY_TRIGGER = 45
+/** Số ứng viên được so khung hình. Mỗi lượt ~350ms nên 8 vẫn thoải mái trong 60s. */
+const FRAME_MATCH_TOP_N = 8
+const FRAME_CHECK_CONCURRENCY = 3
+/**
+ * Tỉ lệ frame gốc tìm được cặp khớp. Đo thực nghiệm: video không liên quan
+ * cho 0%, còn chính nó cho 100% — nên 10% đã là tín hiệu rất mạnh.
+ */
+const FRAME_COVERAGE_THRESHOLD = 0.1
 
 interface RawSearchCandidate {
   videoId: string
@@ -139,6 +157,12 @@ export async function findCopies(
      * vấn theo tiêu đề trắng tay.
      */
     transcriptDiscovery?: 'auto' | 'always' | 'off'
+    /**
+     * So khung hình qua storyboard YouTube (mặc định bật). Đây là bằng chứng
+     * media hạng `strong` duy nhất chạy được không cần worker.
+     */
+    frameMatch?: boolean
+    frameMatchTopN?: number
   } = {}
 ): Promise<FindCopiesResult> {
   const apiKey = options.apiKey
@@ -280,6 +304,36 @@ export async function findCopies(
     }
   }
 
+  // --- So khớp khung hình bằng storyboard ---
+  // Chạy được ngay trên Vercel: storyboard là ảnh tĩnh trên CDN, không cần
+  // yt-dlp/ffmpeg và không tốn quota API. Đây là bằng chứng hạng `strong`
+  // duy nhất khả dụng khi chưa có worker, và là cách duy nhất bắt được kẻ
+  // chỉ lấy hình ảnh (đổi tiêu đề, đổi thumbnail, tắt tiếng).
+  let frameChecked = 0
+  if (options.frameMatch !== false) {
+    const frameTargets = sortedPre.slice(0, options.frameMatchTopN ?? FRAME_MATCH_TOP_N)
+    if (frameTargets.length > 0) {
+      const originalFrames = await fetchStoryboardHashes(videoId)
+
+      if (originalFrames.length > 0) {
+        await mapWithConcurrency(frameTargets, FRAME_CHECK_CONCURRENCY, async entry => {
+          const candFrames = await fetchStoryboardHashes(entry.cand.videoId)
+          if (candFrames.length === 0) return
+          frameChecked += 1
+
+          const match = compareFrameHashes(originalFrames, candFrames)
+          if (match.coverage >= FRAME_COVERAGE_THRESHOLD) {
+            entry.reasons.push({
+              code: 'video_frame_match',
+              label: REASON_LABELS.video_frame_match,
+              points: Math.round(35 * Math.min(1, match.coverage / 0.5))
+            })
+          }
+        })
+      }
+    }
+  }
+
   const mediaCheckTargets = new Set(
     options.deepMediaCheck
       ? [...preScored]
@@ -358,6 +412,7 @@ export async function findCopies(
     candidates,
     searched: preScored.length,
     transcriptChecked,
+    frameChecked,
     mediaChecked,
     mediaCheckEnabled: !!options.deepMediaCheck,
     mediaCheckStatus,
