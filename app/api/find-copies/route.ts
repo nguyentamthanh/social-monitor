@@ -4,7 +4,11 @@ import { authOptions } from '@/lib/auth'
 import { initializeDatabase } from '@/lib/db'
 import { extractYouTubeVideoId } from '@/lib/copyright/urlParser'
 import { YouTubeLookupError } from '@/lib/copyright/youtubeVideoLookup'
-import { findCopies } from '@/lib/copyright/findCopies'
+import { findCopies, FIND_COPIES_QUOTA_UNITS } from '@/lib/copyright/findCopies'
+import { resolveApiKeys } from '@/lib/copyright/apiKeys'
+import { parseOrError, youtubeUrlRequestSchema } from '@/lib/validation'
+import { getQuota, recordUsage } from '@/lib/copyright/quota'
+import { getUserSettings } from '@/lib/models/UserSettings'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
@@ -17,9 +21,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await request.json().catch(() => ({}))
-    const rawUrl: string = typeof body.url === 'string' ? body.url : ''
-    const deepMediaCheck = body.deepMediaCheck === true
+    const parsed = parseOrError(youtubeUrlRequestSchema, await request.json().catch(() => ({})))
+    if (!parsed.ok) return parsed.response
+    const rawUrl = parsed.data.url
+    const deepMediaCheck = parsed.data.deepMediaCheck === true
 
     const videoId = extractYouTubeVideoId(rawUrl)
     if (!videoId) {
@@ -29,7 +34,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const result = await findCopies(videoId, { deepMediaCheck })
+    const userId = (session.user as any).id || session.user.email!
+    const keys = await resolveApiKeys(userId)
+
+    const settings = await getUserSettings(userId).catch(() => null)
+    const quota = await getQuota(userId, settings?.preferences)
+    if (quota.exceeded) {
+      return NextResponse.json(
+        {
+          error: 'quota_exceeded',
+          message: `Đã dùng hết ${quota.budget} quota YouTube hôm nay. Quota reset lúc 00:00 giờ Thái Bình Dương, hoặc tăng hạn mức trong Cài đặt.`,
+          quota
+        },
+        { status: 429 }
+      )
+    }
+    const result = await findCopies(videoId, { deepMediaCheck, apiKey: keys.youtubeApiKey })
+    await recordUsage(userId, FIND_COPIES_QUOTA_UNITS)
     return NextResponse.json(result)
   } catch (error) {
     if (error instanceof YouTubeLookupError) {

@@ -9,6 +9,7 @@ export default function LocaleSwitch() {
   return (
     <Segmented
       size="small"
+      className="locale-switch"
       value={locale}
       onChange={(value) => setLocale(value as 'vi' | 'en')}
       options={[

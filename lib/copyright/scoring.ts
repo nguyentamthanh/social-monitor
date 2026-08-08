@@ -10,6 +10,7 @@ export interface ScoreResult {
 const REASON_LABELS: Record<string, string> = {
   brand_name_match: 'Trùng tên thương hiệu',
   keyword_match: 'Trùng keyword theo dõi',
+  tag_overlap: 'Trùng tags',
   text_similarity_high: 'Nội dung giống văn bản gốc',
   official_domain_missing: 'Nguồn không nằm trong domain chính thức',
   official_domain_match: 'Nguồn thuộc domain chính thức',
@@ -44,6 +45,20 @@ export function scoreCandidate(asset: BrandAsset, candidate: RawCandidate): Scor
   const keywordHits = keywords.filter(keyword => candidateText.includes(keyword))
   if (keywordHits.length > 0) {
     reasons.push(reason('keyword_match', Math.min(30, 12 + keywordHits.length * 6)))
+  }
+
+  // Tag overlap: match video tags against asset name + keywords
+  const candidateTags = ((candidate.metadata?.tags as string[]) || [])
+    .map(normalizeText)
+    .filter(tag => tag.length >= 2)
+  if (candidateTags.length > 0) {
+    const tagSignals = new Set([assetName, ...keywords].filter(Boolean))
+    const tagHits = candidateTags.filter(tag =>
+      [...tagSignals].some(signal => tag.includes(signal) || signal.includes(tag))
+    )
+    if (tagHits.length > 0) {
+      reasons.push(reason('tag_overlap', Math.min(20, 8 + tagHits.length * 4)))
+    }
   }
 
   if (asset.text_content && asset.asset_type !== 'audio') {

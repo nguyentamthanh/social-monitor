@@ -1,10 +1,13 @@
 import { extractYouTubeVideoId } from '@/lib/copyright/urlParser'
+import type { CopyrightAssetType } from '@/types'
 
 const YOUTUBE_RE = /(youtube\.com|youtu\.be)/i
 const DOMAIN_RE = /^[\w-]+(\.[\w-]+)+(\/.*)?$/i
 
 export type DetectedInput = {
-  assetType: 'video' | 'brand_name'
+  /** `detectScanInput` chỉ trả về 'video' | 'brand_name', nhưng kiểu này còn
+   * dùng chung cho payload từ tệp kéo-thả (image / audio / video). */
+  assetType: CopyrightAssetType
   name: string
   youtubeUrl?: string
   officialDomains?: string

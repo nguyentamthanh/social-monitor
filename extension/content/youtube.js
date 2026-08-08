@@ -43,7 +43,7 @@ function riskColor(score) {
 function renderLoading() {
   return `
     <div class="sm-panel-inner">
-      <div class="sm-header">🛡️ Social Monitor</div>
+      <div class="sm-header">🛡️ Copyright Checker</div>
       <div class="sm-loading">Đang kiểm tra bản quyền…</div>
     </div>`
 }
@@ -51,7 +51,7 @@ function renderLoading() {
 function renderSetupNeeded() {
   return `
     <div class="sm-panel-inner">
-      <div class="sm-header">🛡️ Social Monitor</div>
+      <div class="sm-header">🛡️ Copyright Checker</div>
       <div class="sm-warning">⚙️ Chưa cấu hình —
         <a id="sm-open-options">Mở cài đặt</a>
       </div>
@@ -61,7 +61,7 @@ function renderSetupNeeded() {
 function renderError(msg) {
   return `
     <div class="sm-panel-inner">
-      <div class="sm-header">🛡️ Social Monitor</div>
+      <div class="sm-header">🛡️ Copyright Checker</div>
       <div class="sm-error">⚠️ ${msg}</div>
     </div>`
 }
@@ -72,7 +72,7 @@ function renderResult(data, appUrl) {
   if (noAssets) {
     return `
       <div class="sm-panel-inner">
-        <div class="sm-header">🛡️ Social Monitor</div>
+        <div class="sm-header">🛡️ Copyright Checker</div>
         <div class="sm-info">Chưa có Brand Asset nào.
           <a href="${appUrl}/assets" target="_blank">Thêm tài sản →</a>
         </div>
@@ -91,7 +91,7 @@ function renderResult(data, appUrl) {
   return `
     <div class="sm-panel-inner">
       <div class="sm-header">
-        🛡️ Social Monitor
+        🛡️ Copyright Checker
         <span class="sm-score" style="background:${color}20;color:${color};border-color:${color}40">${topScore}</span>
       </div>
       <div class="sm-meta">${assetsChecked} tài sản được kiểm tra</div>

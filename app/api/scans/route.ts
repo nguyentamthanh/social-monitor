@@ -4,8 +4,11 @@ import { authOptions } from '@/lib/auth'
 import { initializeDatabase } from '@/lib/db'
 import { runCopyrightScan } from '@/lib/copyright/scanner'
 import { getConnectorStatuses } from '@/lib/copyright/adapters'
+import { resolveApiKeys } from '@/lib/copyright/apiKeys'
+import { getQuota } from '@/lib/copyright/quota'
+import { getUserSettings } from '@/lib/models/UserSettings'
 import { findScanRunsByUserId } from '@/lib/models/CopyrightMonitor'
-import { Platform } from '@/types'
+import { parseOrError, scanRequestSchema } from '@/lib/validation'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,12 +21,15 @@ export async function GET() {
     }
 
     const userId = (session.user as any).id || session.user.email!
-    const [scans, connectorStatus] = await Promise.all([
+    const [scans, keys, settings] = await Promise.all([
       findScanRunsByUserId(userId),
-      Promise.resolve(getConnectorStatuses())
+      resolveApiKeys(userId),
+      getUserSettings(userId).catch(() => null)
     ])
+    const connectorStatus = getConnectorStatuses(undefined, keys)
+    const quota = await getQuota(userId, settings?.preferences)
 
-    return NextResponse.json({ scans, connectorStatus })
+    return NextResponse.json({ scans, connectorStatus, quota })
   } catch (error) {
     console.error('Scans GET error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -38,13 +44,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await request.json().catch(() => ({}))
-    const assetIds = Array.isArray(body.assetIds)
-      ? body.assetIds.map((id: unknown) => Number(id)).filter((id: number) => Number.isInteger(id))
-      : undefined
-    const platforms = Array.isArray(body.platforms)
-      ? body.platforms.filter((platform: string) => ['facebook', 'google', 'youtube', 'tiktok'].includes(platform)) as Platform[]
-      : undefined
+    const parsed = parseOrError(scanRequestSchema, await request.json().catch(() => ({})))
+    if (!parsed.ok) return parsed.response
+    const { assetIds, platforms } = parsed.data
 
     const userId = (session.user as any).id || session.user.email!
     const result = await runCopyrightScan({ userId, assetIds, platforms })

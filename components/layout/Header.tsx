@@ -1,18 +1,21 @@
 'use client'
 
-import { Layout, Input, Badge, Avatar, Dropdown, Space, Popover, List, Empty, Spin } from 'antd'
+import { Layout, Input, Badge, Avatar, Dropdown, Space, Popover, List, Empty, Spin, Button, Tooltip } from 'antd'
 import {
   SearchOutlined,
   BellOutlined,
   SettingOutlined,
   UserOutlined,
-  LogoutOutlined
+  LogoutOutlined,
+  SunOutlined,
+  MoonOutlined
 } from '@ant-design/icons'
 import { signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import LocaleSwitch from '@/components/ui/LocaleSwitch'
 import { useTranslation } from '@/lib/i18n/context'
+import { useTheme } from '@/components/ThemeProvider'
 
 const { Header: AntHeader } = Layout
 
@@ -33,6 +36,7 @@ export default function Header({ title }: HeaderProps) {
   const { data: session } = useSession()
   const router = useRouter()
   const { t } = useTranslation()
+  const { theme, toggleTheme } = useTheme()
   const [notifications, setNotifications] = useState<NotificationItem[]>([])
   const [unread, setUnread] = useState(0)
   const [loadingNotifs, setLoadingNotifs] = useState(false)
@@ -87,7 +91,7 @@ export default function Header({ title }: HeaderProps) {
           borderBottom: '1px solid rgba(255,255,255,0.06)'
         }}
       >
-        <span style={{ fontWeight: 600, color: '#fafafa' }}>{t('common.notifications')}</span>
+        <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{t('common.notifications')}</span>
         {unread > 0 && (
           <a onClick={markAllRead} style={{ fontSize: 12 }}>
             Mark all read
@@ -104,8 +108,8 @@ export default function Header({ title }: HeaderProps) {
           renderItem={(item) => (
             <List.Item style={{ padding: '12px', cursor: 'pointer', background: !item.read_at ? 'rgba(139,92,246,0.05)' : 'transparent' }}>
               <List.Item.Meta
-                title={<span style={{ color: '#fafafa', fontSize: 13 }}>{item.title}</span>}
-                description={<span style={{ color: '#a1a1aa', fontSize: 12 }}>{item.message}</span>}
+                title={<span style={{ color: 'var(--text-primary)', fontSize: 13 }}>{item.title}</span>}
+                description={<span style={{ color: 'var(--text-secondary)', fontSize: 12 }}>{item.message}</span>}
               />
             </List.Item>
           )}
@@ -121,37 +125,48 @@ export default function Header({ title }: HeaderProps) {
         alignItems: 'center',
         justifyContent: 'space-between'
       }}
+      className="!h-12 sm:!h-14 md:!h-16 !pl-12 !pr-2 sm:!pr-3 md:!px-8"
     >
-      <h2 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: '#fafafa', letterSpacing: '-0.01em' }}>
+      {/* pl-12 trên mobile chừa chỗ cho nút hamburger fixed của Sidebar */}
+      <h2 className="m-0 text-sm sm:text-base md:text-lg font-semibold text-[var(--text-primary)] tracking-tight truncate max-w-[150px] sm:max-w-[200px] md:max-w-none">
         {title || t('nav.dashboard')}
       </h2>
-      <Space size={16}>
+      <Space size={8} className="gap-1 sm:gap-2 md:gap-4">
+        {/* inline-flex chứ không phải block: affix-wrapper cần flex để icon và ô
+            chữ nằm cùng hàng */}
         <Input
-          className="app-header-search"
+          className="hidden! lg:inline-flex!"
           placeholder={t('common.search')}
           prefix={<SearchOutlined />}
-          style={{ width: 280 }}
+          style={{ width: 240 }}
         />
-        <LocaleSwitch />
+        <Tooltip title={theme === 'dark' ? t('common.lightMode') : t('common.darkMode')}>
+          <Button
+            type="text"
+            shape="circle"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+            icon={
+              theme === 'dark'
+                ? <SunOutlined className="text-[15px] sm:text-lg text-[var(--text-secondary)]" />
+                : <MoonOutlined className="text-[15px] sm:text-lg text-[var(--text-secondary)]" />
+            }
+            className="!flex !items-center !justify-center"
+          />
+        </Tooltip>
+        <div className="hidden sm:block">
+          <LocaleSwitch />
+        </div>
         <Popover content={notifContent} trigger="click" placement="bottomRight" arrow={false}>
           <Badge count={unread} size="small">
-            <BellOutlined style={{ fontSize: 18, color: '#a1a1aa', cursor: 'pointer' }} />
+            <BellOutlined className="text-[15px] sm:text-lg text-[var(--text-secondary)] cursor-pointer" />
           </Badge>
         </Popover>
         <Dropdown menu={{ items: userMenuItems, onClick: handleMenuClick }} trigger={['click']}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              cursor: 'pointer',
-              padding: '4px 8px',
-              borderRadius: 10
-            }}
-          >
-            <Avatar style={{ background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)' }} size={32} icon={<UserOutlined />} />
-            <div className="app-header-user-meta" style={{ lineHeight: 1.3 }}>
-              <div style={{ fontSize: 13, fontWeight: 500, color: '#fafafa' }}>{session?.user?.name || 'User'}</div>
+          <div className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer px-1 sm:px-2 py-1 rounded-xl">
+            <Avatar style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)' }} size={24} className="sm:!w-[28px] sm:!h-[28px] md:!w-[32px] md:!h-[32px]" icon={<UserOutlined />} />
+            <div className="hidden md:block leading-tight">
+              <div className="text-sm font-medium text-[var(--text-primary)]">{session?.user?.name || 'User'}</div>
             </div>
           </div>
         </Dropdown>

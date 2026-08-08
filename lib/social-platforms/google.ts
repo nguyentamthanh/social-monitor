@@ -1,1 +1,0 @@
-export { googleAdapter } from './index'

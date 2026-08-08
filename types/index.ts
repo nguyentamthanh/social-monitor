@@ -13,68 +13,6 @@ export interface User {
   createdAt?: Date
 }
 
-export interface Keyword {
-  _id?: string
-  userId: string
-  term: string
-  platforms: Platform[]
-  status: 'active' | 'paused' | 'error'
-  refreshInterval: number
-  lastFetchedAt?: Date
-  createdAt?: Date
-}
-
-export interface Author {
-  id: string
-  name: string
-  handle: string
-  avatar?: string
-}
-
-export interface Metrics {
-  likes: number
-  shares: number
-  comments: number
-  views: number
-}
-
-export interface Mention {
-  _id?: string
-  keywordId: string
-  platform: Platform
-  externalId: string
-  author: Author
-  content: string
-  url: string
-  metrics: Metrics
-  publishedAt: Date
-  fetchedAt: Date
-}
-
-export interface TrendData {
-  _id?: string
-  keywordId: string
-  platform: Platform | 'all'
-  date: Date
-  mentionCount: number
-  engagement: number
-}
-
-export interface MentionResult {
-  platform: Platform
-  externalId: string
-  author: Author
-  content: string
-  url: string
-  metrics: Metrics
-  publishedAt: Date
-}
-
-export interface PlatformAdapter {
-  platform: Platform
-  searchMentions(keyword: string): Promise<MentionResult[]>
-}
-
 export interface BrandAsset {
   id: number
   user_id: string
@@ -102,7 +40,7 @@ export interface RawCandidate {
   title: string
   content: string
   url: string
-  author?: Author
+  author?: { id?: string; name?: string; handle?: string; avatar?: string } | null
   publishedAt?: Date | null
   metadata?: Record<string, unknown>
   media?: {
@@ -171,7 +109,7 @@ export interface Finding {
   title: string
   content: string
   url: string
-  author?: Author | null
+  author?: { id?: string; name?: string; handle?: string; avatar?: string } | null
   risk_score: number
   reasons: FindingReason[]
   status: FindingStatus

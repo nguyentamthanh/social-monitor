@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Form, Input, Button, message } from 'antd'
 import { MailOutlined, LockOutlined, SafetyCertificateOutlined } from '@ant-design/icons'
 import { useTranslation } from '@/lib/i18n/context'
+import ThemeToggle from '@/components/ui/ThemeToggle'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -32,22 +33,23 @@ export default function LoginPage() {
   }
 
   const useDemo = () => {
-    onSubmit({ email: 'admin@admin.com', password: 'admin123' })
+    onSubmit({ email: 'demo@demo.com', password: 'demo123456' })
   }
 
   return (
     <div className="auth-shell">
+      <ThemeToggle className="auth-theme-toggle" />
       <div className="auth-hero">
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 40 }}>
             <div style={{
               width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              borderRadius: 12, background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+              borderRadius: 12, background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
               boxShadow: '0 0 24px rgba(139,92,246,0.5)'
             }}>
               <SafetyCertificateOutlined style={{ color: 'white', fontSize: 22 }} />
             </div>
-            <span style={{ color: '#fafafa', fontSize: 20, fontWeight: 700 }}>{t('app.name')}</span>
+            <span style={{ color: 'var(--text-primary)', fontSize: 20, fontWeight: 700 }}>{t('app.name')}</span>
           </div>
           <h1>{t('auth.brandTitle')}</h1>
           <p>{t('auth.brandSub')}</p>
@@ -57,10 +59,10 @@ export default function LoginPage() {
           {['Text', 'Image', 'Video', 'Audio'].map((label, i) => (
             <div key={label}>
               <div style={{
-                color: ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b'][i],
+                color: ['#8b5cf6', '#ec4899', '#10b981', '#f59e0b'][i],
                 fontSize: 22, fontWeight: 700, lineHeight: 1
               }}>4</div>
-              <div style={{ color: '#a1a1aa', fontSize: 12, marginTop: 4 }}>{label} scan</div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: 12, marginTop: 4 }}>{label} scan</div>
             </div>
           ))}
         </div>
@@ -88,7 +90,7 @@ export default function LoginPage() {
               {t('auth.tryDemo')}
             </Button>
           </Form>
-          <div style={{ marginTop: 24, textAlign: 'center', color: '#a1a1aa', fontSize: 13 }}>
+          <div style={{ marginTop: 24, textAlign: 'center', color: 'var(--text-secondary)', fontSize: 13 }}>
             {t('auth.noAccount')}{' '}
             <Link href="/register" className="auth-link">{t('auth.register')}</Link>
           </div>

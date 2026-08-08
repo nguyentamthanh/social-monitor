@@ -46,15 +46,15 @@ export default function UploadDropzone({ onFile, accept, hint }: Props) {
       />
       {preview ? (
         <div>
-          <FileImageOutlined style={{ fontSize: 32, color: '#06b6d4', marginBottom: 12 }} />
-          <div style={{ color: '#fafafa', fontWeight: 600, marginBottom: 4 }}>{preview.name}</div>
-          <div style={{ color: '#71717a', fontSize: 12 }}>{(preview.size / 1024).toFixed(1)} KB</div>
+          <FileImageOutlined style={{ fontSize: 32, color: '#ec4899', marginBottom: 12 }} />
+          <div style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: 4 }}>{preview.name}</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>{(preview.size / 1024).toFixed(1)} KB</div>
         </div>
       ) : (
         <div>
           <CloudUploadOutlined className="dropzone-icon" />
-          <div style={{ color: '#fafafa', fontWeight: 500, marginBottom: 4 }}>{t('assets.upload')}</div>
-          <div style={{ color: '#71717a', fontSize: 12 }}>{hint || t('assets.uploadHint')}</div>
+          <div style={{ color: 'var(--text-primary)', fontWeight: 500, marginBottom: 4 }}>{t('assets.upload')}</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>{hint || t('assets.uploadHint')}</div>
         </div>
       )}
     </div>

@@ -2,10 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { initializeDatabase } from '@/lib/db'
-import { copyrightAdapters } from '@/lib/copyright/adapters'
+import { copyrightAdapters, countYoutubeQueries } from '@/lib/copyright/adapters'
+import { resolveApiKeys } from '@/lib/copyright/apiKeys'
+import { parseOrError, quickScanSchema } from '@/lib/validation'
+import { getQuota, recordUsage, YOUTUBE_COST } from '@/lib/copyright/quota'
+import { getUserSettings } from '@/lib/models/UserSettings'
 import { scoreCandidate } from '@/lib/copyright/scoring'
 import { computePHash } from '@/lib/copyright/imageHash'
-import { findCopies } from '@/lib/copyright/findCopies'
+import { findCopies, FIND_COPIES_QUOTA_UNITS } from '@/lib/copyright/findCopies'
 import { extractYouTubeVideoId } from '@/lib/copyright/urlParser'
 import { BrandAsset, Platform, CopyrightAssetType } from '@/types'
 import { resolveFindCopiesOptions } from './resolveFindCopiesOptions'
@@ -13,6 +17,11 @@ import { resolveFindCopiesOptions } from './resolveFindCopiesOptions'
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 export const maxDuration = 300
+
+function formDataString(formData: FormData, key: string): string {
+  const value = formData.get(key)
+  return typeof value === 'string' ? value : ''
+}
 
 function splitList(value: string): string[] {
   return value
@@ -29,20 +38,57 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const userId = (session.user as any).id || session.user.email!
+    const keys = await resolveApiKeys(userId)
+
     const formData = await request.formData()
-    const mode = String(formData.get('mode') || '').trim() || undefined
-    const assetType = String(formData.get('assetType') || 'brand_name') as CopyrightAssetType
-    const keywords = splitList(String(formData.get('keywords') || ''))
-    const officialDomains = splitList(String(formData.get('officialDomains') || ''))
     const file = formData.get('file')
-    const platformsStr = String(formData.get('platforms') || 'youtube,google')
-    const platforms = splitList(platformsStr).filter(p => ['youtube', 'google', 'facebook', 'tiktok'].includes(p)) as Platform[]
-    const youtubeUrl = String(formData.get('youtubeUrl') || '').trim() || null
+
+    // Validate phần text của FormData; `file` xử lý riêng vì zod không mô tả Blob.
+    const parsed = parseOrError(quickScanSchema, {
+      name: formDataString(formData, 'name'),
+      assetType: formDataString(formData, 'assetType') || 'brand_name',
+      keywords: formDataString(formData, 'keywords'),
+      officialDomains: formDataString(formData, 'officialDomains'),
+      youtubeUrl: formDataString(formData, 'youtubeUrl'),
+      textContent: formDataString(formData, 'textContent'),
+      audioTitle: formDataString(formData, 'audioTitle'),
+      audioArtist: formDataString(formData, 'audioArtist'),
+      mode: formDataString(formData, 'mode') || undefined,
+      platforms: formDataString(formData, 'platforms') || 'youtube,google'
+    })
+    if (!parsed.ok) return parsed.response
+
+    const input = parsed.data
+    const mode = input.mode
+    const assetType = input.assetType as CopyrightAssetType
+    const keywords = splitList(input.keywords || '')
+    const officialDomains = splitList(input.officialDomains || '')
+    const platforms = input.platforms as Platform[]
+    const youtubeUrl = input.youtubeUrl || null
     const youtubeVideoId = youtubeUrl ? extractYouTubeVideoId(youtubeUrl) : null
     let youtubeDeepSummary: Record<string, unknown> | null = null
 
+    // Chặn trước khi gọi YouTube: hết quota thì nói rõ thay vì để Google trả 403.
+    const usesYoutube = platforms.includes('youtube')
+    const settings = await getUserSettings(userId).catch(() => null)
+    const quota = usesYoutube
+      ? await getQuota(userId, settings?.preferences)
+      : null
+    if (quota?.exceeded) {
+      return NextResponse.json(
+        {
+          error: 'quota_exceeded',
+          message: `Đã dùng hết ${quota.budget} quota YouTube hôm nay. Quota reset lúc 00:00 giờ Thái Bình Dương, hoặc tăng hạn mức trong Cài đặt.`,
+          quota
+        },
+        { status: 429 }
+      )
+    }
+
     if (youtubeVideoId && platforms.includes('youtube')) {
-      const result = await findCopies(youtubeVideoId, resolveFindCopiesOptions(mode))
+      const result = await findCopies(youtubeVideoId, { ...resolveFindCopiesOptions(mode), apiKey: keys.youtubeApiKey })
+      await recordUsage(userId, FIND_COPIES_QUOTA_UNITS)
       const findings = result.candidates.map(candidate => ({
         platform: 'youtube',
         source: 'youtube_find_copies_deep',
@@ -84,18 +130,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    let name = String(formData.get('name') || '').trim()
-    let textContent = String(formData.get('textContent') || '').trim() || null
-    let audioTitle = String(formData.get('audioTitle') || '').trim() || null
-    let audioArtist = String(formData.get('audioArtist') || '').trim() || null
+    let name = input.name || ''
+    let textContent = input.textContent || null
+    let audioTitle = input.audioTitle || null
+    let audioArtist = input.audioArtist || null
     let perceptualHash: string | null = null
 
     // If YouTube URL is provided, fetch its metadata to auto-populate attributes
     if (youtubeUrl && ['audio', 'video'].includes(assetType)) {
       const videoId = extractYouTubeVideoId(youtubeUrl)
       if (videoId) {
-        const apiKey = process.env.YOUTUBE_API_KEY
-        if (apiKey && apiKey !== 'your_youtube_api_key_here') {
+        const apiKey = keys.youtubeApiKey
+        if (apiKey) {
           try {
             const ytRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${apiKey}`)
             if (ytRes.ok) {
@@ -152,8 +198,6 @@ export async function POST(request: NextRequest) {
         ? { title: audioTitle || name, artist: audioArtist || undefined }
         : null
 
-    const userId = (session.user as any).id || session.user.email!
-
     // Create Mock BrandAsset
     const mockAsset: BrandAsset = {
       id: 0,
@@ -177,11 +221,14 @@ export async function POST(request: NextRequest) {
       const adapter = copyrightAdapters[platform]
       if (!platform) continue
 
-      const status = adapter.status()
+      const status = adapter.status(keys)
       if (status.capability !== 'ready') continue
 
       try {
-        const candidates = await adapter.search(mockAsset)
+        const candidates = await adapter.search(mockAsset, keys)
+        if (platform === 'youtube') {
+          await recordUsage(userId, countYoutubeQueries(mockAsset) * YOUTUBE_COST.search)
+        }
         for (const candidate of candidates) {
           const dedupeKey = `${platform}:${candidate.externalId || candidate.url}`
           if (seen.has(dedupeKey)) continue

@@ -19,45 +19,6 @@ export async function initializeDatabase(): Promise<void> {
     `)
 
     await query(`
-      CREATE TABLE IF NOT EXISTS keywords (
-        id SERIAL PRIMARY KEY,
-        user_id VARCHAR NOT NULL,
-        term VARCHAR NOT NULL,
-        platforms TEXT[] NOT NULL,
-        status VARCHAR DEFAULT 'active',
-        refresh_interval INTEGER DEFAULT 3600000,
-        last_fetched_at TIMESTAMP,
-        created_at TIMESTAMP DEFAULT NOW()
-      )
-    `)
-
-    await query(`
-      CREATE TABLE IF NOT EXISTS mentions (
-        id SERIAL PRIMARY KEY,
-        keyword_id INTEGER NOT NULL,
-        platform VARCHAR NOT NULL,
-        external_id VARCHAR NOT NULL,
-        author JSONB NOT NULL,
-        content TEXT NOT NULL,
-        url VARCHAR NOT NULL,
-        metrics JSONB NOT NULL,
-        published_at TIMESTAMP NOT NULL,
-        fetched_at TIMESTAMP DEFAULT NOW()
-      )
-    `)
-
-    await query(`
-      CREATE TABLE IF NOT EXISTS trend_data (
-        id SERIAL PRIMARY KEY,
-        keyword_id INTEGER NOT NULL,
-        platform VARCHAR NOT NULL,
-        date DATE NOT NULL,
-        mention_count INTEGER DEFAULT 0,
-        engagement INTEGER DEFAULT 0
-      )
-    `)
-
-    await query(`
       CREATE TABLE IF NOT EXISTS brand_assets (
         id SERIAL PRIMARY KEY,
         user_id VARCHAR NOT NULL,
@@ -157,10 +118,6 @@ export async function initializeDatabase(): Promise<void> {
       )
     `)
 
-    await query(`CREATE INDEX IF NOT EXISTS idx_mentions_keyword_id ON mentions(keyword_id)`)
-    await query(`CREATE INDEX IF NOT EXISTS idx_mentions_published_at ON mentions(published_at)`)
-    await query(`CREATE INDEX IF NOT EXISTS idx_keywords_user_id ON keywords(user_id)`)
-    await query(`CREATE INDEX IF NOT EXISTS idx_trend_data_keyword_id ON trend_data(keyword_id)`)
     await query(`CREATE INDEX IF NOT EXISTS idx_brand_assets_user_id ON brand_assets(user_id)`)
     await query(`CREATE INDEX IF NOT EXISTS idx_scan_runs_user_id ON scan_runs(user_id)`)
     await query(`CREATE INDEX IF NOT EXISTS idx_findings_user_id ON findings(user_id)`)
@@ -177,6 +134,18 @@ export async function initializeDatabase(): Promise<void> {
       )
     `)
     await query(`CREATE INDEX IF NOT EXISTS idx_extension_api_keys_user_id ON extension_api_keys(user_id)`)
+
+    // Đếm quota API bên thứ ba đã tiêu theo từng user, từng ngày (UTC).
+    await query(`
+      CREATE TABLE IF NOT EXISTS api_usage (
+        user_id VARCHAR NOT NULL,
+        provider VARCHAR NOT NULL,
+        usage_date DATE NOT NULL,
+        units INTEGER NOT NULL DEFAULT 0,
+        updated_at TIMESTAMP DEFAULT NOW(),
+        PRIMARY KEY (user_id, provider, usage_date)
+      )
+    `)
 
     initialized = true
   })()

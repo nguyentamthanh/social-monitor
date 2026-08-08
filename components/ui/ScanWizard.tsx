@@ -25,9 +25,9 @@ interface Props {
 }
 
 const PLATFORM_ICONS: Record<Platform, React.ReactNode> = {
-  youtube: <YoutubeFilled style={{ color: '#ff6b6b' }} />,
-  google: <GoogleSquareFilled style={{ color: '#88aaff' }} />,
-  facebook: <FacebookFilled style={{ color: '#6aa5ff' }} />,
+  youtube: <YoutubeFilled style={{ color: '#ef4444' }} />,
+  google: <GoogleSquareFilled style={{ color: '#4285f4' }} />,
+  facebook: <FacebookFilled style={{ color: '#1877f2' }} />,
   tiktok: <TikTokFilled />
 }
 
@@ -212,15 +212,15 @@ export default function ScanWizard({ open, onClose, onCompleted }: Props) {
 
           {scanMode === 'asset' ? (
             <div>
-              <div style={{ marginBottom: 16, color: '#a1a1aa', fontSize: 13 }}>
+              <div style={{ marginBottom: 16, color: 'var(--text-secondary)', fontSize: 13 }}>
                 Chọn các tài sản bạn muốn quét. Có thể chọn nhiều.
               </div>
               {loadingAssets ? (
-                <div style={{ padding: 24, textAlign: 'center', color: '#a1a1aa' }}>{t('common.loading')}</div>
+                <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-secondary)' }}>{t('common.loading')}</div>
               ) : assets.length === 0 ? (
                 <Empty
                   description={
-                    <span style={{ color: '#a1a1aa' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>
                       Chưa có tài sản nào. <Link href="/assets" style={{ color: '#8b5cf6' }}>Tạo tài sản mới</Link>
                     </span>
                   }
@@ -235,7 +235,7 @@ export default function ScanWizard({ open, onClose, onCompleted }: Props) {
                         alignItems: 'center',
                         gap: 12,
                         padding: '12px 16px',
-                        background: selectedAssets.includes(asset.id) ? 'rgba(139, 92, 246, 0.08)' : '#13131a',
+                        background: selectedAssets.includes(asset.id) ? 'rgba(139, 92, 246, 0.08)' : 'var(--bg-card)',
                         border: `1px solid ${selectedAssets.includes(asset.id) ? '#8b5cf6' : 'rgba(255,255,255,0.06)'}`,
                         borderRadius: 12,
                         cursor: 'pointer',
@@ -251,8 +251,8 @@ export default function ScanWizard({ open, onClose, onCompleted }: Props) {
                       />
                       <FileProtectOutlined style={{ fontSize: 18, color: '#8b5cf6' }} />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ color: '#fafafa', fontWeight: 500 }}>{asset.name}</div>
-                        <div style={{ color: '#71717a', fontSize: 12 }}>
+                        <div style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{asset.name}</div>
+                        <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>
                           {asset.asset_type.toUpperCase()} · {asset.keywords?.length || 0} keywords
                         </div>
                       </div>
@@ -263,7 +263,7 @@ export default function ScanWizard({ open, onClose, onCompleted }: Props) {
               )}
             </div>
           ) : (
-            <Form form={quickForm} layout="vertical" style={{ background: '#13131a', padding: 20, borderRadius: 16, border: '1px solid rgba(255,255,255,0.04)' }}>
+            <Form form={quickForm} layout="vertical" style={{ background: 'var(--bg-card)', padding: 20, borderRadius: 16, border: '1px solid rgba(255,255,255,0.04)' }}>
               <Form.Item name="name" label="Tên tài sản quét nhanh" rules={[{ required: true, message: 'Vui lòng nhập tên' }]}>
                 <Input placeholder="VD: Slogan chiến dịch mới" />
               </Form.Item>
@@ -327,7 +327,7 @@ export default function ScanWizard({ open, onClose, onCompleted }: Props) {
 
       {step === 1 && (
         <div>
-          <div style={{ marginBottom: 16, color: '#a1a1aa', fontSize: 13 }}>
+          <div style={{ marginBottom: 16, color: 'var(--text-secondary)', fontSize: 13 }}>
             Chọn nền tảng để quét. Connector limited cần API key/approval.
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
@@ -342,7 +342,7 @@ export default function ScanWizard({ open, onClose, onCompleted }: Props) {
                   disabled={!ready}
                   style={{
                     padding: 16,
-                    background: selected ? 'rgba(139, 92, 246, 0.1)' : '#13131a',
+                    background: selected ? 'rgba(139, 92, 246, 0.1)' : 'var(--bg-card)',
                     border: `1px solid ${selected ? '#8b5cf6' : 'rgba(255,255,255,0.06)'}`,
                     borderRadius: 12,
                     cursor: ready ? 'pointer' : 'not-allowed',
@@ -353,7 +353,7 @@ export default function ScanWizard({ open, onClose, onCompleted }: Props) {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
                     <span style={{ fontSize: 22 }}>{PLATFORM_ICONS[p]}</span>
-                    <span style={{ color: '#fafafa', fontWeight: 600, textTransform: 'capitalize' }}>{p}</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 600, textTransform: 'capitalize' }}>{p}</span>
                   </div>
                   <div style={{ fontSize: 11, color: ready ? '#10b981' : '#f59e0b' }}>
                     {ready ? '● Sẵn sàng' : '● Cần cấu hình'}
@@ -369,9 +369,9 @@ export default function ScanWizard({ open, onClose, onCompleted }: Props) {
         <div style={{ textAlign: 'center', padding: '32px 16px' }}>
           {scanProgress.status === 'running' && (
             <>
-              <Progress type="circle" percent={75} status="active" strokeColor={{ '0%': '#8b5cf6', '100%': '#06b6d4' }} />
-              <h3 style={{ color: '#fafafa', marginTop: 24 }}>{t('scans.runningStatus')}</h3>
-              <p style={{ color: '#a1a1aa', marginTop: 8 }}>
+              <Progress type="circle" percent={75} status="active" strokeColor={{ '0%': '#8b5cf6', '100%': '#ec4899' }} />
+              <h3 style={{ color: 'var(--text-primary)', marginTop: 24 }}>{t('scans.runningStatus')}</h3>
+              <p style={{ color: 'var(--text-secondary)', marginTop: 8 }}>
                 {scanMode === 'quick' ? 'Đang chạy quét nhanh ad-hoc...' : `Đang quét ${selectedAssets.length} tài sản...`}
               </p>
             </>
@@ -379,10 +379,10 @@ export default function ScanWizard({ open, onClose, onCompleted }: Props) {
           {scanProgress.status === 'completed' && (
             <>
               <CheckCircleOutlined style={{ fontSize: 64, color: '#10b981' }} />
-              <h3 style={{ color: '#fafafa', marginTop: 24 }}>{t('scans.completed')}</h3>
+              <h3 style={{ color: 'var(--text-primary)', marginTop: 24 }}>{t('scans.completed')}</h3>
               
-              <p style={{ color: '#a1a1aa', marginTop: 8 }}>
-                Phát hiện <strong style={{ color: '#fafafa' }}>{scanProgress.findings}</strong> kết quả vi phạm tiềm ẩn.
+              <p style={{ color: 'var(--text-secondary)', marginTop: 8 }}>
+                Phát hiện <strong style={{ color: 'var(--text-primary)' }}>{scanProgress.findings}</strong> kết quả vi phạm tiềm ẩn.
               </p>
 
               {scanMode === 'asset' && scanId && (
@@ -393,13 +393,13 @@ export default function ScanWizard({ open, onClose, onCompleted }: Props) {
 
               {scanMode === 'quick' && quickFindings.length > 0 && (
                 <div style={{ marginTop: 24, textAlign: 'left' }}>
-                  <h4 style={{ color: '#fafafa', marginBottom: 12, fontSize: 14 }}>Kết quả quét nhanh:</h4>
+                  <h4 style={{ color: 'var(--text-primary)', marginBottom: 12, fontSize: 14 }}>Kết quả quét nhanh:</h4>
                   <Table
                     dataSource={quickFindings}
                     rowKey={(record) => `${record.platform}:${record.externalId}`}
                     size="small"
                     pagination={{ pageSize: 5 }}
-                    style={{ background: '#13131a', borderRadius: 8 }}
+                    style={{ background: 'var(--bg-card)', borderRadius: 8 }}
                     columns={[
                       {
                         title: 'Nền tảng',
@@ -414,10 +414,10 @@ export default function ScanWizard({ open, onClose, onCompleted }: Props) {
                         key: 'title',
                         render: (title: string, record: any) => (
                           <div>
-                            <a href={record.url} target="_blank" rel="noreferrer" style={{ color: '#a78bfa', fontWeight: 500, textDecoration: 'underline' }}>
+                            <a href={record.url} target="_blank" rel="noreferrer" style={{ color: '#7c3aed', fontWeight: 500, textDecoration: 'underline' }}>
                               {title}
                             </a>
-                            <div style={{ color: '#71717a', fontSize: 11, marginTop: 4 }}>
+                            <div style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 4 }}>
                               {record.content?.slice(0, 100)}...
                             </div>
                           </div>
@@ -437,7 +437,7 @@ export default function ScanWizard({ open, onClose, onCompleted }: Props) {
 
               {scanMode === 'quick' && quickFindings.length === 0 && (
                 <div style={{ marginTop: 24 }}>
-                  <Empty description={<span style={{ color: '#71717a' }}>Không tìm thấy hành vi vi phạm nào đáng nghi ngờ.</span>} />
+                  <Empty description={<span style={{ color: 'var(--text-muted)' }}>Không tìm thấy hành vi vi phạm nào đáng nghi ngờ.</span>} />
                 </div>
               )}
             </>
@@ -445,8 +445,8 @@ export default function ScanWizard({ open, onClose, onCompleted }: Props) {
           {scanProgress.status === 'failed' && (
             <>
               <div style={{ fontSize: 64, color: '#ef4444' }}>✕</div>
-              <h3 style={{ color: '#fafafa', marginTop: 24 }}>{t('scans.failed')}</h3>
-              <p style={{ color: '#a1a1aa' }}>Vui lòng kiểm tra cấu hình connector hoặc định dạng tệp và thử lại.</p>
+              <h3 style={{ color: 'var(--text-primary)', marginTop: 24 }}>{t('scans.failed')}</h3>
+              <p style={{ color: 'var(--text-secondary)' }}>Vui lòng kiểm tra cấu hình connector hoặc định dạng tệp và thử lại.</p>
             </>
           )}
         </div>

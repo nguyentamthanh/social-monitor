@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Social Monitor",
+  "name": "Copyright Checker",
   "version": "1.0.0",
-  "description": "Kiểm tra bản quyền trực tiếp trên YouTube — powered by Social Monitor",
+  "description": "Kiểm tra bản quyền trực tiếp trên YouTube — powered by Copyright Checker",
   "permissions": ["storage", "activeTab"],
   "host_permissions": [
     "https://www.youtube.com/*",
@@ -26,7 +26,7 @@
   ],
   "action": {
     "default_popup": "popup/popup.html",
-    "default_title": "Social Monitor"
+    "default_title": "Copyright Checker"
   },
   "options_ui": {
     "page": "options/options.html",

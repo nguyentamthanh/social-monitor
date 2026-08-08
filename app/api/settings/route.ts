@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { initializeDatabase } from '@/lib/db'
 import { getUserSettings, maskedSettings, upsertUserSettings } from '@/lib/models/UserSettings'
+import { parseOrError, settingsSchema } from '@/lib/validation'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,12 +30,14 @@ export async function PUT(request: NextRequest) {
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    const body = await request.json()
+    const parsed = parseOrError(settingsSchema, await request.json().catch(() => ({})))
+    if (!parsed.ok) return parsed.response
+
     const userId = (session.user as any).id || session.user.email!
     await upsertUserSettings({
       userId,
-      apiKeys: body.apiKeys || {},
-      preferences: body.preferences || {}
+      apiKeys: parsed.data.apiKeys || {},
+      preferences: parsed.data.preferences || {}
     })
     const refreshed = await getUserSettings(userId)
     return NextResponse.json(maskedSettings(refreshed))

@@ -20,11 +20,11 @@ export class YouTubeLookupError extends Error {
 
 export async function fetchYouTubeVideoById(
   videoId: string,
-  options: { computeThumbnailHash?: boolean } = {}
+  options: { computeThumbnailHash?: boolean; apiKey?: string } = {}
 ): Promise<YouTubeLookupResult> {
-  const apiKey = process.env.YOUTUBE_API_KEY
-  if (!apiKey || apiKey === 'your_youtube_api_key_here') {
-    throw new YouTubeLookupError('config_missing', 'Chưa cấu hình YOUTUBE_API_KEY')
+  const apiKey = options.apiKey
+  if (!apiKey) {
+    throw new YouTubeLookupError('config_missing', 'Chưa cấu hình YouTube Data API Key')
   }
 
   const params = new URLSearchParams({

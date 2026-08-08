@@ -127,7 +127,7 @@ export default function AssetsPage() {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sidebar />
-      <Layout>
+      <Layout className="ml-0 xl:ml-[260px]">
         <Header title={t('nav.assets')} />
         <Content className="page-container">
           <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
@@ -144,7 +144,7 @@ export default function AssetsPage() {
             <div style={{ textAlign: 'center', padding: 48 }}><Spin /></div>
           ) : assets.length === 0 ? (
             <div className="cm-card" style={{ textAlign: 'center', padding: 60 }}>
-              <Empty description={<span style={{ color: '#71717a' }}>Chưa có tài sản nào</span>}>
+              <Empty description={<span style={{ color: 'var(--text-muted)' }}>Chưa có tài sản nào</span>}>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => openDrawer()}>
                   {t('assets.new')}
                 </Button>
@@ -159,7 +159,7 @@ export default function AssetsPage() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={asset.file_path} alt={asset.name} />
                     ) : (
-                      <span style={{ fontSize: 40, color: '#71717a' }}>
+                      <span style={{ fontSize: 40, color: 'var(--text-muted)' }}>
                         {ASSET_ICONS[asset.asset_type as CopyrightAssetType]}
                       </span>
                     )}

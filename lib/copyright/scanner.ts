@@ -5,7 +5,9 @@ import {
   updateScanRun,
   upsertFinding
 } from '@/lib/models/CopyrightMonitor'
-import { copyrightAdapters, getConnectorStatuses } from '@/lib/copyright/adapters'
+import { copyrightAdapters, countYoutubeQueries, getConnectorStatuses } from '@/lib/copyright/adapters'
+import { resolveApiKeys, type ScanApiKeys } from '@/lib/copyright/apiKeys'
+import { recordUsage, YOUTUBE_COST } from '@/lib/copyright/quota'
 import { scoreCandidate } from '@/lib/copyright/scoring'
 import { createNotification } from '@/lib/models/Notification'
 import { ConnectorStatus, Platform, ScanRun } from '@/types'
@@ -17,8 +19,11 @@ export async function runCopyrightScan(input: {
   userId: string
   assetIds?: number[]
   platforms?: Platform[]
+  /** Bỏ trống thì tự phân giải theo user (settings → env). */
+  keys?: ScanApiKeys
 }): Promise<{ scanRun: ScanRun; findingsCreated: number }> {
   const platforms = input.platforms && input.platforms.length > 0 ? input.platforms : DEFAULT_PLATFORMS
+  const keys = input.keys ?? (await resolveApiKeys(input.userId))
   const assets = await findActiveAssetsByIds(input.userId, input.assetIds)
   const scanRun = await createScanRun({
     userId: input.userId,
@@ -30,7 +35,7 @@ export async function runCopyrightScan(input: {
     const completedRun = await updateScanRun(
       scanRun.id,
       'completed',
-      getConnectorStatuses(platforms),
+      getConnectorStatuses(platforms, keys),
       { message: 'No active assets to scan' },
       0
     )
@@ -43,7 +48,7 @@ export async function runCopyrightScan(input: {
 
   for (const platform of platforms) {
     const adapter = copyrightAdapters[platform]
-    const status = adapter.status()
+    const status = adapter.status(keys)
 
     if (status.capability !== 'ready') {
       platformStatus.push(status)
@@ -53,7 +58,10 @@ export async function runCopyrightScan(input: {
     try {
       const seen = new Set<string>()
       for (const asset of assets) {
-        const candidates = await adapter.search(asset)
+        const candidates = await adapter.search(asset, keys)
+        if (platform === 'youtube') {
+          await recordUsage(input.userId, countYoutubeQueries(asset) * YOUTUBE_COST.search)
+        }
         for (const candidate of candidates) {
           const dedupeKey = `${asset.id}:${candidate.platform}:${candidate.externalId || candidate.url}`
           if (seen.has(dedupeKey)) {

@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Layout, Input, Button, Spin, Empty, Tag, message, Checkbox } from 'antd'
-import { SearchOutlined, LinkOutlined, YoutubeOutlined } from '@ant-design/icons'
+import { Layout, Input, Button, Spin, Empty, Tag, message, Switch } from 'antd'
+import { SearchOutlined, YoutubeOutlined, ThunderboltOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/layout/Sidebar'
 import Header from '@/components/layout/Header'
+import CheckSwitch from '@/components/ui/CheckSwitch'
 import { useTranslation } from '@/lib/i18n/context'
 
 const { Content } = Layout
@@ -144,13 +145,13 @@ export default function FindCopiesPage() {
     }
   }
 
-  const scoreColor = (s: number) => (s >= 70 ? '#ef4444' : s >= 45 ? '#f59e0b' : '#10b981')
+  const scoreColor = (s: number) => (s >= 70 ? 'var(--danger)' : s >= 45 ? 'var(--warning)' : 'var(--success)')
   const scoreLabel = (s: number) => (s >= 70 ? 'CAO' : s >= 45 ? 'TRUNG BÌNH' : 'THẤP')
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sidebar />
-      <Layout>
+      <Layout className="ml-0 xl:ml-[260px]">
         <Header title={t('nav.findCopies')} />
         <Content className="page-container">
           <div className="page-header">
@@ -158,70 +159,78 @@ export default function FindCopiesPage() {
             <p>{t('findCopies.sub')}</p>
           </div>
 
-          <div className="cm-card" style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12 }}>
-              <span style={{ color: '#a1a1aa', fontSize: 13, flex: 1 }}>
-                {t('findCopies.inputLabel')} <span style={{ color: '#71717a' }}>(tối đa {MAX_URLS} link, mỗi dòng 1 link)</span>
+          <CheckSwitch />
+
+          <div className="scan-deck" style={{ marginBottom: 16 }}>
+            <div className="scan-deck-glow" />
+            <div className="scan-deck-head">
+              <div className="scan-deck-title">
+                <div className="scan-deck-bolt"><SearchOutlined /></div>
+                <div>
+                  <div className="scan-deck-name">{t('findCopies.inputLabel')}</div>
+                  <div className="scan-deck-desc">Tối đa {MAX_URLS} link, mỗi dòng 1 link — quét tuần tự (queue)</div>
+                </div>
+              </div>
+              <span className="check-sample-btn" onClick={() => setUrlsText(SAMPLE_URLS.join('\n'))} role="button">
+                Tải link mẫu
               </span>
-              <a
-                onClick={() => setUrlsText(SAMPLE_URLS.join('\n'))}
-                style={{ color: '#8b5cf6', fontSize: 12, cursor: 'pointer' }}
-              >
-                Tải mẫu
-              </a>
             </div>
+
             <Input.TextArea
+              className="check-textarea"
               value={urlsText}
               onChange={(e) => setUrlsText(e.target.value)}
               placeholder={`${t('findCopies.placeholder')}\nhttps://www.youtube.com/watch?v=...`}
-              rows={3}
               disabled={loading}
               autoSize={{ minRows: 3, maxRows: 5 }}
             />
+
             <Button
+              className="scan-deck-cta"
               type="primary"
-              icon={<SearchOutlined />}
-              size="large"
+              icon={<ThunderboltOutlined />}
               onClick={run}
               loading={loading}
               disabled={!urlsText.trim()}
-              style={{ marginTop: 16, width: '100%' }}
+              style={{ width: '100%', marginTop: 12 }}
             >
               {t('findCopies.run')}
             </Button>
 
-            <Checkbox
-              checked={deepMediaCheck}
-              onChange={(event) => setDeepMediaCheck(event.target.checked)}
-              disabled={loading}
-              style={{ marginTop: 12, color: '#d4d4d8' }}
-            >
-              Deep check âm thanh + frame video
-            </Checkbox>
-
-            <div style={{ marginTop: 16, color: '#71717a', fontSize: 12, lineHeight: 1.6 }}>
-              <div>{t('findCopies.help')}</div>
-              <div style={{ marginTop: 6 }}>
-                Tối đa {MAX_URLS} link/lần, chạy tuần tự (queue). Tốn {MAX_URLS * 101} unit / 10,000 free quota. Mất ~{MAX_URLS * 10}s tổng.
+            <div className="scan-deck-options">
+              <div className="scan-option-group">
+                <span className="scan-option-label">Deep check</span>
+                <Switch checked={deepMediaCheck} onChange={setDeepMediaCheck} disabled={loading} />
+                <span style={{ color: 'var(--text-secondary)', fontSize: 12.5 }}>Âm thanh + frame video</span>
               </div>
-              {deepMediaCheck && (
-                <div style={{ marginTop: 6, color: '#fbbf24' }}>
-                  Deep check cần yt-dlp, ffmpeg và fpcalc trên server; thời gian chạy sẽ lâu hơn.
-                </div>
-              )}
+              <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>
+                ~{MAX_URLS * 101} unit YouTube API / {MAX_URLS * 10}s tổng
+              </div>
             </div>
+
+            {deepMediaCheck && (
+              <div className="check-note is-warning">
+                <InfoCircleOutlined style={{ marginTop: 1 }} />
+                <span>Deep check cần yt-dlp, ffmpeg và fpcalc trên server; thời gian chạy sẽ lâu hơn.</span>
+              </div>
+            )}
           </div>
 
           {loading && entries.length === 0 ? (
-            <div className="cm-card" style={{ textAlign: 'center', padding: 64 }}>
-              <Spin size="large" />
-              <div style={{ color: '#a1a1aa', marginTop: 16, fontSize: 13 }}>
-                Đang quét YouTube, chấm điểm và đối chiếu transcript...
+            <div className="cm-card scan-results">
+              <div className="scan-idle">
+                <Spin size="large" />
+                <div className="scan-idle-title" style={{ marginTop: 16 }}>Đang quét YouTube...</div>
+                <div className="scan-idle-sub">Chấm điểm và đối chiếu transcript</div>
               </div>
             </div>
           ) : entries.length === 0 ? (
-            <div className="cm-card">
-              <Empty description={<span style={{ color: '#71717a' }}>Dán {MAX_URLS} link YouTube và bấm quét</span>} />
+            <div className="cm-card scan-results">
+              <div className="scan-idle">
+                <div className="scan-idle-icon"><SearchOutlined /></div>
+                <div className="scan-idle-title">Chưa có kết quả</div>
+                <div className="scan-idle-sub">Dán tối đa {MAX_URLS} link YouTube và bấm quét</div>
+              </div>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -259,10 +268,8 @@ function BatchEntryView({
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Spin />
           <div>
-            <div style={{ color: '#71717a', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>
-              Link #{index}
-            </div>
-            <div style={{ color: '#fafafa', fontSize: 13, marginTop: 4 }}>{entry.url}</div>
+            <div className="check-batch-index">Link #{index}</div>
+            <div style={{ color: 'var(--text-primary)', fontSize: 13, marginTop: 4 }}>{entry.url}</div>
           </div>
         </div>
       </div>
@@ -272,11 +279,9 @@ function BatchEntryView({
   if (entry.status === 'error') {
     return (
       <div className="cm-card">
-        <div style={{ color: '#71717a', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>
-          Link #{index} · Lỗi
-        </div>
-        <div style={{ color: '#fafafa', fontSize: 13, marginBottom: 8 }}>{entry.url}</div>
-        <div style={{ color: '#fca5a5', fontSize: 13 }}>{entry.error}</div>
+        <div className="check-batch-index">Link #{index} · Lỗi</div>
+        <div style={{ color: 'var(--text-primary)', fontSize: 13, marginBottom: 8 }}>{entry.url}</div>
+        <div style={{ color: 'var(--danger)', fontSize: 13 }}>{entry.error}</div>
       </div>
     )
   }
@@ -285,35 +290,29 @@ function BatchEntryView({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div className="cm-card">
-        <div style={{ display: 'flex', gap: 16 }}>
+        <div className="check-video-card" style={{ marginBottom: 0, background: 'transparent', border: 'none', padding: 0 }}>
           {data.original.thumbnailUrl && (
-            <img
-              src={data.original.thumbnailUrl}
-              alt={data.original.title}
-              style={{ width: 180, height: 100, objectFit: 'cover', borderRadius: 10, flexShrink: 0 }}
-            />
+            <img src={data.original.thumbnailUrl} alt={data.original.title} style={{ width: 180, height: 100, objectFit: 'cover', borderRadius: 10, flexShrink: 0 }} />
           )}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ color: '#71717a', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>
-              Link #{index} · Video gốc
-            </div>
-            <div style={{ color: '#fafafa', fontSize: 15, fontWeight: 600, marginBottom: 6 }}>
+            <div className="check-batch-index">Link #{index} · Video gốc</div>
+            <div style={{ color: 'var(--text-primary)', fontSize: 15, fontWeight: 600, marginBottom: 6, marginTop: 4 }}>
               {data.original.title}
             </div>
-            <div style={{ color: '#a1a1aa', fontSize: 12, marginBottom: 8 }}>
-              <YoutubeOutlined style={{ marginRight: 6 }} />
+            <div className="check-video-meta">
+              <YoutubeOutlined style={{ marginRight: 6, color: '#ff6b6b' }} />
               {data.original.channelTitle}
             </div>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
               <Tag>Quét {data.searched}</Tag>
               <Tag>Transcript {data.transcriptChecked}</Tag>
               {data.mediaCheckEnabled && <Tag>Media {data.mediaChecked}</Tag>}
-              <Tag style={{ background: 'rgba(139, 92, 246, 0.15)', color: '#c4b5fd' }}>
+              <Tag style={{ background: 'rgba(139, 92, 246, 0.15)', color: 'var(--accent-violet)' }}>
                 {data.candidates.length} reup
               </Tag>
             </div>
             {data.mediaCheckStatus && (
-              <div style={{ color: '#fbbf24', fontSize: 12, marginTop: 8 }}>
+              <div style={{ color: 'var(--warning)', fontSize: 12, marginTop: 8 }}>
                 {data.mediaCheckStatus}
               </div>
             )}
@@ -323,29 +322,25 @@ function BatchEntryView({
 
       {data.candidates.length === 0 ? (
         <div className="cm-card">
-          <Empty description={<span style={{ color: '#71717a' }}>Không phát hiện video reup khả nghi</span>} />
+          <Empty description={<span style={{ color: 'var(--text-muted)' }}>Không phát hiện video reup khả nghi</span>} />
         </div>
       ) : (
         data.candidates.map((c) => (
-          <div key={c.videoId} className="cm-card" style={{ padding: 14 }}>
+          <div key={c.videoId} className="check-match-card">
             <div style={{ display: 'flex', gap: 14 }}>
               {c.thumbnailUrl && (
                 <a href={c.url} target="_blank" rel="noreferrer" style={{ flexShrink: 0 }}>
-                  <img
-                    src={c.thumbnailUrl}
-                    alt={c.title}
-                    style={{ width: 140, height: 80, objectFit: 'cover', borderRadius: 8 }}
-                  />
+                  <img src={c.thumbnailUrl} alt={c.title} style={{ width: 140, height: 80, objectFit: 'cover', borderRadius: 8 }} />
                 </a>
               )}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
+                <div className="check-match-head">
                   <a
                     href={c.url}
                     target="_blank"
                     rel="noreferrer"
                     style={{
-                      color: '#fafafa',
+                      color: 'var(--text-primary)',
                       fontWeight: 600,
                       fontSize: 13,
                       textDecoration: 'none',
@@ -357,46 +352,39 @@ function BatchEntryView({
                   >
                     {c.title}
                   </a>
-                  <Tag
-                    style={{
-                      background: 'rgba(255,255,255,0.06)',
-                      color: scoreColor(c.riskScore),
-                      fontWeight: 700,
-                      flexShrink: 0
-                    }}
-                  >
+                  <Tag style={{ background: 'var(--bg-hover)', color: scoreColor(c.riskScore), fontWeight: 700, flexShrink: 0 }}>
                     {scoreLabel(c.riskScore)} · {c.riskScore}
                   </Tag>
                 </div>
-                <div style={{ color: '#a1a1aa', fontSize: 11, marginBottom: 8 }}>
+                <div className="check-match-meta">
                   {c.channelTitle}
                   {c.publishedAt && ` · ${new Date(c.publishedAt).toLocaleDateString()}`}
                 </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                <div className="check-reason-row">
                   {c.reasons.map((r, i) => (
                     <Tag
                       key={i}
                       style={{
                         fontSize: 10,
-                        background: r.points >= 0 ? 'rgba(255,255,255,0.04)' : 'rgba(239, 68, 68, 0.1)',
-                        color: r.points >= 0 ? '#a1a1aa' : '#fca5a5'
+                        background: r.points >= 0 ? 'var(--bg-hover)' : 'rgba(239, 68, 68, 0.1)',
+                        color: r.points >= 0 ? 'var(--text-secondary)' : 'var(--danger)'
                       }}
                     >
                       {r.label} {r.points >= 0 ? `+${r.points}` : r.points}
                     </Tag>
                   ))}
                   {c.mediaCheck?.audio?.checked && (
-                    <Tag style={{ fontSize: 10, background: 'rgba(16, 185, 129, 0.1)', color: '#86efac' }}>
+                    <Tag style={{ fontSize: 10, background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)' }}>
                       Audio {(c.mediaCheck.audio.similarity * 100).toFixed(0)}%
                     </Tag>
                   )}
                   {c.mediaCheck?.video?.checked && (
-                    <Tag style={{ fontSize: 10, background: 'rgba(59, 130, 246, 0.1)', color: '#93c5fd' }}>
+                    <Tag style={{ fontSize: 10, background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
                       Frame {(c.mediaCheck.video.bestFrameSimilarity * 100).toFixed(0)}% · {c.mediaCheck.video.matchedFrames} frame
                     </Tag>
                   )}
                   {c.mediaCheck && !c.mediaCheck.available && (
-                    <Tag style={{ fontSize: 10, background: 'rgba(251, 191, 36, 0.1)', color: '#fde68a' }}>
+                    <Tag style={{ fontSize: 10, background: 'rgba(251, 191, 36, 0.1)', color: '#b45309' }}>
                       Media unavailable
                     </Tag>
                   )}

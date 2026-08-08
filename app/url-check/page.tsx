@@ -2,11 +2,12 @@
 
 import { useState } from 'react'
 import { Layout, Input, Button, Spin, Empty, Tag, Progress, message } from 'antd'
-import { YoutubeOutlined, LinkOutlined } from '@ant-design/icons'
+import { YoutubeOutlined, LinkOutlined, SafetyCertificateOutlined, ThunderboltOutlined } from '@ant-design/icons'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/layout/Sidebar'
 import Header from '@/components/layout/Header'
+import CheckSwitch from '@/components/ui/CheckSwitch'
 import { useTranslation } from '@/lib/i18n/context'
 import { FindingReason } from '@/types'
 
@@ -86,13 +87,13 @@ export default function UrlCheckPage() {
     }
   }
 
-  const scoreColor = (s: number) => (s >= 70 ? '#ef4444' : s >= 45 ? '#f59e0b' : '#10b981')
+  const scoreColor = (s: number) => (s >= 70 ? 'var(--danger)' : s >= 45 ? 'var(--warning)' : 'var(--success)')
   const scoreLabel = (s: number) => (s >= 70 ? 'CAO' : s >= 45 ? 'TRUNG BÌNH' : 'THẤP')
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sidebar />
-      <Layout>
+      <Layout className="ml-0 xl:ml-[260px]">
         <Header title={t('nav.urlCheck')} />
         <Content className="page-container">
           <div className="page-header">
@@ -100,113 +101,110 @@ export default function UrlCheckPage() {
             <p>{t('urlCheck.sub')}</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            <div className="cm-card">
-              <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: '#a1a1aa', fontSize: 13 }}>{t('urlCheck.inputLabel')}</span>
-                <a onClick={() => setUrl(SAMPLE_URL)} style={{ color: '#8b5cf6', fontSize: 12, cursor: 'pointer' }}>
-                  Tải mẫu
-                </a>
-              </div>
-              <Input
-                size="large"
-                prefix={<LinkOutlined style={{ color: '#71717a' }} />}
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder={t('urlCheck.placeholder')}
-                onPressEnter={run}
-              />
-              <Button
-                type="primary"
-                icon={<YoutubeOutlined />}
-                size="large"
-                onClick={run}
-                loading={loading}
-                disabled={!url.trim()}
-                style={{ marginTop: 16, width: '100%' }}
-              >
-                {t('urlCheck.run')}
-              </Button>
+          <CheckSwitch />
 
-              <div style={{ marginTop: 20, color: '#71717a', fontSize: 12, lineHeight: 1.6 }}>
-                <p style={{ marginBottom: 8 }}>{t('urlCheck.help')}</p>
-                <ul style={{ paddingLeft: 18, margin: 0 }}>
-                  <li>youtube.com/watch?v=...</li>
-                  <li>youtu.be/...</li>
-                  <li>youtube.com/shorts/...</li>
-                </ul>
+          <div className="cm-grid-2">
+            <div className="scan-deck">
+              <div className="scan-deck-glow" />
+              <div className="scan-deck-head">
+                <div className="scan-deck-title">
+                  <div className="scan-deck-bolt"><LinkOutlined /></div>
+                  <div>
+                    <div className="scan-deck-name">{t('urlCheck.inputLabel')}</div>
+                    <div className="scan-deck-desc">Đối chiếu tự động với toàn bộ brand asset đang active</div>
+                  </div>
+                </div>
+                <span
+                  className="check-sample-btn"
+                  onClick={() => setUrl(SAMPLE_URL)}
+                  role="button"
+                >
+                  Tải link mẫu
+                </span>
+              </div>
+
+              <div className="scan-deck-input-row">
+                <Input
+                  className="scan-deck-input"
+                  prefix={<YoutubeOutlined style={{ color: '#ff6b6b' }} />}
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder={t('urlCheck.placeholder')}
+                  onPressEnter={run}
+                />
+                <Button
+                  className="scan-deck-cta"
+                  type="primary"
+                  icon={<ThunderboltOutlined />}
+                  onClick={run}
+                  loading={loading}
+                  disabled={!url.trim()}
+                >
+                  {t('urlCheck.run')}
+                </Button>
+              </div>
+
+              <div className="check-help-chips">
+                <span className="check-help-chip">youtube.com/watch?v=...</span>
+                <span className="check-help-chip">youtu.be/...</span>
+                <span className="check-help-chip">youtube.com/shorts/...</span>
+              </div>
+
+              <div className="check-note">
+                <SafetyCertificateOutlined style={{ marginTop: 1 }} />
+                <span>{t('urlCheck.help')} Hệ thống chấm điểm rủi ro 0–100 dựa trên tên thương hiệu, keyword, pHash ảnh và domain.</span>
               </div>
             </div>
 
-            <div className="cm-card">
-              <h3 style={{ color: '#fafafa', fontSize: 16, fontWeight: 600, marginBottom: 16 }}>
+            <div className="cm-card scan-results">
+              <h3 style={{ color: 'var(--text-primary)', fontSize: 16, fontWeight: 600, marginBottom: 16 }}>
                 Kết quả phân tích
               </h3>
               {loading ? (
-                <div style={{ textAlign: 'center', padding: 48 }}>
-                  <Spin />
+                <div className="scan-idle">
+                  <Spin size="large" />
+                  <div className="scan-idle-title" style={{ marginTop: 16 }}>Đang phân tích video...</div>
+                  <div className="scan-idle-sub">Đối chiếu với brand asset và tính điểm rủi ro</div>
                 </div>
               ) : error ? (
-                <Empty description={<span style={{ color: '#fca5a5' }}>{error}</span>} />
+                <div className="scan-failed">
+                  <div className="scan-failed-icon">!</div>
+                  <div>
+                    <div className="scan-result-title">Kiểm tra thất bại</div>
+                    <div className="scan-result-sub">{error}</div>
+                  </div>
+                </div>
               ) : !result ? (
-                <Empty description={<span style={{ color: '#71717a' }}>Dán URL và bấm kiểm tra</span>} />
+                <div className="scan-idle">
+                  <div className="scan-idle-icon"><LinkOutlined /></div>
+                  <div className="scan-idle-title">Chưa có kết quả</div>
+                  <div className="scan-idle-sub">Dán URL YouTube và bấm &quot;{t('urlCheck.run')}&quot;</div>
+                </div>
               ) : (
                 <div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      gap: 12,
-                      padding: 12,
-                      background: '#13131a',
-                      border: '1px solid rgba(255,255,255,0.05)',
-                      borderRadius: 12,
-                      marginBottom: 16
-                    }}
-                  >
+                  <div className="check-video-card">
                     {result.video.thumbnailUrl && (
-                      <img
-                        src={result.video.thumbnailUrl}
-                        alt={result.video.title}
-                        style={{ width: 120, height: 68, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }}
-                      />
+                      <img src={result.video.thumbnailUrl} alt={result.video.title} className="check-video-thumb" />
                     )}
                     <div style={{ minWidth: 0, flex: 1 }}>
-                      <div
-                        style={{
-                          color: '#fafafa',
-                          fontSize: 13,
-                          fontWeight: 600,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical'
-                        }}
-                      >
-                        {result.video.title}
-                      </div>
-                      <div style={{ color: '#a1a1aa', fontSize: 12, marginTop: 4 }}>{result.video.channelTitle}</div>
-                      <a
-                        href={result.video.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{ color: '#8b5cf6', fontSize: 11 }}
-                      >
-                        Mở YouTube
+                      <div className="check-video-title">{result.video.title}</div>
+                      <div className="check-video-meta">{result.video.channelTitle}</div>
+                      <a href={result.video.url} target="_blank" rel="noreferrer" className="check-video-link">
+                        Mở trên YouTube ↗
                       </a>
                     </div>
                   </div>
 
-                  <div style={{ textAlign: 'center', marginBottom: 16 }}>
+                  <div className="check-score-block">
                     <Progress
                       type="dashboard"
                       percent={result.topScore}
                       strokeColor={scoreColor(result.topScore)}
                       format={(v) => (
-                        <span style={{ color: '#fafafa', fontSize: 28, fontWeight: 700 }}>{v}</span>
+                        <span style={{ color: 'var(--text-primary)', fontSize: 28, fontWeight: 700 }}>{v}</span>
                       )}
                     />
-                    <div style={{ color: '#a1a1aa', marginTop: 8, fontSize: 13 }}>
+                    <div className="check-score-sub">
                       Top score · Đã đối chiếu {result.assetsChecked} tài sản
                     </div>
                   </div>
@@ -214,27 +212,16 @@ export default function UrlCheckPage() {
                   {result.matches.length > 0 ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                       {result.matches.map((m) => (
-                        <div
-                          key={m.assetId}
-                          style={{
-                            background: '#13131a',
-                            border: '1px solid rgba(255,255,255,0.05)',
-                            borderRadius: 12,
-                            padding: 14
-                          }}
-                        >
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                            <span style={{ color: '#fafafa', fontWeight: 600, fontSize: 13 }}>
-                              {m.assetName}{' '}
-                              <span style={{ color: '#71717a', fontWeight: 400, fontSize: 11 }}>
-                                ({m.assetType})
-                              </span>
+                        <div key={m.assetId} className="check-match-card">
+                          <div className="check-match-head">
+                            <span className="check-match-name">
+                              {m.assetName} <span className="check-match-type">({m.assetType})</span>
                             </span>
-                            <Tag style={{ background: 'rgba(255,255,255,0.06)', color: scoreColor(m.riskScore) }}>
+                            <Tag style={{ background: 'var(--bg-hover)', color: scoreColor(m.riskScore), fontWeight: 700 }}>
                               {scoreLabel(m.riskScore)} · {m.riskScore}
                             </Tag>
                           </div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                          <div className="check-reason-row">
                             {m.reasons.map((r, i) => (
                               <Tag key={i} style={{ fontSize: 11 }}>
                                 {r.label} {r.points > 0 ? `+${r.points}` : r.points}
@@ -244,13 +231,13 @@ export default function UrlCheckPage() {
                         </div>
                       ))}
                       {result.scanRunId !== null && (
-                        <Button type="link" onClick={() => router.push('/findings')} style={{ padding: 0 }}>
+                        <Button type="link" onClick={() => router.push('/findings')} style={{ padding: 0, alignSelf: 'flex-start' }}>
                           Xem trong Findings →
                         </Button>
                       )}
                     </div>
                   ) : (
-                    <Empty description={<span style={{ color: '#71717a' }}>Không trùng với tài sản nào</span>} />
+                    <Empty description={<span style={{ color: 'var(--text-muted)' }}>Không trùng với tài sản nào</span>} />
                   )}
                 </div>
               )}

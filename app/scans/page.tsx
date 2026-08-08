@@ -20,7 +20,8 @@ import {
   Tooltip,
   Progress,
   Skeleton,
-  Space
+  Space,
+  Statistic
 } from 'antd'
 import type { InputRef } from 'antd'
 import {
@@ -35,7 +36,9 @@ import {
   SearchOutlined,
   BulbOutlined,
   RedoOutlined,
-  SettingOutlined
+  SettingOutlined,
+  ClockCircleOutlined,
+  HistoryOutlined
 } from '@ant-design/icons'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
@@ -45,6 +48,7 @@ import Header from '@/components/layout/Header'
 import PlatformBadge from '@/components/ui/PlatformBadge'
 import RiskPill from '@/components/ui/RiskPill'
 import UploadDropzone from '@/components/ui/UploadDropzone'
+import CheckSwitch from '@/components/ui/CheckSwitch'
 import { ConnectorStatus, Platform, ScanRun, BrandAsset } from '@/types'
 import { useTranslation } from '@/lib/i18n/context'
 import { detectScanInput, type DetectedInput } from '@/lib/scans/detectScanInput'
@@ -59,9 +63,9 @@ const statusColors: Record<string, string> = {
 }
 
 const PLATFORM_ICONS: Record<Platform, React.ReactNode> = {
-  youtube: <YoutubeFilled style={{ color: '#ff6b6b' }} />,
-  google: <GoogleSquareFilled style={{ color: '#88aaff' }} />,
-  facebook: <FacebookFilled style={{ color: '#6aa5ff' }} />,
+  youtube: <YoutubeFilled style={{ color: '#ef4444' }} />,
+  google: <GoogleSquareFilled style={{ color: '#4285f4' }} />,
+  facebook: <FacebookFilled style={{ color: '#1877f2' }} />,
   tiktok: <TikTokFilled />
 }
 
@@ -70,6 +74,21 @@ const LS_PLATFORMS = 'scan.platforms'
 const LS_YT_MODE = 'scan.youtubeMode'
 
 type YouTubeMode = 'fast' | 'deep'
+
+/** Mẫu bấm-1-lần để người dùng mới biết ô nhập chấp nhận cái gì. */
+const EXAMPLES: Array<{ icon: string; label: string; value: string }> = [
+  { icon: '🎬', label: 'Link YouTube', value: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+  { icon: '🌐', label: 'Tên miền', value: 'nike.com' },
+  { icon: '🔤', label: 'Từ khóa', value: 'Just Do It' }
+]
+
+/** Suy ra loại tài sản từ MIME type của tệp kéo-thả / dán vào. */
+function assetTypeFromFile(file: File): 'image' | 'video' | 'audio' | null {
+  if (file.type.startsWith('image/')) return 'image'
+  if (file.type.startsWith('video/')) return 'video'
+  if (file.type.startsWith('audio/')) return 'audio'
+  return null
+}
 
 export default function ScansPage() {
   const { status } = useSession()
@@ -88,6 +107,8 @@ export default function ScansPage() {
   const [quickScanMeta, setQuickScanMeta] = useState<any>(null)
   const [rescanningId, setRescanningId] = useState<number | null>(null)
   const [youtubeMode, setYoutubeMode] = useState<YouTubeMode>('fast')
+  const [dragging, setDragging] = useState(false)
+  const [quota, setQuota] = useState<{ used: number; budget: number; remaining: number; exceeded: boolean; nearLimit: boolean } | null>(null)
 
   // Advanced section state
   const [assets, setAssets] = useState<BrandAsset[]>([])
@@ -107,6 +128,7 @@ export default function ScansPage() {
         const data = await res.json()
         setScans(data.scans || [])
         setConnectorStatus(data.connectorStatus || [])
+        setQuota(data.quota || null)
       }
     } finally {
       setLoadingScans(false)
@@ -243,6 +265,34 @@ export default function ScansPage() {
     runQuickScan(detected)
   }
 
+  /** Kéo-thả hoặc dán tệp thẳng vào scan deck → quét luôn, không cần mở Nâng cao. */
+  const scanFile = useCallback((file: File) => {
+    const assetType = assetTypeFromFile(file)
+    if (!assetType) {
+      message.warning('Chỉ hỗ trợ tệp ảnh, video hoặc âm thanh')
+      return
+    }
+    const base = file.name.replace(/\.[^.]+$/, '').trim() || file.name
+    setQuery(base)
+    runQuickScan({ assetType, name: base, keywords: base }, file)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedPlatforms, youtubeMode])
+
+  const onDeckDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragging(false)
+    const file = e.dataTransfer.files?.[0]
+    if (file) scanFile(file)
+  }
+
+  const onDeckPaste = (e: React.ClipboardEvent) => {
+    const file = e.clipboardData.files?.[0]
+    if (file) {
+      e.preventDefault()
+      scanFile(file)
+    }
+  }
+
   const onAdvancedQuickScan = async () => {
     try {
       const values = await advancedForm.validateFields()
@@ -319,19 +369,28 @@ export default function ScansPage() {
     }
   }
 
+  const historyStats = useMemo(() => {
+    const total = scans.length
+    const completed = scans.filter(s => s.status === 'completed').length
+    const failed = scans.filter(s => s.status === 'failed').length
+    const running = scans.filter(s => s.status === 'running' || s.status === 'queued').length
+    const findings = scans.reduce((acc, s) => acc + (s.findings_count || 0), 0)
+    return { total, completed, failed, running, findings }
+  }, [scans])
+
   const columns = useMemo(() => ([
-    { title: 'ID', dataIndex: 'id', key: 'id', width: 70, render: (v: number) => <span style={{ color: '#a1a1aa' }}>#{v}</span> },
+    { title: 'ID', dataIndex: 'id', key: 'id', width: 70, render: (v: number) => <span style={{ color: 'var(--text-secondary)' }}>#{v}</span> },
     {
       title: 'Trạng thái', dataIndex: 'status', key: 'status', width: 110,
       render: (v: string) => <Tag color={statusColors[v] || 'default'}>{v}</Tag>
     },
     {
       title: 'Tài sản', dataIndex: 'asset_ids', key: 'asset_ids', width: 90,
-      render: (ids: number[]) => <span style={{ color: '#a1a1aa' }}>{ids?.length || 0} asset</span>
+      render: (ids: number[]) => <span style={{ color: 'var(--text-secondary)' }}>{ids?.length || 0} asset</span>
     },
     {
       title: 'Kết quả', dataIndex: 'findings_count', key: 'findings_count', width: 90,
-      render: (v: number) => <span style={{ color: v > 0 ? '#fcd34d' : '#a1a1aa', fontWeight: 600 }}>{v || 0}</span>
+      render: (v: number) => <span style={{ color: v > 0 ? 'var(--risk-medium)' : 'var(--text-secondary)', fontWeight: 600 }}>{v || 0}</span>
     },
     {
       title: 'Connectors', dataIndex: 'platform_status', key: 'platform_status',
@@ -343,7 +402,7 @@ export default function ScansPage() {
     },
     {
       title: 'Bắt đầu', dataIndex: 'started_at', key: 'started_at', width: 160,
-      render: (d: string) => <span style={{ color: '#a1a1aa', fontSize: 12 }}>{d ? new Date(d).toLocaleString() : '—'}</span>
+      render: (d: string) => <span style={{ color: 'var(--text-secondary)', fontSize: 12 }}>{d ? new Date(d).toLocaleString() : '—'}</span>
     },
     {
       title: '', key: 'actions', width: 110, fixed: 'right' as const,
@@ -358,33 +417,114 @@ export default function ScansPage() {
     }
   ]), [rescanningId])
 
-  const inputHint = useMemo(() => {
+  /** Cho người dùng thấy hệ thống đã hiểu input của họ là gì trước khi bấm quét. */
+  const detection = useMemo(() => {
     const d = detectScanInput(query)
-    if (!d) return 'Mẹo: dán link YouTube để hệ thống tự lấy metadata, hoặc gõ domain (vd: nike.com).'
-    if (d.assetType === 'video') return 'Đã nhận diện link YouTube — sẽ tìm video tương tự và deep check âm thanh + frame video.'
-    if (d.officialDomains) return `Sẽ quét tên miền chính thức: ${d.officialDomains}`
-    return `Sẽ quét theo từ khóa: "${d.keywords}"`
+    if (!d) {
+      return {
+        badge: null,
+        hint: 'Dán link YouTube, gõ tên miền (vd: nike.com), gõ từ khóa — hoặc kéo-thả tệp ảnh/video/audio vào đây.'
+      }
+    }
+    if (d.assetType === 'video') {
+      return {
+        badge: { icon: '🎬', label: 'Link YouTube' },
+        hint: 'Sẽ tìm video tương tự, đối chiếu tiêu đề, transcript và frame hình ảnh.'
+      }
+    }
+    if (d.officialDomains) {
+      return {
+        badge: { icon: '🌐', label: 'Tên miền' },
+        hint: `Sẽ quét nội dung mạo danh tên miền chính thức: ${d.officialDomains}`
+      }
+    }
+    return {
+      badge: { icon: '🔤', label: 'Từ khóa' },
+      hint: `Sẽ quét theo từ khóa: "${d.keywords}"`
+    }
   }, [query])
+
+  const readyPlatforms = useMemo(
+    () => new Set(connectorStatus.filter(c => c.capability === 'ready').map(c => c.platform)),
+    [connectorStatus]
+  )
+
+  /** Lý do cụ thể từng nền tảng chưa dùng được, để tooltip nói rõ thiếu key nào. */
+  const platformReason = useMemo(() => {
+    const map = new Map<Platform, string>()
+    for (const status of connectorStatus) {
+      if (status.capability !== 'ready') map.set(status.platform, status.message)
+    }
+    return map
+  }, [connectorStatus])
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sidebar />
-      <Layout>
+      <Layout className="ml-0 xl:ml-[260px]">
         <Header title={t('nav.scans')} />
         <Content className="page-container" style={{ padding: '24px 32px' }}>
-
-          {/* Header */}
-          <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16, marginBottom: 20 }}>
+          {/* Toolbar */}
+          <div className="dash-toolbar" style={{ marginBottom: 20 }}>
             <div>
-              <h1 style={{ fontSize: 28, fontWeight: 700, margin: 0, background: 'linear-gradient(90deg, #fafafa 0%, #a1a1aa 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{t('scans.title')}</h1>
-              <p style={{ color: '#71717a', marginTop: 4, fontSize: 14 }}>Dán link, gõ từ khóa hoặc domain — bấm <kbd style={{ background: '#27272a', padding: '1px 6px', borderRadius: 4, color: '#e4e4e7', fontSize: 11 }}>Enter</kbd> để quét ngay.</p>
+              <h1 className="dash-title">
+                {t('scans.title')}
+                <span className="dash-title-dot">.</span>
+              </h1>
+              <p className="dash-sub">
+                Dán link, gõ từ khóa hoặc domain — bấm <kbd style={{ background: 'var(--bg-hover)', padding: '1px 6px', borderRadius: 4, color: 'var(--text-secondary)', fontSize: 11 }}>Enter</kbd> để quét ngay. Phím tắt <kbd style={{ background: 'var(--bg-hover)', padding: '1px 6px', borderRadius: 4, color: 'var(--text-secondary)', fontSize: 11 }}>Ctrl K</kbd> để tập trung vào ô nhập.
+              </p>
             </div>
-            <Button icon={<ReloadOutlined />} onClick={load} className="cm-btn-secondary">Làm mới lịch sử</Button>
+            <Button icon={<ReloadOutlined />} onClick={load} className="dash-refresh-btn">
+              Làm mới lịch sử
+            </Button>
           </div>
 
-          {/* Hero scan bar */}
-          <div className="cm-card" style={{ padding: 20, background: 'linear-gradient(180deg, #15151d 0%, #101016 100%)', border: '1px solid rgba(139,92,246,0.18)', borderRadius: 16, marginBottom: 20 }}>
-            <Space.Compact style={{ width: '100%' }}>
+          <CheckSwitch />
+
+          {/* ===== SCAN DECK — hero control surface ===== */}
+          <div
+            className={`scan-deck${dragging ? ' is-dragging' : ''}`}
+            onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={onDeckDrop}
+            onPaste={onDeckPaste}
+          >
+            <div className="scan-deck-glow" />
+            <div className="scan-deck-head">
+              <div className="scan-deck-title">
+                <span className="scan-deck-bolt"><ThunderboltOutlined /></span>
+                <div>
+                  <div className="scan-deck-name">Quét bản quyền ngay lập tức</div>
+                  <div className="scan-deck-desc">Hệ thống tự nhận diện link / domain / từ khóa, quét trên các nền tảng bạn chọn</div>
+                </div>
+              </div>
+              <div className="scan-deck-badges">
+                <div className="scan-deck-badge">
+                  {readyPlatforms.size}/{PLATFORM_LIST.length} nền tảng sẵn sàng
+                </div>
+                {quota && quota.used > 0 && (
+                  <Tooltip title={`Mỗi lần quét YouTube tốn ~${100 * 6} quota unit. Hạn mức reset lúc 00:00 giờ Thái Bình Dương.`}>
+                    <div className={`scan-deck-badge scan-deck-badge--quota${quota.exceeded ? ' is-exceeded' : quota.nearLimit ? ' is-warning' : ''}`}>
+                      Quota YouTube: {quota.used.toLocaleString()}/{quota.budget.toLocaleString()}
+                    </div>
+                  </Tooltip>
+                )}
+              </div>
+            </div>
+
+            {!loadingScans && readyPlatforms.size === 0 && (
+              <div className="scan-deck-alert">
+                <span aria-hidden>⚠️</span>
+                <div>
+                  <strong>Chưa nền tảng nào sẵn sàng.</strong>{' '}
+                  Cần thêm API key của YouTube hoặc Google Search thì mới quét được.
+                </div>
+                <Link href="/settings" className="scan-deck-alert__cta">Cấu hình ngay →</Link>
+              </div>
+            )}
+
+            <div className="scan-deck-input-row">
               <Input
                 ref={inputRef}
                 size="large"
@@ -392,80 +532,135 @@ export default function ScansPage() {
                 onChange={(e) => setQuery(e.target.value)}
                 onPressEnter={onHeroScan}
                 disabled={scanning}
-                prefix={<SearchOutlined style={{ color: '#71717a' }} />}
+                prefix={<SearchOutlined style={{ color: 'var(--text-muted)' }} />}
                 placeholder="Dán link YouTube, domain (vd: nike.com), hoặc gõ từ khóa thương hiệu..."
                 allowClear
+                className="scan-deck-input"
               />
-              <Button
-                type="primary"
-                size="large"
-                icon={<ThunderboltOutlined />}
-                loading={scanning}
-                onClick={onHeroScan}
-              >Quét ngay</Button>
-            </Space.Compact>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, gap: 12, flexWrap: 'wrap' }}>
-              <div style={{ color: '#a1a1aa', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <BulbOutlined style={{ color: '#fcd34d' }} />
-                {inputHint}
+              <Tooltip title={selectedPlatforms.length === 0 ? 'Chọn ít nhất 1 nền tảng đã cấu hình API key' : ''}>
+                <Button
+                  type="primary"
+                  size="large"
+                  icon={<ThunderboltOutlined />}
+                  loading={scanning}
+                  disabled={selectedPlatforms.length === 0}
+                  onClick={onHeroScan}
+                  className="scan-deck-cta"
+                >
+                  Quét ngay
+                </Button>
+              </Tooltip>
+            </div>
+
+            <div className="scan-deck-hint">
+              {detection.badge ? (
+                <span className="scan-detect-badge">
+                  <span aria-hidden>{detection.badge.icon}</span>
+                  {detection.badge.label}
+                </span>
+              ) : (
+                <BulbOutlined style={{ color: 'var(--risk-medium)' }} />
+              )}
+              <span>{detection.hint}</span>
+            </div>
+
+            {!query && !scanning && (
+              <div className="scan-examples">
+                <span className="scan-option-label">Thử ngay</span>
+                {EXAMPLES.map((ex) => (
+                  <button
+                    key={ex.label}
+                    type="button"
+                    className="scan-example-chip"
+                    onClick={() => {
+                      setQuery(ex.value)
+                      inputRef.current?.focus()
+                    }}
+                  >
+                    <span aria-hidden>{ex.icon}</span> {ex.label}
+                  </button>
+                ))}
+                <label className="scan-example-chip scan-example-chip--file">
+                  <span aria-hidden>📁</span> Chọn tệp
+                  <input
+                    type="file"
+                    accept="image/*,video/*,audio/*"
+                    hidden
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) scanFile(file)
+                      e.target.value = ''
+                    }}
+                  />
+                </label>
               </div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                <span style={{ color: '#71717a', fontSize: 11, marginRight: 4 }}>Nền tảng:</span>
-                {PLATFORM_LIST.map(p => {
-                  const s = connectorStatus.find(c => c.platform === p)
-                  const ready = s?.capability === 'ready'
-                  const selected = selectedPlatforms.includes(p)
-                  return (
-                    <Tooltip key={p} title={ready ? '' : 'Cần cấu hình API key'}>
-                      <Button
-                        size="small"
-                        icon={PLATFORM_ICONS[p]}
-                        disabled={!ready}
-                        onClick={() => togglePlatform(p)}
-                        style={{
-                          background: selected ? 'rgba(139, 92, 246, 0.18)' : 'rgba(255,255,255,0.02)',
-                          borderColor: selected ? '#8b5cf6' : 'rgba(255,255,255,0.08)',
-                          color: selected ? '#a78bfa' : '#a1a1aa',
-                          opacity: ready ? 1 : 0.4
-                        }}
-                      >
-                        <span style={{ textTransform: 'capitalize', fontSize: 12 }}>{p}</span>
-                      </Button>
-                    </Tooltip>
-                  )
-                })}
-                <Tooltip title="Chỉ áp dụng khi dán link YouTube. Fast nhanh hơn (tắt check âm thanh + hình ảnh), Deep đầy đủ.">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 10 }}>
-                    <span style={{ color: '#71717a', fontSize: 11 }}>YouTube mode:</span>
-                    <Segmented
-                      size="small"
-                      value={youtubeMode}
-                      onChange={(v) => setYoutubeMode(v as YouTubeMode)}
-                      options={[
-                        { label: 'Fast', value: 'fast' },
-                        { label: 'Deep', value: 'deep' }
-                      ]}
-                    />
-                  </div>
+            )}
+
+            {dragging && (
+              <div className="scan-deck-dropzone">
+                <span>Thả tệp để quét ngay — ảnh, video hoặc audio</span>
+              </div>
+            )}
+
+            <div className="scan-deck-options">
+              <div className="scan-option-group">
+                <span className="scan-option-label">Nền tảng</span>
+                <div className="scan-platform-row">
+                  {PLATFORM_LIST.map(p => {
+                    const ready = readyPlatforms.has(p)
+                    const selected = selectedPlatforms.includes(p)
+                    return (
+                      <Tooltip key={p} title={ready ? '' : platformReason.get(p) || 'Cần cấu hình API key'}>
+                        <button
+                          type="button"
+                          className={`scan-platform-chip${selected ? ' is-selected' : ''}${!ready ? ' is-disabled' : ''}`}
+                          disabled={!ready}
+                          onClick={() => togglePlatform(p)}
+                        >
+                          {PLATFORM_ICONS[p]}
+                          <span style={{ textTransform: 'capitalize' }}>{p}</span>
+                          {selected && <span className="scan-chip-check">✓</span>}
+                        </button>
+                      </Tooltip>
+                    )
+                  })}
+                </div>
+              </div>
+              <div className="scan-option-group">
+                <span className="scan-option-label">Chế độ YouTube</span>
+                <Segmented
+                  size="small"
+                  value={youtubeMode}
+                  onChange={(v) => setYoutubeMode(v as YouTubeMode)}
+                  options={[
+                    { label: '⚡ Fast', value: 'fast' },
+                    { label: '🔍 Deep', value: 'deep' }
+                  ]}
+                />
+                <Tooltip title="Fast: quét nhanh, bỏ qua check âm thanh + hình ảnh. Deep: đầy đủ, chậm hơn.">
+                  <span className="scan-mode-help">?</span>
                 </Tooltip>
               </div>
             </div>
           </div>
 
-          {/* Live results panel */}
-          <div className="cm-card" style={{ padding: 20, background: '#13131a', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, marginBottom: 20, minHeight: 200 }}>
+          {/* ===== LIVE RESULTS PANEL ===== */}
+          <div className="cm-card scan-results" style={{ padding: 20, minHeight: 200 }}>
             {scanProgress.status === 'idle' && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', color: '#71717a', textAlign: 'center' }}>
-                <SearchOutlined style={{ fontSize: 32, color: '#4b5563', marginBottom: 8 }} />
-                <div style={{ fontSize: 13 }}>Kết quả quét trực tiếp sẽ hiển thị tại đây.</div>
+              <div className="scan-idle">
+                <div className="scan-idle-icon"><SearchOutlined /></div>
+                <div className="scan-idle-title">Sẵn sàng quét</div>
+                <div className="scan-idle-sub">Kết quả quét sẽ hiển thị ngay tại đây sau khi bạn bấm Quét ngay</div>
               </div>
             )}
 
             {scanProgress.status === 'running' && (
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-                  <Progress percent={75} status="active" strokeColor={{ '0%': '#8b5cf6', '100%': '#06b6d4' }} showInfo={false} style={{ flex: 1 }} />
-                  <span style={{ color: '#a1a1aa', fontSize: 12 }}>Đang quét trên {selectedPlatforms.length} nền tảng…</span>
+                  <Progress percent={100} status="active" strokeColor={{ '0%': '#8b5cf6', '100%': '#ec4899' }} showInfo={false} style={{ flex: 1 }} />
+                  <span style={{ color: 'var(--text-secondary)', fontSize: 12, whiteSpace: 'nowrap' }}>
+                    Đang quét trên {selectedPlatforms.length} nền tảng…
+                  </span>
                 </div>
                 <Skeleton active paragraph={{ rows: 3 }} title={false} />
               </div>
@@ -473,15 +668,19 @@ export default function ScansPage() {
 
             {scanProgress.status === 'completed' && (
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-                  <CheckCircleOutlined style={{ fontSize: 22, color: '#10b981' }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ color: '#fafafa', fontWeight: 600, fontSize: 14 }}>Phát hiện {scanProgress.findings} kết quả nghi vấn</div>
-                    <div style={{ color: '#a1a1aa', fontSize: 12 }}>
-                      {quickFindings.length > 0 ? 'Bấm tiêu đề để mở nguồn trong tab mới.' : 'Không tìm thấy vi phạm đáng nghi.'}
+                <div className="scan-result-head">
+                  <div className="scan-result-status">
+                    <CheckCircleOutlined style={{ fontSize: 22, color: 'var(--success)' }} />
+                    <div>
+                      <div className="scan-result-title">Phát hiện {scanProgress.findings} kết quả nghi vấn</div>
+                      <div className="scan-result-sub">
+                        {quickFindings.length > 0 ? 'Bấm tiêu đề để mở nguồn trong tab mới.' : 'Không tìm thấy vi phạm đáng nghi.'}
+                      </div>
                     </div>
                   </div>
-                  <Link href="/findings"><Button size="small">Xem tất cả Findings →</Button></Link>
+                  <Link href="/findings">
+                    <Button size="small">Xem tất cả Findings →</Button>
+                  </Link>
                 </div>
                 {(quickScanMeta?.mode === 'youtube_deep_url' || quickScanMeta?.mode === 'youtube_deep_fallback') && (
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
@@ -504,7 +703,7 @@ export default function ScansPage() {
                       {
                         title: 'Tiêu đề', dataIndex: 'title', key: 'title',
                         render: (title: string, record: any) => (
-                          <a href={record.url} target="_blank" rel="noreferrer" style={{ color: '#a78bfa', fontWeight: 500, fontSize: 13 }}>{title}</a>
+                          <a href={record.url} target="_blank" rel="noreferrer" style={{ color: 'var(--accent-violet)', fontWeight: 500, fontSize: 13 }}>{title}</a>
                         )
                       },
                       {
@@ -529,40 +728,40 @@ export default function ScansPage() {
             )}
 
             {scanProgress.status === 'failed' && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 8 }}>
-                <div style={{ fontSize: 28, color: '#ef4444' }}>✕</div>
+              <div className="scan-failed">
+                <div className="scan-failed-icon">✕</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ color: '#fafafa', fontWeight: 600 }}>Quét thất bại</div>
-                  <div style={{ color: '#a1a1aa', fontSize: 12 }}>Kiểm tra kết nối hoặc API key.</div>
+                  <div className="scan-result-title">Quét thất bại</div>
+                  <div className="scan-result-sub">Kiểm tra kết nối hoặc API key.</div>
                 </div>
                 <Button size="small" icon={<RedoOutlined />} onClick={onHeroScan}>Thử lại</Button>
               </div>
             )}
           </div>
 
-          {/* Advanced */}
+          {/* ===== ADVANCED ===== */}
           <Collapse
             ghost
             style={{ marginBottom: 24 }}
             items={[{
               key: 'advanced',
               label: (
-                <span style={{ color: '#a1a1aa', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ color: 'var(--text-secondary)', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                   <SettingOutlined /> Nâng cao: quét tài sản đã lưu hoặc upload tệp / audio
                 </span>
               ),
               children: (
                 <Row gutter={[16, 16]}>
                   <Col xs={24} lg={12}>
-                    <div className="cm-card" style={{ padding: 18, background: '#13131a', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 14 }}>
+                    <div className="cm-card" style={{ padding: 18, background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: 14 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                        <h4 style={{ color: '#fafafa', margin: 0, fontSize: 14 }}>Giám sát tài sản đã lưu</h4>
-                        <Link href="/assets" style={{ color: '#8b5cf6', fontSize: 12 }}>Quản lý tài sản →</Link>
+                        <h4 style={{ color: 'var(--text-primary)', margin: 0, fontSize: 14 }}>Giám sát tài sản đã lưu</h4>
+                        <Link href="/assets" style={{ color: 'var(--accent-violet)', fontSize: 12 }}>Quản lý tài sản →</Link>
                       </div>
                       {loadingAssets ? (
                         <div style={{ padding: 24, textAlign: 'center' }}><Spin size="small" /></div>
                       ) : assets.length === 0 ? (
-                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span style={{ color: '#71717a' }}>Chưa có tài sản nào.</span>} />
+                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span style={{ color: 'var(--text-muted)' }}>Chưa có tài sản nào.</span>} />
                       ) : (
                         <>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 240, overflowY: 'auto', paddingRight: 4 }}>
@@ -570,8 +769,8 @@ export default function ScansPage() {
                               <label key={asset.id} style={{
                                 display: 'flex', alignItems: 'center', gap: 10,
                                 padding: '8px 12px',
-                                background: selectedAssets.includes(asset.id) ? 'rgba(139, 92, 246, 0.08)' : '#181820',
-                                border: `1px solid ${selectedAssets.includes(asset.id) ? '#8b5cf6' : 'rgba(255,255,255,0.04)'}`,
+                                background: selectedAssets.includes(asset.id) ? 'rgba(139, 92, 246, 0.08)' : 'var(--surface-subtle)',
+                                border: `1px solid ${selectedAssets.includes(asset.id) ? 'var(--accent-violet)' : 'var(--border-subtle)'}`,
                                 borderRadius: 8, cursor: 'pointer'
                               }}>
                                 <Checkbox
@@ -581,10 +780,10 @@ export default function ScansPage() {
                                     else setSelectedAssets(selectedAssets.filter(id => id !== asset.id))
                                   }}
                                 />
-                                <FileProtectOutlined style={{ color: '#8b5cf6' }} />
+                                <FileProtectOutlined style={{ color: 'var(--accent-violet)' }} />
                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ color: '#fafafa', fontSize: 13, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{asset.name}</div>
-                                  <div style={{ color: '#71717a', fontSize: 11 }}>{asset.asset_type.toUpperCase()} · {asset.keywords?.length || 0} keywords</div>
+                                  <div style={{ color: 'var(--text-primary)', fontSize: 13, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{asset.name}</div>
+                                  <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>{asset.asset_type.toUpperCase()} · {asset.keywords?.length || 0} keywords</div>
                                 </div>
                                 <Tag style={{ fontSize: 10 }}>{asset.status}</Tag>
                               </label>
@@ -604,17 +803,17 @@ export default function ScansPage() {
                     </div>
                   </Col>
                   <Col xs={24} lg={12}>
-                    <div className="cm-card" style={{ padding: 18, background: '#13131a', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 14 }}>
-                      <h4 style={{ color: '#fafafa', marginTop: 0, marginBottom: 12, fontSize: 14 }}>Quét nhanh với tùy chọn chi tiết</h4>
+                    <div className="cm-card" style={{ padding: 18, background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: 14 }}>
+                      <h4 style={{ color: 'var(--text-primary)', marginTop: 0, marginBottom: 12, fontSize: 14 }}>Quét nhanh với tùy chọn chi tiết</h4>
                       <Form form={advancedForm} layout="vertical" size="small" initialValues={{ assetType: 'brand_name' }}>
                         <Row gutter={12}>
                           <Col span={12}>
-                            <Form.Item name="name" label={<span style={{ color: '#a1a1aa', fontSize: 12 }}>Tên tài sản</span>}>
+                            <Form.Item name="name" label={<span style={{ color: 'var(--text-secondary)', fontSize: 12 }}>Tên tài sản</span>}>
                               <Input placeholder="VD: Slogan chiến dịch" />
                             </Form.Item>
                           </Col>
                           <Col span={12}>
-                            <Form.Item name="assetType" label={<span style={{ color: '#a1a1aa', fontSize: 12 }}>Loại</span>}>
+                            <Form.Item name="assetType" label={<span style={{ color: 'var(--text-secondary)', fontSize: 12 }}>Loại</span>}>
                               <Select
                                 options={[
                                   { label: '🏢 Thương hiệu / Keyword', value: 'brand_name' },
@@ -630,42 +829,42 @@ export default function ScansPage() {
                         </Row>
                         <Row gutter={12}>
                           <Col span={12}>
-                            <Form.Item name="keywords" label={<span style={{ color: '#a1a1aa', fontSize: 12 }}>Từ khóa</span>}>
+                            <Form.Item name="keywords" label={<span style={{ color: 'var(--text-secondary)', fontSize: 12 }}>Từ khóa</span>}>
                               <Input placeholder="slogan, tagline" />
                             </Form.Item>
                           </Col>
                           <Col span={12}>
-                            <Form.Item name="officialDomains" label={<span style={{ color: '#a1a1aa', fontSize: 12 }}>Domain chính thức</span>}>
+                            <Form.Item name="officialDomains" label={<span style={{ color: 'var(--text-secondary)', fontSize: 12 }}>Domain chính thức</span>}>
                               <Input placeholder="example.com" />
                             </Form.Item>
                           </Col>
                         </Row>
                         {['audio', 'video'].includes(watchType || '') && (
-                          <Form.Item name="youtubeUrl" label={<span style={{ color: '#a1a1aa', fontSize: 12 }}>YouTube URL</span>}>
+                          <Form.Item name="youtubeUrl" label={<span style={{ color: 'var(--text-secondary)', fontSize: 12 }}>YouTube URL</span>}>
                             <Input placeholder="https://www.youtube.com/watch?v=..." />
                           </Form.Item>
                         )}
                         {watchType === 'audio' && (
                           <Row gutter={12}>
                             <Col span={12}>
-                              <Form.Item name="audioTitle" label={<span style={{ color: '#a1a1aa', fontSize: 12 }}>Tên bài hát</span>}>
+                              <Form.Item name="audioTitle" label={<span style={{ color: 'var(--text-secondary)', fontSize: 12 }}>Tên bài hát</span>}>
                                 <Input />
                               </Form.Item>
                             </Col>
                             <Col span={12}>
-                              <Form.Item name="audioArtist" label={<span style={{ color: '#a1a1aa', fontSize: 12 }}>Nghệ sĩ</span>}>
+                              <Form.Item name="audioArtist" label={<span style={{ color: 'var(--text-secondary)', fontSize: 12 }}>Nghệ sĩ</span>}>
                                 <Input />
                               </Form.Item>
                             </Col>
                           </Row>
                         )}
                         {['text', 'brand_name'].includes(watchType || 'brand_name') && (
-                          <Form.Item name="textContent" label={<span style={{ color: '#a1a1aa', fontSize: 12 }}>Nội dung văn bản</span>}>
+                          <Form.Item name="textContent" label={<span style={{ color: 'var(--text-secondary)', fontSize: 12 }}>Nội dung văn bản</span>}>
                             <Input.TextArea rows={3} placeholder="Nội dung cần quét..." />
                           </Form.Item>
                         )}
                         {['image', 'logo', 'video', 'audio'].includes(watchType || '') && (
-                          <Form.Item label={<span style={{ color: '#a1a1aa', fontSize: 12 }}>Tệp tải lên</span>}>
+                          <Form.Item label={<span style={{ color: 'var(--text-secondary)', fontSize: 12 }}>Tệp tải lên</span>}>
                             <UploadDropzone
                               accept={['image', 'logo'].includes(watchType || '') ? 'image/*' : watchType === 'video' ? 'video/*' : 'audio/*'}
                               onFile={setAdvancedFile}
@@ -683,13 +882,39 @@ export default function ScansPage() {
             }]}
           />
 
-          {/* History */}
+          {/* ===== HISTORY ===== */}
           <div className="cm-card" style={{ padding: 24 }}>
-            <h3 style={{ color: '#fafafa', fontSize: 16, fontWeight: 600, marginBottom: 16 }}>{t('scans.history')}</h3>
+            <div className="dash-section-header" style={{ marginBottom: 16 }}>
+              <h3 style={{ color: 'var(--text-primary)', fontSize: 16, fontWeight: 600, margin: 0 }}>
+                <HistoryOutlined style={{ marginRight: 8, color: 'var(--accent-violet)' }} />
+                {t('scans.history')}
+              </h3>
+            </div>
+
+            {scans.length > 0 && (
+              <div className="scan-history-stats">
+                <div className="scan-history-stat">
+                  <Statistic title="Tổng lần quét" value={historyStats.total} valueStyle={{ color: 'var(--text-primary)', fontSize: 22, fontWeight: 700 }} />
+                </div>
+                <div className="scan-history-stat">
+                  <Statistic title="Hoàn thành" value={historyStats.completed} valueStyle={{ color: 'var(--success)', fontSize: 22, fontWeight: 700 }} />
+                </div>
+                <div className="scan-history-stat">
+                  <Statistic title="Đang chạy" value={historyStats.running} valueStyle={{ color: '#38bdf8', fontSize: 22, fontWeight: 700 }} />
+                </div>
+                <div className="scan-history-stat">
+                  <Statistic title="Thất bại" value={historyStats.failed} valueStyle={{ color: 'var(--danger)', fontSize: 22, fontWeight: 700 }} />
+                </div>
+                <div className="scan-history-stat">
+                  <Statistic title="Tổng findings" value={historyStats.findings} valueStyle={{ color: 'var(--risk-medium)', fontSize: 22, fontWeight: 700 }} />
+                </div>
+              </div>
+            )}
+
             {loadingScans ? (
               <div style={{ textAlign: 'center', padding: 48 }}><Spin /></div>
             ) : scans.length === 0 ? (
-              <Empty description={<span style={{ color: '#71717a' }}>Chưa có lần quét nào</span>} />
+              <Empty description={<span style={{ color: 'var(--text-muted)' }}>Chưa có lần quét nào</span>} />
             ) : (
               <Table dataSource={scans} columns={columns} rowKey="id" pagination={{ pageSize: 10 }} scroll={{ x: 800 }} />
             )}

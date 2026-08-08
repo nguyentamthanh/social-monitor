@@ -86,7 +86,7 @@ export default function FindingsPage() {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sidebar />
-      <Layout>
+      <Layout className="ml-0 xl:ml-[260px]">
         <Header title={t('nav.findings')} />
         <Content className="page-container">
           <div className="page-header">
@@ -120,7 +120,7 @@ export default function FindingsPage() {
                   { label: 'TikTok', value: 'tiktok' }
                 ]}
               />
-              <span style={{ color: '#71717a', fontSize: 12 }}>Tổng: {total}</span>
+              <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>Tổng: {total}</span>
             </div>
             <Segmented
               value={view}
@@ -136,14 +136,14 @@ export default function FindingsPage() {
             <div style={{ textAlign: 'center', padding: 48 }}><Spin /></div>
           ) : findings.length === 0 ? (
             <div className="cm-card" style={{ textAlign: 'center', padding: 60 }}>
-              <Empty description={<span style={{ color: '#71717a' }}>Chưa có vi phạm nào</span>} />
+              <Empty description={<span style={{ color: 'var(--text-muted)' }}>Chưa có vi phạm nào</span>} />
             </div>
           ) : view === 'grid' ? (
             <div className="finding-grid">
               {findings.map(f => (
                 <div key={f.id} className="finding-card" onClick={() => setSelected(f)}>
                   <div className="finding-thumb">
-                    <span style={{ fontSize: 40, color: '#71717a' }}>⚠</span>
+                    <span style={{ fontSize: 40, color: 'var(--text-muted)' }}>⚠</span>
                     <div style={{ position: 'absolute', top: 10, left: 10 }}><RiskPill score={f.risk_score} /></div>
                     <div style={{ position: 'absolute', top: 10, right: 10 }}><PlatformBadge platform={f.platform as Platform} showLabel={false} /></div>
                   </div>
@@ -169,11 +169,11 @@ export default function FindingsPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 760 }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <th style={{ textAlign: 'left', padding: 12, color: '#71717a', fontSize: 11, textTransform: 'uppercase' }}>Risk</th>
-                    <th style={{ textAlign: 'left', padding: 12, color: '#71717a', fontSize: 11, textTransform: 'uppercase' }}>Title</th>
-                    <th style={{ textAlign: 'left', padding: 12, color: '#71717a', fontSize: 11, textTransform: 'uppercase' }}>Platform</th>
-                    <th style={{ textAlign: 'left', padding: 12, color: '#71717a', fontSize: 11, textTransform: 'uppercase' }}>Status</th>
-                    <th style={{ textAlign: 'left', padding: 12, color: '#71717a', fontSize: 11, textTransform: 'uppercase' }}>Found</th>
+                    <th style={{ textAlign: 'left', padding: 12, color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase' }}>Risk</th>
+                    <th style={{ textAlign: 'left', padding: 12, color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase' }}>Title</th>
+                    <th style={{ textAlign: 'left', padding: 12, color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase' }}>Platform</th>
+                    <th style={{ textAlign: 'left', padding: 12, color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase' }}>Status</th>
+                    <th style={{ textAlign: 'left', padding: 12, color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase' }}>Found</th>
                     <th style={{ padding: 12 }}></th>
                   </tr>
                 </thead>
@@ -181,10 +181,10 @@ export default function FindingsPage() {
                   {findings.map(f => (
                     <tr key={f.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer' }} onClick={() => setSelected(f)}>
                       <td style={{ padding: 12 }}><RiskPill score={f.risk_score} /></td>
-                      <td style={{ padding: 12, color: '#fafafa', maxWidth: 360, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.title}</td>
+                      <td style={{ padding: 12, color: 'var(--text-primary)', maxWidth: 360, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.title}</td>
                       <td style={{ padding: 12 }}><PlatformBadge platform={f.platform as Platform} /></td>
                       <td style={{ padding: 12 }}><Tag>{f.status}</Tag></td>
-                      <td style={{ padding: 12, color: '#71717a', fontSize: 12 }}>{new Date(f.found_at).toLocaleDateString()}</td>
+                      <td style={{ padding: 12, color: 'var(--text-muted)', fontSize: 12 }}>{new Date(f.found_at).toLocaleDateString()}</td>
                       <td style={{ padding: 12 }}>
                         <Button size="small" icon={<EyeOutlined />} onClick={(e) => { e.stopPropagation(); setSelected(f) }}>Xem</Button>
                       </td>
@@ -211,7 +211,7 @@ export default function FindingsPage() {
               <PlatformBadge platform={selected.platform as Platform} />
               <Tag>{selected.status}</Tag>
             </div>
-            <div style={{ background: '#13131a', padding: 16, borderRadius: 12, marginBottom: 16, color: '#a1a1aa', fontSize: 13, lineHeight: 1.6 }}>
+            <div style={{ background: 'var(--bg-card)', padding: 16, borderRadius: 12, marginBottom: 16, color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.6 }}>
               {selected.content}
             </div>
             <div style={{ marginBottom: 16 }}>
@@ -221,12 +221,12 @@ export default function FindingsPage() {
             </div>
             {selected.reasons?.length > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <div style={{ color: '#71717a', fontSize: 11, textTransform: 'uppercase', marginBottom: 8 }}>Lý do</div>
+                <div style={{ color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', marginBottom: 8 }}>Lý do</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {selected.reasons.map(r => (
-                    <div key={r.code} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#13131a', borderRadius: 8 }}>
-                      <span style={{ color: '#fafafa', fontSize: 13 }}>{r.label}</span>
-                      <span style={{ color: r.points > 0 ? '#fcd34d' : '#6ee7b7', fontWeight: 600, fontSize: 13 }}>
+                    <div key={r.code} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--bg-card)', borderRadius: 8 }}>
+                      <span style={{ color: 'var(--text-primary)', fontSize: 13 }}>{r.label}</span>
+                      <span style={{ color: r.points > 0 ? '#d97706' : '#059669', fontWeight: 600, fontSize: 13 }}>
                         {r.points > 0 ? '+' : ''}{r.points}
                       </span>
                     </div>

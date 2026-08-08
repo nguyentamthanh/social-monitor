@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Layout, Card, Form, Input, Button, message, Switch, Tabs, Alert, Tooltip } from 'antd'
-import { KeyOutlined, SaveOutlined, GlobalOutlined, ChromeOutlined, CopyOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons'
+import { KeyOutlined, SaveOutlined, GlobalOutlined, ChromeOutlined, CopyOutlined, DeleteOutlined, ReloadOutlined, ApiOutlined } from '@ant-design/icons'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/layout/Sidebar'
@@ -12,12 +12,51 @@ import { useTranslation } from '@/lib/i18n/context'
 const { Content } = Layout
 
 const KEY_FIELDS = [
-  { name: 'youtube_api_key', label: 'YouTube Data API Key', hint: 'Lấy từ Google Cloud Console' },
-  { name: 'google_search_api_key', label: 'Google Search API Key', hint: 'Custom Search JSON API' },
-  { name: 'google_search_engine_id', label: 'Google Custom Search Engine ID', hint: 'CX ID từ cse.google.com' },
-  { name: 'facebook_token', label: 'Facebook Access Token (optional)', hint: 'Cần Meta app approval' },
-  { name: 'tiktok_token', label: 'TikTok Access Token (optional)', hint: 'Cần TikTok Research API access' }
+  {
+    name: 'youtube_api_key',
+    label: 'YouTube Data API Key',
+    hint: 'Tạo credential trong Google Cloud Console, nhớ bật "YouTube Data API v3"',
+    docUrl: 'https://console.cloud.google.com/apis/credentials'
+  },
+  {
+    name: 'google_search_api_key',
+    label: 'Google Search API Key',
+    hint: 'Custom Search JSON API — bấm "Get a Key" trong trang tài liệu',
+    docUrl: 'https://developers.google.com/custom-search/v1/introduction'
+  },
+  {
+    name: 'google_search_engine_id',
+    label: 'Google Custom Search Engine ID',
+    hint: 'CX ID của search engine bạn tạo (nhớ bật "Search the entire web")',
+    docUrl: 'https://programmablesearchengine.google.com/controlpanel/all'
+  },
+  {
+    name: 'facebook_token',
+    label: 'Facebook Access Token (tuỳ chọn)',
+    hint: 'Cần Meta app review; nếu chưa có, Facebook vẫn quét được qua Google Custom Search',
+    docUrl: 'https://developers.facebook.com/apps'
+  },
+  {
+    name: 'tiktok_token',
+    label: 'TikTok Access Token (tuỳ chọn)',
+    hint: 'Cần được duyệt TikTok Research API',
+    docUrl: 'https://developers.tiktok.com/products/research-api'
+  }
 ]
+
+const PLATFORM_LABEL: Record<string, string> = {
+  youtube: 'YouTube',
+  google: 'Google Search',
+  facebook: 'Facebook',
+  tiktok: 'TikTok'
+}
+
+interface ConnectorCheck {
+  platform: string
+  capability: 'ready' | 'limited' | 'error'
+  code: string
+  message: string
+}
 
 export default function SettingsPage() {
   const { status } = useSession()
@@ -26,6 +65,9 @@ export default function SettingsPage() {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const [autoRefresh, setAutoRefresh] = useState(false)
+
+  const [testing, setTesting] = useState(false)
+  const [checks, setChecks] = useState<ConnectorCheck[] | null>(null)
 
   const [extKeyState, setExtKeyState] = useState<{ hasKey: boolean; createdAt: string | null }>({ hasKey: false, createdAt: null })
   const [extKeyPlain, setExtKeyPlain] = useState<string | null>(null)
@@ -104,10 +146,32 @@ export default function SettingsPage() {
     }
   }
 
+  /** Gọi thử API thật với key đang gõ trên form — không lưu vào DB. */
+  const handleTest = async () => {
+    setTesting(true)
+    try {
+      const values = form.getFieldsValue()
+      const res = await fetch('/api/settings/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKeys: values })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data?.error || 'Test failed')
+      setChecks(data.connectors || [])
+      if (data.readyCount > 0) message.success(`${data.readyCount} nền tảng sẵn sàng`)
+      else message.warning('Chưa nền tảng nào sẵn sàng — kiểm tra lại key')
+    } catch (err: any) {
+      message.error(err?.message || 'Không kiểm tra được kết nối')
+    } finally {
+      setTesting(false)
+    }
+  }
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sidebar />
-      <Layout>
+      <Layout className="ml-0 xl:ml-[260px]">
         <Header title={t('nav.settings')} />
         <Content className="page-container">
           <div className="page-header">
@@ -123,15 +187,53 @@ export default function SettingsPage() {
                 label: <span><KeyOutlined /> {t('settings.apiKeys')}</span>,
                 children: (
                   <Card>
+                    <Alert
+                      type="info"
+                      showIcon
+                      style={{ marginBottom: 20 }}
+                      message="Cần ít nhất YouTube Data API Key để quét được"
+                      description="Key do bạn tự tạo trên trang của nhà cung cấp — bấm link cạnh mỗi ô để mở đúng trang. Key được mã hoá AES-256 trước khi lưu."
+                    />
                     <Form form={form} layout="vertical">
                       {KEY_FIELDS.map(field => (
-                        <Form.Item key={field.name} name={field.name} label={field.label} tooltip={field.hint}>
+                        <Form.Item
+                          key={field.name}
+                          name={field.name}
+                          tooltip={field.hint}
+                          label={
+                            <span className="settings-key-label">
+                              {field.label}
+                              <a href={field.docUrl} target="_blank" rel="noreferrer noopener">
+                                Lấy key →
+                              </a>
+                            </span>
+                          }
+                        >
                           <Input.Password placeholder="Nhập key..." autoComplete="new-password" />
                         </Form.Item>
                       ))}
-                      <Button type="primary" icon={<SaveOutlined />} onClick={handleSave} loading={loading}>
-                        {t('common.save')}
-                      </Button>
+
+                      {checks && (
+                        <div className="settings-check-row">
+                          {checks.map(check => (
+                            <Tooltip key={check.platform} title={check.message}>
+                              <span className={`settings-check-chip is-${check.capability}`}>
+                                {check.capability === 'ready' ? '✓' : check.capability === 'error' ? '✕' : '—'}
+                                {PLATFORM_LABEL[check.platform] || check.platform}
+                              </span>
+                            </Tooltip>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="settings-actions">
+                        <Button type="primary" icon={<SaveOutlined />} onClick={handleSave} loading={loading}>
+                          {t('common.save')}
+                        </Button>
+                        <Button icon={<ApiOutlined />} onClick={handleTest} loading={testing}>
+                          Kiểm tra kết nối
+                        </Button>
+                      </div>
                     </Form>
                   </Card>
                 )
@@ -142,8 +244,8 @@ export default function SettingsPage() {
                 children: (
                   <Card>
                     <div style={{ maxWidth: 520 }}>
-                      <h3 style={{ color: '#fafafa', fontWeight: 600, marginBottom: 6 }}>Chrome Extension API Key</h3>
-                      <p style={{ color: '#71717a', fontSize: 13, marginBottom: 20 }}>
+                      <h3 style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: 6 }}>Chrome Extension API Key</h3>
+                      <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 20 }}>
                         Dùng key này để kết nối Chrome Extension với tài khoản của bạn.
                         Key chỉ hiển thị một lần — hãy lưu lại ngay sau khi tạo.
                       </p>
@@ -175,18 +277,18 @@ export default function SettingsPage() {
                         />
                       )}
 
-                      <div style={{ padding: 16, background: '#13131a', borderRadius: 10, marginBottom: 20 }}>
+                      <div style={{ padding: 16, background: 'var(--bg-card)', borderRadius: 10, marginBottom: 20 }}>
                         {extKeyState.hasKey ? (
                           <div>
                             <div style={{ color: '#10b981', fontSize: 13, marginBottom: 4 }}>✓ Đã có API key đang hoạt động</div>
                             {extKeyState.createdAt && (
-                              <div style={{ color: '#71717a', fontSize: 12 }}>
+                              <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>
                                 Tạo lúc: {new Date(extKeyState.createdAt).toLocaleString('vi-VN')}
                               </div>
                             )}
                           </div>
                         ) : (
-                          <div style={{ color: '#71717a', fontSize: 13 }}>Chưa có API key nào.</div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Chưa có API key nào.</div>
                         )}
                       </div>
 
@@ -220,20 +322,20 @@ export default function SettingsPage() {
                 children: (
                   <Card>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 12, background: '#13131a', borderRadius: 10 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 12, background: 'var(--bg-card)', borderRadius: 10 }}>
                         <div>
-                          <div style={{ color: '#fafafa', fontWeight: 500 }}>Ngôn ngữ</div>
-                          <div style={{ color: '#71717a', fontSize: 12 }}>Chọn ngôn ngữ giao diện</div>
+                          <div style={{ color: 'var(--text-primary)', fontWeight: 500 }}>Ngôn ngữ</div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>Chọn ngôn ngữ giao diện</div>
                         </div>
                         <div style={{ display: 'flex', gap: 8 }}>
                           <Button size="small" type={locale === 'vi' ? 'primary' : 'default'} onClick={() => setLocale('vi')}>Tiếng Việt</Button>
                           <Button size="small" type={locale === 'en' ? 'primary' : 'default'} onClick={() => setLocale('en')}>English</Button>
                         </div>
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 12, background: '#13131a', borderRadius: 10 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 12, background: 'var(--bg-card)', borderRadius: 10 }}>
                         <div>
-                          <div style={{ color: '#fafafa', fontWeight: 500 }}>Tự động làm mới</div>
-                          <div style={{ color: '#71717a', fontSize: 12 }}>Cập nhật trang mỗi 60 giây</div>
+                          <div style={{ color: 'var(--text-primary)', fontWeight: 500 }}>Tự động làm mới</div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>Cập nhật trang mỗi 60 giây</div>
                         </div>
                         <Switch checked={autoRefresh} onChange={setAutoRefresh} />
                       </div>

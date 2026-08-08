@@ -1,11 +1,12 @@
 import { BrandAsset, ConnectorStatus, Platform, RawCandidate } from '@/types'
 import { computePHashFromUrl } from '@/lib/copyright/imageHash'
 import { audioStreamingSearchQuery, buildAudioQuery } from '@/lib/copyright/audioMatcher'
+import { EMPTY_API_KEYS, type ScanApiKeys } from '@/lib/copyright/apiKeys'
 
 interface CopyrightAdapter {
   platform: Platform
-  status(): ConnectorStatus
-  search(asset: BrandAsset): Promise<RawCandidate[]>
+  status(keys: ScanApiKeys): ConnectorStatus
+  search(asset: BrandAsset, keys: ScanApiKeys): Promise<RawCandidate[]>
 }
 
 // Strip common YouTube/MV decorations so the search query is broad enough
@@ -53,21 +54,28 @@ function buildYoutubeQueries(asset: BrandAsset): string[] {
   return Array.from(queries).slice(0, 6)
 }
 
+/**
+ * Số lần gọi `search.list` mà một lần quét YouTube sẽ tốn. Dùng để ước lượng
+ * quota trước khi chạy — xem `lib/copyright/quota.ts`.
+ */
+export function countYoutubeQueries(asset: BrandAsset): number {
+  return buildYoutubeQueries(asset).length
+}
+
 const youtubeAdapter: CopyrightAdapter = {
   platform: 'youtube',
-  status() {
-    const apiKey = process.env.YOUTUBE_API_KEY || ''
-    if (!apiKey || apiKey === 'your_youtube_api_key_here') {
-      return limited('youtube', 'config_missing', 'Chưa cấu hình YOUTUBE_API_KEY')
+  status(keys) {
+    if (!keys.youtubeApiKey) {
+      return limited('youtube', 'config_missing', 'Chưa cấu hình YouTube Data API Key')
     }
 
     return ready('youtube', 'YouTube Data API đã sẵn sàng')
   },
-  async search(asset) {
-    const status = this.status()
+  async search(asset, keys) {
+    const status = this.status(keys)
     if (status.capability !== 'ready') return []
 
-    const apiKey = process.env.YOUTUBE_API_KEY!
+    const apiKey = keys.youtubeApiKey
     const queries = buildYoutubeQueries(asset)
     const seenVideoIds = new Set<string>()
     const candidates: RawCandidate[] = []
@@ -138,26 +146,23 @@ const youtubeAdapter: CopyrightAdapter = {
 
 const googleAdapter: CopyrightAdapter = {
   platform: 'google',
-  status() {
-    const apiKey = process.env.GOOGLE_SEARCH_API_KEY || process.env.GOOGLE_API_KEY || ''
-    const engineId = process.env.GOOGLE_SEARCH_ENGINE_ID || ''
-
-    if (!apiKey || !engineId) {
+  status(keys) {
+    if (!keys.googleSearchApiKey || !keys.googleSearchEngineId) {
       return limited(
         'google',
         'config_missing',
-        'Cần cấu hình GOOGLE_SEARCH_API_KEY và GOOGLE_SEARCH_ENGINE_ID'
+        'Cần cấu hình Google Search API Key và Custom Search Engine ID'
       )
     }
 
     return ready('google', 'Google Programmable Search connector đã sẵn sàng')
   },
-  async search(asset) {
-    const status = this.status()
+  async search(asset, keys) {
+    const status = this.status(keys)
     if (status.capability !== 'ready') return []
 
-    const apiKey = process.env.GOOGLE_SEARCH_API_KEY || process.env.GOOGLE_API_KEY!
-    const engineId = process.env.GOOGLE_SEARCH_ENGINE_ID!
+    const apiKey = keys.googleSearchApiKey
+    const engineId = keys.googleSearchEngineId
 
     const baseParams: Record<string, string> = {
       key: apiKey,
@@ -243,21 +248,20 @@ function formatDateUTC(date: Date): string {
 
 const SEA_REGION_CODES = ['VN', 'TH', 'ID', 'PH', 'MY', 'SG']
 
-function createTikTokResearchAdapter(getToken: () => string): CopyrightAdapter {
+function createTikTokResearchAdapter(): CopyrightAdapter {
   return {
     platform: 'tiktok',
-    status() {
-      const token = getToken()
-      if (!token || token === 'your_tiktok_access_token_here') {
-        return limited('tiktok', 'config_missing', 'Chưa cấu hình TIKTOK_ACCESS_TOKEN (TikTok Research API)')
+    status(keys) {
+      if (!keys.tiktokToken) {
+        return limited('tiktok', 'config_missing', 'Chưa cấu hình TikTok Access Token (Research API)')
       }
       return ready('tiktok', 'TikTok Research API đã sẵn sàng')
     },
-    async search(asset) {
-      const status = this.status()
+    async search(asset, keys) {
+      const status = this.status(keys)
       if (status.capability !== 'ready') return []
 
-      const token = getToken()
+      const token = keys.tiktokToken
       const keyword = queryForAsset(asset).trim()
       if (!keyword) return []
 
@@ -347,9 +351,9 @@ function createTikTokResearchAdapter(getToken: () => string): CopyrightAdapter {
   }
 }
 
-// Export cho unit test (inject token)
-export function createTikTokResearchAdapterForTest(getToken: () => string): CopyrightAdapter {
-  return createTikTokResearchAdapter(getToken)
+// Export cho unit test
+export function createTikTokResearchAdapterForTest(): CopyrightAdapter {
+  return createTikTokResearchAdapter()
 }
 
 function googleSiteSearchAdapter(
@@ -359,17 +363,17 @@ function googleSiteSearchAdapter(
 ): CopyrightAdapter {
   return {
     platform,
-    status() {
-      const apiKey = process.env.GOOGLE_SEARCH_API_KEY || process.env.GOOGLE_API_KEY || ''
-      const engineId = process.env.GOOGLE_SEARCH_ENGINE_ID || ''
-      if (!apiKey || !engineId) {
-        return limited(platform, 'config_missing', `Cần GOOGLE_SEARCH_API_KEY + GOOGLE_SEARCH_ENGINE_ID để quét ${site}`)
+    status(keys) {
+      if (!keys.googleSearchApiKey || !keys.googleSearchEngineId) {
+        return limited(platform, 'config_missing', `Cần Google Search API Key + Custom Search Engine ID để quét ${site}`)
       }
       return ready(platform, readyMessage)
     },
-    async search(asset) {
-      const apiKey = process.env.GOOGLE_SEARCH_API_KEY || process.env.GOOGLE_API_KEY!
-      const engineId = process.env.GOOGLE_SEARCH_ENGINE_ID!
+    async search(asset, keys) {
+      if (this.status(keys).capability !== 'ready') return []
+
+      const apiKey = keys.googleSearchApiKey
+      const engineId = keys.googleSearchEngineId
       const q = queryForAsset(asset)
 
       const params = new URLSearchParams({
@@ -422,7 +426,7 @@ const facebookAdapter: CopyrightAdapter = googleSiteSearchAdapter(
   'Facebook search qua Google Custom Search đã sẵn sàng'
 )
 
-const tiktokAdapter: CopyrightAdapter = createTikTokResearchAdapter(() => process.env.TIKTOK_ACCESS_TOKEN || '')
+const tiktokAdapter: CopyrightAdapter = createTikTokResearchAdapter()
 
 export const copyrightAdapters: Record<Platform, CopyrightAdapter> = {
   facebook: facebookAdapter,
@@ -431,8 +435,11 @@ export const copyrightAdapters: Record<Platform, CopyrightAdapter> = {
   tiktok: tiktokAdapter
 }
 
-export function getConnectorStatuses(platforms: Platform[] = ['youtube', 'google', 'facebook', 'tiktok']): ConnectorStatus[] {
-  return platforms.map(platform => copyrightAdapters[platform].status())
+export function getConnectorStatuses(
+  platforms: Platform[] = ['youtube', 'google', 'facebook', 'tiktok'],
+  keys: ScanApiKeys = EMPTY_API_KEYS
+): ConnectorStatus[] {
+  return platforms.map(platform => copyrightAdapters[platform].status(keys))
 }
 
 function ready(platform: Platform, message: string): ConnectorStatus {

@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Form, Input, Button, message } from 'antd'
 import { MailOutlined, LockOutlined, UserOutlined, SafetyCertificateOutlined } from '@ant-design/icons'
 import { useTranslation } from '@/lib/i18n/context'
+import ThemeToggle from '@/components/ui/ThemeToggle'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -40,17 +41,18 @@ export default function RegisterPage() {
 
   return (
     <div className="auth-shell">
+      <ThemeToggle className="auth-theme-toggle" />
       <div className="auth-hero">
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 40 }}>
             <div style={{
               width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              borderRadius: 12, background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
+              borderRadius: 12, background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
               boxShadow: '0 0 24px rgba(139,92,246,0.5)'
             }}>
               <SafetyCertificateOutlined style={{ color: 'white', fontSize: 22 }} />
             </div>
-            <span style={{ color: '#fafafa', fontSize: 20, fontWeight: 700 }}>{t('app.name')}</span>
+            <span style={{ color: 'var(--text-primary)', fontSize: 20, fontWeight: 700 }}>{t('app.name')}</span>
           </div>
           <h1>{t('auth.brandTitle')}</h1>
           <p>{t('auth.brandSub')}</p>
@@ -78,7 +80,7 @@ export default function RegisterPage() {
               {t('auth.registerCta')}
             </Button>
           </Form>
-          <div style={{ marginTop: 24, textAlign: 'center', color: '#a1a1aa', fontSize: 13 }}>
+          <div style={{ marginTop: 24, textAlign: 'center', color: 'var(--text-secondary)', fontSize: 13 }}>
             {t('auth.haveAccount')}{' '}
             <Link href="/login" className="auth-link">{t('auth.login')}</Link>
           </div>

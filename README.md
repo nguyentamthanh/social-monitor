@@ -1,4 +1,4 @@
-# Copyright Monitor
+# Copyright Checker
 
 Dashboard giám sát bản quyền thương hiệu cho **text · ảnh · video · âm nhạc** trên Web, YouTube và Google.
 

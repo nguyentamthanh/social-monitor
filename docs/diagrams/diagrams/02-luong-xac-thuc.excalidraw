@@ -1,0 +1,1133 @@
+{
+ "type": "excalidraw",
+ "version": 2,
+ "source": "hermes-agent",
+ "elements": [
+  {
+   "type": "text",
+   "id": "n84",
+   "x": 80,
+   "y": 30,
+   "width": 750.2,
+   "height": 26.4,
+   "text": "LUỒNG XÁC THỰC — LOGIN / REGISTER (NextAuth Credentials + JWT)",
+   "fontSize": 22,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "left",
+   "verticalAlign": "top",
+   "originalText": "LUỒNG XÁC THỰC — LOGIN / REGISTER (NextAuth Credentials + JWT)",
+   "autoResize": true
+  },
+  {
+   "type": "ellipse",
+   "id": "n85",
+   "x": 330,
+   "y": 110,
+   "width": 140,
+   "height": 60,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#c3fae8",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "boundElements": [
+    {
+     "id": "n86",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n86",
+   "x": 354.75,
+   "y": 128.625,
+   "width": 90.5,
+   "height": 22.75,
+   "text": "Người dùng",
+   "fontSize": 15,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "Người dùng",
+   "autoResize": true,
+   "containerId": "n85"
+  },
+  {
+   "type": "arrow",
+   "id": "n87",
+   "x": 470,
+   "y": 140,
+   "width": 130,
+   "height": 0,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     130,
+     0
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "text",
+   "id": "n88",
+   "x": 455.925,
+   "y": 106.0,
+   "width": 158.15,
+   "height": 20,
+   "text": "nhập email + mật khẩu",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "nhập email + mật khẩu",
+   "autoResize": true
+  },
+  {
+   "type": "rectangle",
+   "id": "n89",
+   "x": 600,
+   "y": 110,
+   "width": 220,
+   "height": 60,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#a5d8ff",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n90",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n90",
+   "x": 625.15,
+   "y": 120.5,
+   "width": 169.70000000000002,
+   "height": 39.0,
+   "text": "/login\nsignIn('credentials')",
+   "fontSize": 14,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "/login\nsignIn('credentials')",
+   "autoResize": true,
+   "containerId": "n89"
+  },
+  {
+   "type": "arrow",
+   "id": "n91",
+   "x": 820,
+   "y": 140,
+   "width": 130,
+   "height": 0,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     130,
+     0
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "text",
+   "id": "n92",
+   "x": 866.7,
+   "y": 106.0,
+   "width": 36.6,
+   "height": 20,
+   "text": "POST",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "POST",
+   "autoResize": true
+  },
+  {
+   "type": "rectangle",
+   "id": "n93",
+   "x": 950,
+   "y": 110,
+   "width": 240,
+   "height": 60,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#a5d8ff",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n94",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n94",
+   "x": 950.5,
+   "y": 129.25,
+   "width": 239.00000000000003,
+   "height": 21.5,
+   "text": "/api/auth/callback/credentials",
+   "fontSize": 14,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "/api/auth/callback/credentials",
+   "autoResize": true,
+   "containerId": "n93"
+  },
+  {
+   "type": "arrow",
+   "id": "n95",
+   "x": 1190,
+   "y": 140,
+   "width": 130,
+   "height": 0,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     130,
+     0
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "rectangle",
+   "id": "n97",
+   "x": 1320,
+   "y": 110,
+   "width": 260,
+   "height": 60,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#d0bfff",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n98",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n98",
+   "x": 1349.75,
+   "y": 129.25,
+   "width": 200.50000000000003,
+   "height": 21.5,
+   "text": "authorize() — lib/auth.ts",
+   "fontSize": 14,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "authorize() — lib/auth.ts",
+   "autoResize": true,
+   "containerId": "n97"
+  },
+  {
+   "type": "arrow",
+   "id": "n99",
+   "x": 1450,
+   "y": 170,
+   "width": 0,
+   "height": 130,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     130
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "text",
+   "id": "n100",
+   "x": 1289.0,
+   "y": 225.0,
+   "width": 151.0,
+   "height": 20,
+   "text": "có email + mật khẩu?",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "có email + mật khẩu?",
+   "autoResize": true
+  },
+  {
+   "type": "diamond",
+   "id": "n101",
+   "x": 1370,
+   "y": 300,
+   "width": 160,
+   "height": 70,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#fff3bf",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "boundElements": [
+    {
+     "id": "n102",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n102",
+   "x": 1406.675,
+   "y": 316.75,
+   "width": 86.65,
+   "height": 36.5,
+   "text": "Có email\n+ mật khẩu?",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "Có email\n+ mật khẩu?",
+   "autoResize": true,
+   "containerId": "n101"
+  },
+  {
+   "type": "arrow",
+   "id": "n103",
+   "x": 1450,
+   "y": 370,
+   "width": 0,
+   "height": 100,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     100
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "rectangle",
+   "id": "n105",
+   "x": 1330,
+   "y": 470,
+   "width": 240,
+   "height": 60,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#d0bfff",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n106",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n106",
+   "x": 1374.5,
+   "y": 481.75,
+   "width": 151.0,
+   "height": 36.5,
+   "text": "initializeDatabase()\ntạo bảng nếu chưa có",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "initializeDatabase()\ntạo bảng nếu chưa có",
+   "autoResize": true,
+   "containerId": "n105"
+  },
+  {
+   "type": "arrow",
+   "id": "n107",
+   "x": 1450,
+   "y": 530,
+   "width": 0,
+   "height": 100,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     100
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "rectangle",
+   "id": "n109",
+   "x": 1330,
+   "y": 630,
+   "width": 240,
+   "height": 60,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#c3fae8",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n110",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n110",
+   "x": 1380.55,
+   "y": 640.5,
+   "width": 138.9,
+   "height": 39.0,
+   "text": "findUserByEmail()\nNeon Postgres",
+   "fontSize": 14,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "findUserByEmail()\nNeon Postgres",
+   "autoResize": true,
+   "containerId": "n109"
+  },
+  {
+   "type": "arrow",
+   "id": "n111",
+   "x": 1450,
+   "y": 690,
+   "width": 0,
+   "height": 100,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     100
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "diamond",
+   "id": "n113",
+   "x": 1370,
+   "y": 790,
+   "width": 160,
+   "height": 70,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#fff3bf",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "boundElements": [
+    {
+     "id": "n114",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n114",
+   "x": 1415.2,
+   "y": 805.5,
+   "width": 69.60000000000001,
+   "height": 39.0,
+   "text": "User\ntồn tại?",
+   "fontSize": 14,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "User\ntồn tại?",
+   "autoResize": true,
+   "containerId": "n113"
+  },
+  {
+   "type": "arrow",
+   "id": "n115",
+   "x": 1450,
+   "y": 860,
+   "width": 0,
+   "height": 100,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     100
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "text",
+   "id": "n116",
+   "x": 1417.7,
+   "y": 900.0,
+   "width": 22.3,
+   "height": 20,
+   "text": "có",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "có",
+   "autoResize": true
+  },
+  {
+   "type": "rectangle",
+   "id": "n117",
+   "x": 1330,
+   "y": 960,
+   "width": 240,
+   "height": 60,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#d0bfff",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n118",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n118",
+   "x": 1353.6,
+   "y": 979.25,
+   "width": 192.8,
+   "height": 21.5,
+   "text": "bcrypt.compare(password)",
+   "fontSize": 14,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "bcrypt.compare(password)",
+   "autoResize": true,
+   "containerId": "n117"
+  },
+  {
+   "type": "arrow",
+   "id": "n119",
+   "x": 1450,
+   "y": 1020,
+   "width": 0,
+   "height": 100,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     100
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "diamond",
+   "id": "n121",
+   "x": 1370,
+   "y": 1120,
+   "width": 160,
+   "height": 70,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#fff3bf",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "boundElements": [
+    {
+     "id": "n122",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n122",
+   "x": 1415.2,
+   "y": 1135.5,
+   "width": 69.60000000000001,
+   "height": 39.0,
+   "text": "Mật khẩu\nkhớp?",
+   "fontSize": 14,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "Mật khẩu\nkhớp?",
+   "autoResize": true,
+   "containerId": "n121"
+  },
+  {
+   "type": "arrow",
+   "id": "n123",
+   "x": 1450,
+   "y": 1190,
+   "width": 0,
+   "height": 100,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     100
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "text",
+   "id": "n124",
+   "x": 1417.7,
+   "y": 1230.0,
+   "width": 22.3,
+   "height": 20,
+   "text": "có",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "có",
+   "autoResize": true
+  },
+  {
+   "type": "rectangle",
+   "id": "n125",
+   "x": 1290,
+   "y": 1290,
+   "width": 320,
+   "height": 60,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#b2f2bb",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n126",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n126",
+   "x": 1330.5,
+   "y": 1300.5,
+   "width": 239.00000000000003,
+   "height": 39.0,
+   "text": "Tạo JWT session\n{id, email, name} → /dashboard",
+   "fontSize": 14,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "Tạo JWT session\n{id, email, name} → /dashboard",
+   "autoResize": true,
+   "containerId": "n125"
+  },
+  {
+   "type": "arrow",
+   "id": "n127",
+   "x": 1320,
+   "y": 140,
+   "width": -140,
+   "height": 80,
+   "strokeColor": "#e03131",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     -140,
+     80
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "text",
+   "id": "n128",
+   "x": 1228.125,
+   "y": 146.0,
+   "width": 43.75,
+   "height": 20,
+   "text": "không",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#e03131",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "không",
+   "autoResize": true
+  },
+  {
+   "type": "rectangle",
+   "id": "n129",
+   "x": 960,
+   "y": 220,
+   "width": 220,
+   "height": 56,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#ffc9c9",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n130",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n130",
+   "x": 969.475,
+   "y": 237.875,
+   "width": 201.05,
+   "height": 20.25,
+   "text": "throw 'Missing credentials'",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "throw 'Missing credentials'",
+   "autoResize": true,
+   "containerId": "n129"
+  },
+  {
+   "type": "arrow",
+   "id": "n131",
+   "x": 1370,
+   "y": 825,
+   "width": -190,
+   "height": 0,
+   "strokeColor": "#e03131",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     -190,
+     0
+    ]
+   ],
+   "endArrowhead": "arrow",
+   "strokeStyle": "dashed"
+  },
+  {
+   "type": "text",
+   "id": "n132",
+   "x": 1253.125,
+   "y": 791.0,
+   "width": 43.75,
+   "height": 20,
+   "text": "không",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#e03131",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "không",
+   "autoResize": true
+  },
+  {
+   "type": "diamond",
+   "id": "n133",
+   "x": 980,
+   "y": 790,
+   "width": 200,
+   "height": 70,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#fff3bf",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "boundElements": [
+    {
+     "id": "n134",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n134",
+   "x": 1033.1,
+   "y": 806.75,
+   "width": 93.80000000000001,
+   "height": 36.5,
+   "text": "Là tài khoản\ndemo?",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "Là tài khoản\ndemo?",
+   "autoResize": true,
+   "containerId": "n133"
+  },
+  {
+   "type": "arrow",
+   "id": "n135",
+   "x": 980,
+   "y": 860,
+   "width": 0,
+   "height": 100,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     100
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "text",
+   "id": "n136",
+   "x": 947.7,
+   "y": 900.0,
+   "width": 22.3,
+   "height": 20,
+   "text": "có",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "có",
+   "autoResize": true
+  },
+  {
+   "type": "rectangle",
+   "id": "n137",
+   "x": 860,
+   "y": 960,
+   "width": 240,
+   "height": 60,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#b2f2bb",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n138",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n138",
+   "x": 908.075,
+   "y": 971.75,
+   "width": 143.85000000000002,
+   "height": 36.5,
+   "text": "createUser() tự tạo\ndemo@demo.com",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "createUser() tự tạo\ndemo@demo.com",
+   "autoResize": true,
+   "containerId": "n137"
+  },
+  {
+   "type": "arrow",
+   "id": "n139",
+   "x": 1100,
+   "y": 990,
+   "width": 230,
+   "height": 0,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     230,
+     0
+    ]
+   ],
+   "endArrowhead": "arrow",
+   "strokeStyle": "dashed"
+  },
+  {
+   "type": "arrow",
+   "id": "n141",
+   "x": 1450,
+   "y": 1155,
+   "width": 170,
+   "height": 0,
+   "strokeColor": "#e03131",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     170,
+     0
+    ]
+   ],
+   "endArrowhead": "arrow",
+   "strokeStyle": "dashed"
+  },
+  {
+   "type": "text",
+   "id": "n142",
+   "x": 1513.125,
+   "y": 1121.0,
+   "width": 43.75,
+   "height": 20,
+   "text": "không",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#e03131",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "không",
+   "autoResize": true
+  },
+  {
+   "type": "rectangle",
+   "id": "n143",
+   "x": 1620,
+   "y": 1120,
+   "width": 260,
+   "height": 70,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#ffc9c9",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n144",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n144",
+   "x": 1649.475,
+   "y": 1136.75,
+   "width": 201.05,
+   "height": 36.5,
+   "text": "throw 'Invalid credentials'\n→ /api/auth/error",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "throw 'Invalid credentials'\n→ /api/auth/error",
+   "autoResize": true,
+   "containerId": "n143"
+  }
+ ],
+ "appState": {
+  "viewBackgroundColor": "#ffffff"
+ }
+}

@@ -1,5 +1,6 @@
 node_modules
 .next
+.env
 .env*.local
 public/uploads
 tsconfig.tsbuildinfo
@@ -13,3 +14,18 @@ pnpm-lock.yaml
 .playwright-cli/
 scripts/seed-admin.ts
 scripts/check-db.ts
+
+# Local debug artifacts (curl cookie jars / auth test dumps)
+cookies.txt
+csrf.json
+headers.txt
+resp.txt
+
+# Nested standalone repo, not part of this project
+Checker/
+
+# Local Claude Code tool config (machine-specific)
+.claude/
+
+__pycache__/
+*.pyc

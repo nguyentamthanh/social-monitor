@@ -4,6 +4,9 @@ import { authOptions } from '@/lib/auth'
 import { initializeDatabase } from '@/lib/db'
 import { extractYouTubeVideoId } from '@/lib/copyright/urlParser'
 import { fetchYouTubeVideoById, YouTubeLookupError } from '@/lib/copyright/youtubeVideoLookup'
+import { resolveApiKeys } from '@/lib/copyright/apiKeys'
+import { recordUsage, YOUTUBE_COST } from '@/lib/copyright/quota'
+import { parseOrError, youtubeUrlRequestSchema } from '@/lib/validation'
 import { scoreCandidate } from '@/lib/copyright/scoring'
 import {
   createEvidenceItem,
@@ -37,8 +40,9 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = (session.user as any).id || session.user.email!
-    const body = await request.json().catch(() => ({}))
-    const rawUrl: string = typeof body.url === 'string' ? body.url : ''
+    const parsed = parseOrError(youtubeUrlRequestSchema, await request.json().catch(() => ({})))
+    if (!parsed.ok) return parsed.response
+    const rawUrl = parsed.data.url
 
     const videoId = extractYouTubeVideoId(rawUrl)
     if (!videoId) {
@@ -62,7 +66,9 @@ export async function POST(request: NextRequest) {
 
     let lookup
     try {
-      lookup = await fetchYouTubeVideoById(videoId, { computeThumbnailHash: needThumbnailHash })
+      const keys = await resolveApiKeys(userId)
+      lookup = await fetchYouTubeVideoById(videoId, { computeThumbnailHash: needThumbnailHash, apiKey: keys.youtubeApiKey })
+      await recordUsage(userId, YOUTUBE_COST.videos)
     } catch (err) {
       if (err instanceof YouTubeLookupError) {
         const status = err.code === 'config_missing' ? 500 : err.code === 'not_found' ? 404 : 502
