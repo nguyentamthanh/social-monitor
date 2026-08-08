@@ -28,6 +28,13 @@ export interface BrandAsset {
   file_hash?: string | null
   perceptual_hash?: string | null
   audio_metadata?: { title?: string; artist?: string; album?: string } | null
+  /**
+   * `user` = do người dùng tạo trong thư viện tài sản.
+   * `adhoc` = tự sinh khi quét một URL lạ, để findings có chỗ gắn vào
+   * (findings.asset_id là NOT NULL). Không hiện trong trang Tài sản.
+   */
+  origin?: 'user' | 'adhoc'
+  source_url?: string | null
   status: 'active' | 'paused'
   created_at: Date
   updated_at: Date

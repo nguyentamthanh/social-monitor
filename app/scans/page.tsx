@@ -695,11 +695,13 @@ function ScansPageInner() {
                     <Button size="small">Xem tất cả Findings →</Button>
                   </Link>
                 </div>
-                {(quickScanMeta?.mode === 'youtube_deep_url' || quickScanMeta?.mode === 'youtube_deep_fallback') && (
+                {quickScanMeta?.searched != null && (
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-                    <Tag>Quét YouTube: {quickScanMeta.searched || 0}</Tag>
+                    <Tag>Đã xét: {quickScanMeta.searched || 0} video</Tag>
+                    <Tag color={quickScanMeta.frameChecked ? 'success' : undefined}>
+                      Đối chiếu khung hình: {quickScanMeta.frameChecked || 0}
+                    </Tag>
                     <Tag>Transcript: {quickScanMeta.transcriptChecked || 0}</Tag>
-                    <Tag>Media deep check: {quickScanMeta.mediaChecked || 0}</Tag>
                     {quickScanMeta.mediaCheckStatus && (
                       <Tag color="warning">{quickScanMeta.mediaCheckStatus}</Tag>
                     )}
@@ -723,17 +725,41 @@ function ScansPageInner() {
                         title: 'Bằng chứng',
                         dataIndex: 'reasons',
                         key: 'reasons',
-                        render: (reasons: any[]) => (
-                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                            {(reasons || []).slice(0, 4).map((reason, idx) => (
-                              <Tag key={idx} style={{ fontSize: 10 }}>
-                                {reason.label}
+                        render: (reasons: any[], record: any) => (
+                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', alignItems: 'center' }}>
+                            {/* Bằng chứng media thật quan trọng hơn hẳn khớp
+                                chữ, nên tách riêng thành nhãn nổi bật thay vì
+                                lẫn vào dãy tag xám. */}
+                            {!record.needsVerification && (
+                              <Tag color="success" style={{ fontSize: 10, fontWeight: 600 }}>
+                                ✓ Đã đối chiếu hình ảnh
                               </Tag>
-                            ))}
+                            )}
+                            {(reasons || [])
+                              .filter(r => r.code !== 'video_frame_match')
+                              .slice(0, 3)
+                              .map((reason, idx) => (
+                                <Tag key={idx} style={{ fontSize: 10 }}>
+                                  {reason.label}
+                                </Tag>
+                              ))}
                           </div>
                         )
                       },
-                      { title: 'Rủi ro', dataIndex: 'riskScore', key: 'riskScore', width: 90, render: (score: number) => <RiskPill score={score} /> }
+                      {
+                        title: 'Rủi ro',
+                        dataIndex: 'riskScore',
+                        key: 'riskScore',
+                        width: 130,
+                        render: (score: number, record: any) => (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            <RiskPill score={score} />
+                            {record.needsVerification && (
+                              <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>chưa xác minh media</span>
+                            )}
+                          </div>
+                        )
+                      }
                     ]}
                   />
                 )}

@@ -9,10 +9,88 @@ import { getQuota, recordUsage, YOUTUBE_COST } from '@/lib/copyright/quota'
 import { getUserSettings } from '@/lib/models/UserSettings'
 import { scoreCandidate } from '@/lib/copyright/scoring'
 import { computePHash } from '@/lib/copyright/imageHash'
-import { findCopies } from '@/lib/copyright/findCopies'
+import { findCopies, FindCopiesResult } from '@/lib/copyright/findCopies'
 import { extractYouTubeVideoId } from '@/lib/copyright/urlParser'
+import {
+  upsertAdhocAsset,
+  createScanRun,
+  updateScanRun,
+  upsertFinding,
+  createEvidenceItem
+} from '@/lib/models/CopyrightMonitor'
 import { BrandAsset, Platform, CopyrightAssetType } from '@/types'
 import { resolveFindCopiesOptions } from './resolveFindCopiesOptions'
+
+interface PersistableFinding {
+  platform: string
+  source: string
+  externalId: string
+  title: string
+  content: string
+  url: string
+  author: { id?: string; name?: string; handle?: string }
+  riskScore: number
+  reasons: Array<{ code: string; label: string; points: number }>
+  publishedAt: Date | null
+  media: { thumbnailUrl?: string; deepCheck?: unknown }
+}
+
+/**
+ * Ghi kết quả findCopies xuống DB và trả về id lần quét.
+ * Lỗi ghi không được làm hỏng phản hồi — người dùng vẫn phải thấy kết quả
+ * vừa quét kể cả khi DB trục trặc.
+ */
+async function persistFindCopiesResult(
+  userId: string,
+  result: FindCopiesResult,
+  findings: PersistableFinding[]
+): Promise<number | null> {
+  try {
+    const asset = await upsertAdhocAsset({
+      userId,
+      sourceUrl: result.original.url,
+      name: result.original.title || result.original.videoId,
+      assetType: 'video'
+    })
+
+    const scanRun = await createScanRun({ userId, trigger: 'manual', assetIds: [asset.id] })
+
+    for (const finding of findings) {
+      const saved = await upsertFinding({
+        userId,
+        scanRunId: scanRun.id,
+        assetId: asset.id,
+        platform: finding.platform as Platform,
+        source: finding.source,
+        externalId: finding.externalId,
+        title: finding.title,
+        content: finding.content,
+        url: finding.url,
+        author: finding.author,
+        riskScore: finding.riskScore,
+        reasons: finding.reasons,
+        publishedAt: finding.publishedAt
+      })
+
+      // Thumbnail sống trong evidence_items — đó là nguồn ảnh cho trang
+      // Findings (LEFT JOIN LATERAL trong findFindings).
+      if (finding.media.thumbnailUrl) {
+        await createEvidenceItem({
+          findingId: saved.id,
+          evidenceType: 'thumbnail',
+          thumbnailUrl: finding.media.thumbnailUrl,
+          metadata: { deepCheck: finding.media.deepCheck ?? null }
+        })
+      }
+    }
+
+    await updateScanRun(scanRun.id, 'completed', [], {}, findings.length)
+    return scanRun.id
+  } catch (error) {
+    console.error('persistFindCopiesResult failed:', error)
+    return null
+  }
+}
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -105,6 +183,10 @@ export async function POST(request: NextRequest) {
           handle: candidate.channelTitle
         },
         riskScore: candidate.riskScore,
+        // Cho UI biết ứng viên này đã được đối chiếu media thật (khung hình /
+        // fingerprint) hay mới chỉ khớp chữ — đó là khác biệt quan trọng nhất
+        // khi người dùng quyết định có gửi khiếu nại bản quyền hay không.
+        needsVerification: candidate.needsVerification ?? true,
         reasons: candidate.reasons,
         publishedAt: candidate.publishedAt ? new Date(candidate.publishedAt) : null,
         media: {
@@ -113,10 +195,19 @@ export async function POST(request: NextRequest) {
         }
       }))
 
+      // Lưu kết quả. Trước đây nhánh này chỉ trả JSON rồi thôi: người dùng
+      // quét xong, chuyển trang là mất sạch, mà nút "Xem tất cả Findings" lại
+      // dẫn sang trang trống. Neo vào một asset ad-hoc theo URL gốc để mọi
+      // finding có chỗ gắn, và để quét lại cùng link thì cập nhật đúng bản ghi
+      // cũ thay vì nhân bản.
+      const scanRunId = await persistFindCopiesResult(userId, result, findings)
+
       const youtubeDeepSummary = {
+        scanRunId,
         original: result.original,
         searched: result.searched,
         transcriptChecked: result.transcriptChecked,
+        frameChecked: result.frameChecked,
         mediaChecked: result.mediaChecked,
         mediaCheckEnabled: result.mediaCheckEnabled,
         mediaCheckStatus: result.mediaCheckStatus

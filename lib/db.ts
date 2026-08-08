@@ -118,6 +118,18 @@ export async function initializeDatabase(): Promise<void> {
       )
     `)
 
+    // Tài sản "ad-hoc": findings.asset_id là NOT NULL và unique index upsert
+    // gồm asset_id, nên quét một URL lạ không có gì để gắn vào — đó là lý do
+    // quét nhanh trước đây không lưu được kết quả. Cho asset_id nullable sẽ
+    // ngầm phá unique index (Postgres coi các NULL là khác nhau → findings
+    // nhân bản vô hạn), nên thay vào đó tự tạo một asset đánh dấu origin.
+    await query(`ALTER TABLE brand_assets ADD COLUMN IF NOT EXISTS origin VARCHAR DEFAULT 'user'`)
+    await query(`ALTER TABLE brand_assets ADD COLUMN IF NOT EXISTS source_url TEXT`)
+    await query(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_brand_assets_source
+      ON brand_assets(user_id, source_url) WHERE source_url IS NOT NULL
+    `)
+
     await query(`CREATE INDEX IF NOT EXISTS idx_brand_assets_user_id ON brand_assets(user_id)`)
     await query(`CREATE INDEX IF NOT EXISTS idx_scan_runs_user_id ON scan_runs(user_id)`)
     await query(`CREATE INDEX IF NOT EXISTS idx_findings_user_id ON findings(user_id)`)

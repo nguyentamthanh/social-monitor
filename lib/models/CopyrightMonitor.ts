@@ -37,10 +37,15 @@ export interface BrandAssetUpdate {
   audioMetadata?: { title?: string; artist?: string; album?: string } | null
 }
 
+/**
+ * Thư viện tài sản của người dùng. Loại trừ asset `adhoc` — chúng chỉ là
+ * chỗ neo kỹ thuật cho findings của các lần quét URL lẻ, không phải tài sản
+ * người dùng chủ động khai báo.
+ */
 export async function findAssetsByUserId(userId: string): Promise<BrandAsset[]> {
   return query<BrandAsset>(
     `SELECT * FROM brand_assets
-     WHERE user_id = $1
+     WHERE user_id = $1 AND COALESCE(origin, 'user') = 'user'
      ORDER BY created_at DESC`,
     [userId]
   )
@@ -55,7 +60,9 @@ export async function findAssetById(userId: string, id: number): Promise<BrandAs
 
 export async function findActiveAssetsByIds(userId: string, assetIds?: number[]): Promise<BrandAsset[]> {
   const params: any[] = [userId]
-  const conditions = [`user_id = $1`, `status = 'active'`]
+  // Loại asset adhoc: nếu không, quét theo tài sản sẽ đem cả video từng quét
+  // ra đối chiếu và chúng sẽ tự khớp chính mình.
+  const conditions = [`user_id = $1`, `status = 'active'`, `COALESCE(origin, 'user') = 'user'`]
 
   if (assetIds && assetIds.length > 0) {
     params.push(assetIds)
@@ -95,6 +102,52 @@ export async function createBrandAsset(input: BrandAssetInput): Promise<BrandAss
     ]
   )
 
+  return result!
+}
+
+/**
+ * Lấy (hoặc tạo) tài sản ad-hoc cho một URL được quét trực tiếp.
+ *
+ * `findings.asset_id` là NOT NULL và unique index chống trùng gồm cả
+ * `asset_id`, nên mọi finding đều phải có một asset để gắn vào. Trước đây
+ * quét nhanh không có asset nên **không lưu được gì** — người dùng quét xong,
+ * chuyển trang là mất sạch, còn nút "Xem tất cả Findings" thì dẫn tới trang
+ * trống.
+ *
+ * Quét lại cùng một URL sẽ trả về đúng asset cũ, nhờ đó `upsertFinding` cập
+ * nhật đúng các finding cũ thay vì nhân bản — và tự nhiên có được "tuần này
+ * xuất hiện thêm bản reup nào".
+ */
+export async function upsertAdhocAsset(input: {
+  userId: string
+  sourceUrl: string
+  name: string
+  assetType: CopyrightAssetType
+  keywords?: string[]
+  perceptualHash?: string | null
+}): Promise<BrandAsset> {
+  const result = await queryOne<BrandAsset>(
+    `INSERT INTO brand_assets (
+       user_id, name, asset_type, keywords, official_domains,
+       perceptual_hash, origin, source_url
+     )
+     VALUES ($1, $2, $3, $4, ARRAY[]::text[], $5, 'adhoc', $6)
+     ON CONFLICT (user_id, source_url) WHERE source_url IS NOT NULL
+     DO UPDATE SET
+       name = EXCLUDED.name,
+       keywords = EXCLUDED.keywords,
+       perceptual_hash = COALESCE(EXCLUDED.perceptual_hash, brand_assets.perceptual_hash),
+       updated_at = NOW()
+     RETURNING *`,
+    [
+      input.userId,
+      input.name,
+      input.assetType,
+      input.keywords || [],
+      input.perceptualHash || null,
+      input.sourceUrl
+    ]
+  )
   return result!
 }
 
