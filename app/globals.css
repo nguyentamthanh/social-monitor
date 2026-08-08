@@ -2393,6 +2393,21 @@ body {
   font-weight: 700;
   font-size: 11px;
 }
+
+/* Nhãn "Sắp có" trên chip nền tảng chưa mở — nói rõ là chưa làm xong, chứ
+   không phải người dùng thiếu API key. */
+.scan-chip-soon {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--surface-subtle-strong, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
 /* ===== Trang Cài đặt: link lấy key + kết quả kiểm tra kết nối ===== */
 .settings-key-label {
   display: inline-flex;

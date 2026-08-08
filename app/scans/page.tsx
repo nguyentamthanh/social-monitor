@@ -69,6 +69,19 @@ const PLATFORM_ICONS: Record<Platform, React.ReactNode> = {
 }
 
 const PLATFORM_LIST: Platform[] = ['youtube', 'google', 'facebook', 'tiktok']
+
+/**
+ * Nền tảng đã chạy thật. Ba nền tảng còn lại hiện là "sắp có" chứ không phải
+ * "thiếu API key", vì kể cả cắm key chúng vẫn chưa dùng được:
+ *  - google   : Google CSE chưa được đo quota (quá 100 truy vấn/ngày là tính
+ *               tiền thật), phải làm phần đo trước khi mở.
+ *  - facebook : không phải Graph API mà là Google CSE tìm site:facebook.com;
+ *               Meta không còn cho tìm nội dung công khai nên hiệu quả rất thấp.
+ *  - tiktok   : Research API phải đăng ký và được duyệt, không phải cắm key là xong.
+ * Khi nào một nền tảng sẵn sàng thì chỉ cần thêm vào đây.
+ */
+const ENABLED_PLATFORMS = new Set<Platform>(['youtube'])
+const COMING_SOON_LABEL = 'Sắp có — chưa mở trong bản này'
 const LS_PLATFORMS = 'scan.platforms'
 const LS_YT_MODE = 'scan.youtubeMode'
 
@@ -115,7 +128,7 @@ function ScansPageInner() {
   // đường này). Trước đây /url-check nhận param nhưng không hề đọc nên link
   // người dùng gõ bị nuốt mất.
   const [query, setQuery] = useState(() => searchParams.get('url') || '')
-  const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>(['youtube', 'google'])
+  const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>(['youtube'])
   const [scanning, setScanning] = useState(false)
   const [scanProgress, setScanProgress] = useState<{ status: 'idle' | 'running' | 'completed' | 'failed'; findings: number }>({ status: 'idle', findings: 0 })
   const [quickFindings, setQuickFindings] = useState<any[]>([])
@@ -175,7 +188,10 @@ function ScansPageInner() {
       const saved = localStorage.getItem(LS_PLATFORMS)
       if (saved) {
         const arr = JSON.parse(saved) as Platform[]
-        if (Array.isArray(arr) && arr.length) setSelectedPlatforms(arr.filter(p => PLATFORM_LIST.includes(p)))
+        // Lọc thêm theo ENABLED_PLATFORMS: lựa chọn cũ trong localStorage có
+        // thể còn chứa nền tảng nay đã tạm khoá.
+        const usable = Array.isArray(arr) ? arr.filter(p => ENABLED_PLATFORMS.has(p)) : []
+        if (usable.length) setSelectedPlatforms(usable)
       }
     } catch {}
   }, [])
@@ -204,7 +220,11 @@ function ScansPageInner() {
   // whose API key was removed) so the user doesn't accidentally scan with 0 active platforms
   useEffect(() => {
     if (connectorStatus.length === 0) return
-    const readySet = new Set(connectorStatus.filter(c => c.capability === 'ready').map(c => c.platform))
+    const readySet = new Set(
+      connectorStatus
+        .filter(c => c.capability === 'ready' && ENABLED_PLATFORMS.has(c.platform))
+        .map(c => c.platform)
+    )
     const filtered = selectedPlatforms.filter(p => readySet.has(p))
     if (filtered.length === 0 && readySet.size > 0) {
       setSelectedPlatforms(Array.from(readySet) as Platform[])
@@ -460,7 +480,12 @@ function ScansPageInner() {
   }, [query])
 
   const readyPlatforms = useMemo(
-    () => new Set(connectorStatus.filter(c => c.capability === 'ready').map(c => c.platform)),
+    () =>
+      new Set(
+        connectorStatus
+          .filter(c => c.capability === 'ready' && ENABLED_PLATFORMS.has(c.platform))
+          .map(c => c.platform)
+      ),
     [connectorStatus]
   )
 
@@ -514,10 +539,13 @@ function ScansPageInner() {
               </div>
               <div className="scan-deck-badges">
                 <div className="scan-deck-badge">
-                  {readyPlatforms.size}/{PLATFORM_LIST.length} nền tảng sẵn sàng
+                  {readyPlatforms.size}/{ENABLED_PLATFORMS.size} nền tảng sẵn sàng
                 </div>
                 {quota && quota.used > 0 && (
-                  <Tooltip title={`Mỗi lần quét YouTube tốn ~${100 * 6} quota unit. Hạn mức reset lúc 00:00 giờ Thái Bình Dương.`}>
+                  // Con số cũ hardcode 600 unit (6 truy vấn) — sai kể từ khi
+                  // quét link YouTube đi qua findCopies: 101 unit cho một truy
+                  // vấn, 201 khi phải tìm thêm theo transcript.
+                  <Tooltip title="Mỗi lần quét link YouTube tốn 101 quota unit (201 nếu phải tìm thêm theo transcript). Hạn mức reset lúc 00:00 giờ Thái Bình Dương.">
                     <div className={`scan-deck-badge scan-deck-badge--quota${quota.exceeded ? ' is-exceeded' : quota.nearLimit ? ' is-warning' : ''}`}>
                       Quota YouTube: {quota.used.toLocaleString()}/{quota.budget.toLocaleString()}
                     </div>
@@ -620,10 +648,20 @@ function ScansPageInner() {
                 <span className="scan-option-label">Nền tảng</span>
                 <div className="scan-platform-row">
                   {PLATFORM_LIST.map(p => {
-                    const ready = readyPlatforms.has(p)
+                    const comingSoon = !ENABLED_PLATFORMS.has(p)
+                    const ready = !comingSoon && readyPlatforms.has(p)
                     const selected = selectedPlatforms.includes(p)
                     return (
-                      <Tooltip key={p} title={ready ? '' : platformReason.get(p) || 'Cần cấu hình API key'}>
+                      <Tooltip
+                        key={p}
+                        title={
+                          comingSoon
+                            ? COMING_SOON_LABEL
+                            : ready
+                              ? ''
+                              : platformReason.get(p) || 'Cần cấu hình API key'
+                        }
+                      >
                         <button
                           type="button"
                           className={`scan-platform-chip${selected ? ' is-selected' : ''}${!ready ? ' is-disabled' : ''}`}
@@ -632,7 +670,9 @@ function ScansPageInner() {
                         >
                           {PLATFORM_ICONS[p]}
                           <span style={{ textTransform: 'capitalize' }}>{p}</span>
-                          {selected && <span className="scan-chip-check">✓</span>}
+                          {comingSoon
+                            ? <span className="scan-chip-soon">Sắp có</span>
+                            : selected && <span className="scan-chip-check">✓</span>}
                         </button>
                       </Tooltip>
                     )
