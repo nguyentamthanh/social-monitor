@@ -31,6 +31,7 @@ import {
   GoogleSquareFilled,
   FacebookFilled,
   TikTokFilled,
+  PlaySquareFilled,
   FileProtectOutlined,
   CheckCircleOutlined,
   SearchOutlined,
@@ -65,22 +66,25 @@ const PLATFORM_ICONS: Record<Platform, React.ReactNode> = {
   youtube: <YoutubeFilled style={{ color: '#ef4444' }} />,
   google: <GoogleSquareFilled style={{ color: '#4285f4' }} />,
   facebook: <FacebookFilled style={{ color: '#1877f2' }} />,
-  tiktok: <TikTokFilled />
+  tiktok: <TikTokFilled />,
+  dailymotion: <PlaySquareFilled style={{ color: '#0AACFF' }} />
 }
 
-const PLATFORM_LIST: Platform[] = ['youtube', 'google', 'facebook', 'tiktok']
+const PLATFORM_LIST: Platform[] = ['youtube', 'dailymotion', 'google', 'facebook', 'tiktok']
 
 /**
- * Nền tảng đã chạy thật. Ba nền tảng còn lại hiện là "sắp có" chứ không phải
+ * Nền tảng đã chạy thật. Google/Facebook/TikTok vẫn "sắp có" chứ không phải
  * "thiếu API key", vì kể cả cắm key chúng vẫn chưa dùng được:
- *  - google   : Google CSE chưa được đo quota (quá 100 truy vấn/ngày là tính
- *               tiền thật), phải làm phần đo trước khi mở.
- *  - facebook : không phải Graph API mà là Google CSE tìm site:facebook.com;
- *               Meta không còn cho tìm nội dung công khai nên hiệu quả rất thấp.
- *  - tiktok   : Research API phải đăng ký và được duyệt, không phải cắm key là xong.
+ *  - google     : Google CSE chưa được đo quota (quá 100 truy vấn/ngày là tính
+ *                 tiền thật), phải làm phần đo trước khi mở.
+ *  - facebook   : không phải Graph API mà là Google CSE tìm site:facebook.com;
+ *                 Meta không còn cho tìm nội dung công khai nên hiệu quả rất thấp.
+ *  - tiktok     : Research API phải đăng ký và được duyệt, không phải cắm key là xong.
+ *  - dailymotion: API tìm kiếm công khai không cần key, không hạn mức phải
+ *                 xin — nên bật ngay được, không cần chờ điều kiện gì.
  * Khi nào một nền tảng sẵn sàng thì chỉ cần thêm vào đây.
  */
-const ENABLED_PLATFORMS = new Set<Platform>(['youtube'])
+const ENABLED_PLATFORMS = new Set<Platform>(['youtube', 'dailymotion'])
 const COMING_SOON_LABEL = 'Sắp có — chưa mở trong bản này'
 const LS_PLATFORMS = 'scan.platforms'
 const LS_YT_MODE = 'scan.youtubeMode'
@@ -128,7 +132,7 @@ function ScansPageInner() {
   // đường này). Trước đây /url-check nhận param nhưng không hề đọc nên link
   // người dùng gõ bị nuốt mất.
   const [query, setQuery] = useState(() => searchParams.get('url') || '')
-  const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>(['youtube'])
+  const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>(['youtube', 'dailymotion'])
   const [scanning, setScanning] = useState(false)
   const [scanProgress, setScanProgress] = useState<{ status: 'idle' | 'running' | 'completed' | 'failed'; findings: number }>({ status: 'idle', findings: 0 })
   const [quickFindings, setQuickFindings] = useState<any[]>([])
@@ -742,6 +746,9 @@ function ScansPageInner() {
                       Đối chiếu khung hình: {quickScanMeta.frameChecked || 0}
                     </Tag>
                     <Tag>Transcript: {quickScanMeta.transcriptChecked || 0}</Tag>
+                    {quickScanMeta.dailymotionSearched != null && (
+                      <Tag>Dailymotion: {quickScanMeta.dailymotionSearched} video</Tag>
+                    )}
                     {quickScanMeta.mediaCheckStatus && (
                       <Tag color="warning">{quickScanMeta.mediaCheckStatus}</Tag>
                     )}

@@ -2,6 +2,7 @@ import { BrandAsset, ConnectorStatus, Platform, RawCandidate } from '@/types'
 import { computePHashFromUrl } from '@/lib/copyright/imageHash'
 import { audioStreamingSearchQuery, buildAudioQuery } from '@/lib/copyright/audioMatcher'
 import { EMPTY_API_KEYS, type ScanApiKeys } from '@/lib/copyright/apiKeys'
+import { searchDailymotion } from '@/lib/copyright/dailymotion'
 
 interface CopyrightAdapter {
   platform: Platform
@@ -428,15 +429,64 @@ const facebookAdapter: CopyrightAdapter = googleSiteSearchAdapter(
 
 const tiktokAdapter: CopyrightAdapter = createTikTokResearchAdapter()
 
+/**
+ * Dailymotion — nền tảng duy nhất ở đây không cần API key và không có hạn
+ * mức phải xin, nên `status()` luôn `ready`. Trả `RawCandidate` thô để
+ * `scoreCandidate` (dùng chung cho mọi adapter) tự chấm điểm theo loại tài
+ * sản, kể cả đối chiếu pHash khi asset có `perceptual_hash`.
+ */
+const dailymotionAdapter: CopyrightAdapter = {
+  platform: 'dailymotion',
+  status() {
+    return ready('dailymotion', 'Dailymotion (tìm kiếm công khai, miễn phí) đã sẵn sàng')
+  },
+  async search(asset) {
+    const query = queryForAsset(asset)
+    if (!query) return []
+
+    const raw = await searchDailymotion(query)
+    const wantPHash = ['image', 'logo', 'video'].includes(asset.asset_type) && !!asset.perceptual_hash
+
+    const candidates: RawCandidate[] = []
+    for (const video of raw) {
+      const thumbnailUrl = video.thumbnail_720_url || video.thumbnail_url
+      let perceptualHash: string | undefined
+      if (wantPHash && thumbnailUrl) {
+        const hash = await computePHashFromUrl(thumbnailUrl)
+        if (hash) perceptualHash = hash
+      }
+
+      candidates.push({
+        platform: 'dailymotion',
+        source: 'dailymotion_search',
+        externalId: video.id,
+        title: video.title || '',
+        content: video.description || '',
+        url: video.url || `https://www.dailymotion.com/video/${video.id}`,
+        author: {
+          id: video['owner.id'] || 'dailymotion',
+          name: video['owner.screenname'] || 'Dailymotion',
+          handle: video['owner.screenname'] || 'dailymotion'
+        },
+        publishedAt: video.created_time ? new Date(video.created_time * 1000) : null,
+        metadata: { duration: video.duration },
+        media: { thumbnailUrl, perceptualHash, hash: perceptualHash }
+      })
+    }
+    return candidates
+  }
+}
+
 export const copyrightAdapters: Record<Platform, CopyrightAdapter> = {
   facebook: facebookAdapter,
   google: googleAdapter,
   youtube: youtubeAdapter,
-  tiktok: tiktokAdapter
+  tiktok: tiktokAdapter,
+  dailymotion: dailymotionAdapter
 }
 
 export function getConnectorStatuses(
-  platforms: Platform[] = ['youtube', 'google', 'facebook', 'tiktok'],
+  platforms: Platform[] = ['youtube', 'dailymotion', 'google', 'facebook', 'tiktok'],
   keys: ScanApiKeys = EMPTY_API_KEYS
 ): ConnectorStatus[] {
   return platforms.map(platform => copyrightAdapters[platform].status(keys))

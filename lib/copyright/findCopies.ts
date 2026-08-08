@@ -7,6 +7,7 @@ import { mapWithConcurrency } from '@/lib/util/pool'
 import { capRiskScore, reasonLabel } from '@/lib/copyright/reasons'
 import { extractDistinctivePhrase, buildTranscriptSearchQuery } from '@/lib/copyright/transcriptQuery'
 import { fetchStoryboardHashes, compareFrameHashes } from '@/lib/copyright/storyboard'
+import { parseIsoDuration } from '@/lib/copyright/dailymotion'
 
 export interface CopyCandidate {
   videoId: string
@@ -32,6 +33,10 @@ export interface FindCopiesResult {
     thumbnailUrl?: string
     url: string
     publishedAt: string | null
+    /** pHash thumbnail gốc, để nền tảng khác dùng lại thay vì tải và băm lại. */
+    thumbnailHash?: string
+    /** Thời lượng gốc (giây), dùng làm tín hiệu đối chiếu chéo nền tảng. */
+    durationSec?: number | null
   }
   candidates: CopyCandidate[]
   searched: number
@@ -407,7 +412,9 @@ export async function findCopies(
       channelTitle: original.candidate.author?.name || '',
       thumbnailUrl: original.candidate.media?.thumbnailUrl,
       url: original.candidate.url,
-      publishedAt: originalPublishedAt ? originalPublishedAt.toISOString() : null
+      publishedAt: originalPublishedAt ? originalPublishedAt.toISOString() : null,
+      thumbnailHash: originalThumbHash,
+      durationSec: parseIsoDuration(original.candidate.metadata?.duration as string | undefined)
     },
     candidates,
     searched: preScored.length,

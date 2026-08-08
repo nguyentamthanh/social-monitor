@@ -38,6 +38,7 @@ export const REASON_SPECS: Record<string, ReasonSpec> = {
   audio_title_match: { label: 'Trùng tên bài hát/audio (chỉ so chữ)', class: 'weak' },
   audio_artist_match: { label: 'Trùng nghệ sĩ/hãng phát hành (chỉ so chữ)', class: 'weak' },
   audio_streaming_host: { label: 'Xuất hiện trên dịch vụ streaming', class: 'weak' },
+  duration_match: { label: 'Thời lượng gần như trùng khớp', class: 'weak' },
 
   // --- Khớp nội dung có cấu trúc: trung bình ---
   text_similarity_high: { label: 'Nội dung giống văn bản gốc', class: 'medium' },

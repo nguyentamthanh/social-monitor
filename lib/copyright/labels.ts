@@ -20,5 +20,6 @@ export const platformLabels: Record<Platform, string> = {
   facebook: 'Facebook',
   google: 'Google',
   youtube: 'YouTube',
-  tiktok: 'TikTok'
+  tiktok: 'TikTok',
+  dailymotion: 'Dailymotion'
 }

@@ -4,8 +4,11 @@ import assert from 'node:assert/strict'
 import { resolveFindCopiesOptions } from '../app/api/scans/quick/resolveFindCopiesOptions'
 import { buildFindCopiesInternalsForTest } from '../lib/copyright/findCopies'
 
-test('resolveFindCopiesOptions: fast -> tắt deepMediaCheck & thumbnailMatch', () => {
-  assert.deepEqual(resolveFindCopiesOptions('fast'), { deepMediaCheck: false, thumbnailMatch: false })
+test('resolveFindCopiesOptions: fast -> chỉ tắt deepMediaCheck, giữ thumbnailMatch', () => {
+  // thumbnailMatch không còn bị tắt ở fast kể từ khi pHash được tối ưu
+  // (imageHash.ts, Phase 0) — nó rẻ, và Dailymotion phụ thuộc vào
+  // original.thumbnailHash mà bước này tính ra.
+  assert.deepEqual(resolveFindCopiesOptions('fast'), { deepMediaCheck: false })
 })
 
 test('resolveFindCopiesOptions: deep/undefined -> bật deepMediaCheck', () => {

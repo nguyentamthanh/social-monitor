@@ -6,6 +6,7 @@ import {
   GoogleSquareFilled,
   FacebookFilled,
   TikTokFilled,
+  PlaySquareFilled,
   FileProtectOutlined,
   ThunderboltOutlined,
   CheckCircleOutlined
@@ -28,7 +29,8 @@ const PLATFORM_ICONS: Record<Platform, React.ReactNode> = {
   youtube: <YoutubeFilled style={{ color: '#ef4444' }} />,
   google: <GoogleSquareFilled style={{ color: '#4285f4' }} />,
   facebook: <FacebookFilled style={{ color: '#1877f2' }} />,
-  tiktok: <TikTokFilled />
+  tiktok: <TikTokFilled />,
+  dailymotion: <PlaySquareFilled style={{ color: '#0AACFF' }} />
 }
 
 export default function ScanWizard({ open, onClose, onCompleted }: Props) {

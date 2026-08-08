@@ -31,7 +31,7 @@ export function parseOrError<T extends z.ZodTypeAny>(
   return { ok: true, data: result.data }
 }
 
-export const PLATFORMS = ['youtube', 'google', 'facebook', 'tiktok'] as const
+export const PLATFORMS = ['youtube', 'google', 'facebook', 'tiktok', 'dailymotion'] as const
 export const ASSET_TYPES = ['brand_name', 'text', 'image', 'logo', 'video', 'audio'] as const
 
 /** Chuỗi phân tách bằng dấu phẩy trong FormData → mảng platform hợp lệ. */

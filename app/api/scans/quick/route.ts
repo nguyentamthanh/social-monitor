@@ -10,6 +10,7 @@ import { getUserSettings } from '@/lib/models/UserSettings'
 import { scoreCandidate } from '@/lib/copyright/scoring'
 import { computePHash } from '@/lib/copyright/imageHash'
 import { findCopies, FindCopiesResult } from '@/lib/copyright/findCopies'
+import { findDailymotionCopies } from '@/lib/copyright/dailymotion'
 import { extractYouTubeVideoId } from '@/lib/copyright/urlParser'
 import {
   upsertAdhocAsset,
@@ -167,11 +168,28 @@ export async function POST(request: NextRequest) {
 
     if (youtubeVideoId && platforms.includes('youtube')) {
       const result = await findCopies(youtubeVideoId, { ...resolveFindCopiesOptions(mode), apiKey: keys.youtubeApiKey })
+
       // Ghi đúng số unit đã tiêu: 101 cho một truy vấn, 201 khi phải tìm thêm
-      // theo transcript.
+      // theo transcript. Dailymotion không tính quota nên không cộng vào đây.
       await recordUsage(userId, result.quotaUnits)
-      const findings = result.candidates.map(candidate => ({
-        platform: 'youtube',
+
+      // Dailymotion cần metadata (tiêu đề/thumbnail hash/thời lượng) của video
+      // gốc mà `findCopies` vừa lấy qua YouTube videos.list, nên chạy SAU chứ
+      // không song song — không có gì để tìm nếu chưa biết tìm cái gì.
+      const dmFinal = platforms.includes('dailymotion')
+        ? await findDailymotionCopies(
+            {
+              title: result.original.title,
+              thumbnailHash: result.original.thumbnailHash,
+              publishedAt: result.original.publishedAt,
+              durationSec: result.original.durationSec
+            },
+            { thumbnailMatch: true }
+          ).catch(() => null)
+        : null
+
+      const youtubeFindings = result.candidates.map(candidate => ({
+        platform: 'youtube' as const,
         source: 'youtube_find_copies_deep',
         externalId: candidate.videoId,
         title: candidate.title,
@@ -195,6 +213,23 @@ export async function POST(request: NextRequest) {
         }
       }))
 
+      const dailymotionFindings = (dmFinal?.candidates || []).map(candidate => ({
+        platform: 'dailymotion' as const,
+        source: 'dailymotion_search',
+        externalId: candidate.videoId,
+        title: candidate.title,
+        content: candidate.reasons.map(reason => reason.label).join(', '),
+        url: candidate.url,
+        author: { id: candidate.channelId, name: candidate.channelTitle, handle: candidate.channelTitle },
+        riskScore: candidate.riskScore,
+        needsVerification: candidate.needsVerification,
+        reasons: candidate.reasons,
+        publishedAt: candidate.publishedAt ? new Date(candidate.publishedAt) : null,
+        media: { thumbnailUrl: candidate.thumbnailUrl }
+      }))
+
+      const findings = [...youtubeFindings, ...dailymotionFindings].sort((a, b) => b.riskScore - a.riskScore)
+
       // Lưu kết quả. Trước đây nhánh này chỉ trả JSON rồi thôi: người dùng
       // quét xong, chuyển trang là mất sạch, mà nút "Xem tất cả Findings" lại
       // dẫn sang trang trống. Neo vào một asset ad-hoc theo URL gốc để mọi
@@ -210,7 +245,8 @@ export async function POST(request: NextRequest) {
         frameChecked: result.frameChecked,
         mediaChecked: result.mediaChecked,
         mediaCheckEnabled: result.mediaCheckEnabled,
-        mediaCheckStatus: result.mediaCheckStatus
+        mediaCheckStatus: result.mediaCheckStatus,
+        dailymotionSearched: dmFinal?.searched ?? null
       }
 
       // Trả về vô điều kiện: findCopies đã là câu trả lời đầy đủ cho một link

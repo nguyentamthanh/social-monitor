@@ -1,4 +1,4 @@
-export type Platform = 'facebook' | 'google' | 'youtube' | 'tiktok'
+export type Platform = 'facebook' | 'google' | 'youtube' | 'tiktok' | 'dailymotion'
 export type CopyrightAssetType = 'brand_name' | 'text' | 'image' | 'logo' | 'video' | 'audio'
 export type ScanTrigger = 'manual' | 'scheduled'
 export type ScanStatus = 'queued' | 'running' | 'completed' | 'failed'
