@@ -69,6 +69,13 @@ const youtubeAdapter: CopyrightAdapter = {
     if (!keys.youtubeApiKey) {
       return limited('youtube', 'config_missing', 'Chưa cấu hình YouTube Data API Key')
     }
+    if (keys.youtubeApiKeyIsShared && keys.youtubeFreeScanUsed) {
+      return limited(
+        'youtube',
+        'free_scan_used',
+        'Đã dùng hết lượt quét YouTube miễn phí — nhập YouTube API Key riêng trong Cài đặt để quét tiếp'
+      )
+    }
 
     return ready('youtube', 'YouTube Data API đã sẵn sàng')
   },

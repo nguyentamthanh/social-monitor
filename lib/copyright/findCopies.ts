@@ -175,6 +175,12 @@ export async function findCopies(
     throw new Error('config_missing: YouTube Data API Key chưa cấu hình')
   }
 
+  // Transcript của chính video gốc chỉ cần videoId, không phụ thuộc gì vào
+  // fetchYouTubeVideoById/searchYouTube — bắn đi ngay từ đầu, dùng ở phía
+  // dưới (await transcriptPromise) sau khi các bước kia đã chạy xong, thay vì
+  // đợi tuần tự và cộng dồn ~500ms vào tổng thời gian quét.
+  const transcriptPromise = fetchTranscript(videoId)
+
   const wantPHash = options.thumbnailMatch !== false
   const original = await fetchYouTubeVideoById(videoId, { computeThumbnailHash: wantPHash, apiKey })
 
@@ -256,8 +262,10 @@ export async function findCopies(
 
   // Transcript video gốc lấy MỘT lần rồi dùng cho cả hai việc: tìm kiếm theo
   // nội dung (bên dưới) và đối chiếu transcript (phía sau). Bước này scrape
-  // trang watch, không tốn quota.
-  const originalTranscript = await fetchTranscript(videoId)
+  // trang watch, không tốn quota — và không phụ thuộc rawCandidates/preScored,
+  // nên đã bắn song song ở trên (transcriptPromise) thay vì đợi xong hết rồi
+  // mới gọi; ~500ms này giờ nằm lẫn trong lúc search + preScore chạy.
+  const originalTranscript = await transcriptPromise
   const originalTranscriptNorm = normalizeText(originalTranscript)
 
   // --- Tìm kiếm vòng 2: theo nội dung nói, không theo tiêu đề ---
@@ -289,15 +297,18 @@ export async function findCopies(
   }
 
   const sortedPre = [...preScored].sort((a, b) => b.preliminary - a.preliminary)
-  const transcriptTargets = new Set(sortedPre.slice(0, TRANSCRIPT_TOP_N).map(s => s.cand.videoId))
+  const transcriptTargets = sortedPre.slice(0, TRANSCRIPT_TOP_N)
 
   if (originalTranscriptNorm) {
-    for (const entry of sortedPre) {
-      if (!transcriptTargets.has(entry.cand.videoId)) continue
+    // Trước đây for-loop tuần tự — mỗi candidate đợi xong mới sang candidate
+    // tiếp theo dù chúng độc lập hoàn toàn. Đổi sang mapWithConcurrency như
+    // mọi bước khác trong file này (preScore, frame-match) để 5 candidate
+    // fetch song song thay vì nối đuôi nhau.
+    await mapWithConcurrency(transcriptTargets, THUMBNAIL_HASH_CONCURRENCY, async entry => {
       const candTranscript = await fetchTranscript(entry.cand.videoId)
       transcriptChecked += 1
       const candTranscriptNorm = normalizeText(candTranscript)
-      if (!candTranscriptNorm) continue
+      if (!candTranscriptNorm) return
       const sim = jaccardSimilarity(originalTranscriptNorm, candTranscriptNorm, 3)
       if (sim >= 0.25) {
         entry.reasons.push({
@@ -306,7 +317,7 @@ export async function findCopies(
           points: Math.round(30 * sim)
         })
       }
-    }
+    })
   }
 
   // --- So khớp khung hình bằng storyboard ---

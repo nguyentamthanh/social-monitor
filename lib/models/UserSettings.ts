@@ -4,6 +4,9 @@ import { UserSettings } from '@/types'
 
 const KEY_FIELDS = ['youtube_api_key', 'google_search_api_key', 'google_search_engine_id', 'facebook_token', 'tiktok_token']
 
+/** Preference lưu thời điểm user đã dùng lượt quét YouTube miễn phí bằng key chung hệ thống. */
+export const YOUTUBE_FREE_SCAN_PREF_KEY = 'youtubeFreeScanUsedAt'
+
 export async function getUserSettings(userId: string): Promise<UserSettings | null> {
   const row = await queryOne<any>(
     `SELECT * FROM user_settings WHERE user_id = $1`,
@@ -47,6 +50,14 @@ export async function upsertUserSettings(input: {
     [input.userId, JSON.stringify(mergedKeys), JSON.stringify(mergedPrefs)]
   )
   return result!
+}
+
+/** Đánh dấu user (đang quét bằng key YouTube chung) đã dùng lượt miễn phí. */
+export async function markYoutubeFreeScanUsed(userId: string): Promise<void> {
+  await upsertUserSettings({
+    userId,
+    preferences: { [YOUTUBE_FREE_SCAN_PREF_KEY]: new Date().toISOString() }
+  })
 }
 
 export function getDecryptedKey(settings: UserSettings | null, key: string): string {

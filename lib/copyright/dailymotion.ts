@@ -129,8 +129,13 @@ export async function findDailymotionCopies(
     }
 
     const thumbnailUrl = video.thumbnail_720_url || video.thumbnail_url
-    if (options.thumbnailMatch !== false && original.thumbnailHash && thumbnailUrl) {
-      const hash = await computePHashFromUrl(thumbnailUrl)
+    // pHash tự resize ảnh về 32×32 (imageHash.ts) nên tải bản 720p chỉ để thu
+    // nhỏ là phí băng thông — dùng thumbnail_url (bản nhỏ mặc định của
+    // Dailymotion) để băm, còn thumbnailUrl 720p vẫn giữ nguyên cho UI hiển
+    // thị. Đo thực tế: đây là phần chậm nhất của cả lượt quét (~3.4s/30 ảnh).
+    const hashSourceUrl = video.thumbnail_url || video.thumbnail_720_url
+    if (options.thumbnailMatch !== false && original.thumbnailHash && hashSourceUrl) {
+      const hash = await computePHashFromUrl(hashSourceUrl)
       if (hash) {
         const distance = hammingDistance(original.thumbnailHash, hash)
         if (distance <= 14) {

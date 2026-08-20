@@ -8,6 +8,7 @@ import {
 import { copyrightAdapters, countYoutubeQueries, getConnectorStatuses } from '@/lib/copyright/adapters'
 import { resolveApiKeys, type ScanApiKeys } from '@/lib/copyright/apiKeys'
 import { recordUsage, YOUTUBE_COST } from '@/lib/copyright/quota'
+import { markYoutubeFreeScanUsed } from '@/lib/models/UserSettings'
 import { scoreCandidate } from '@/lib/copyright/scoring'
 import { createNotification } from '@/lib/models/Notification'
 import { ConnectorStatus, Platform, ScanRun } from '@/types'
@@ -61,6 +62,13 @@ export async function runCopyrightScan(input: {
         const candidates = await adapter.search(asset, keys)
         if (platform === 'youtube') {
           await recordUsage(input.userId, countYoutubeQueries(asset) * YOUTUBE_COST.search)
+          // Đang chạy bằng key chung ⇒ lần quét này vừa tiêu lượt miễn phí
+          // duy nhất. Cập nhật cả cờ trong `keys` để không ghi DB lặp lại
+          // nếu vòng lặp còn asset khác cũng quét YouTube trong cùng lượt.
+          if (keys.youtubeApiKeyIsShared && !keys.youtubeFreeScanUsed) {
+            await markYoutubeFreeScanUsed(input.userId)
+            keys.youtubeFreeScanUsed = true
+          }
         }
         for (const candidate of candidates) {
           const dedupeKey = `${asset.id}:${candidate.platform}:${candidate.externalId || candidate.url}`

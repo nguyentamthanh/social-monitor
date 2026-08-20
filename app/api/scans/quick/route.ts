@@ -6,11 +6,12 @@ import { copyrightAdapters, countYoutubeQueries } from '@/lib/copyright/adapters
 import { resolveApiKeys } from '@/lib/copyright/apiKeys'
 import { parseOrError, quickScanSchema } from '@/lib/validation'
 import { getQuota, recordUsage, YOUTUBE_COST } from '@/lib/copyright/quota'
-import { getUserSettings } from '@/lib/models/UserSettings'
+import { getUserSettings, markYoutubeFreeScanUsed } from '@/lib/models/UserSettings'
 import { scoreCandidate } from '@/lib/copyright/scoring'
 import { computePHash } from '@/lib/copyright/imageHash'
 import { findCopies, FindCopiesResult } from '@/lib/copyright/findCopies'
-import { findDailymotionCopies } from '@/lib/copyright/dailymotion'
+import { findDailymotionCopies, parseIsoDuration } from '@/lib/copyright/dailymotion'
+import { fetchYouTubeVideoById } from '@/lib/copyright/youtubeVideoLookup'
 import { extractYouTubeVideoId } from '@/lib/copyright/urlParser'
 import {
   upsertAdhocAsset,
@@ -167,26 +168,54 @@ export async function POST(request: NextRequest) {
     }
 
     if (youtubeVideoId && platforms.includes('youtube')) {
+      // Chế độ này CHỈ quét YouTube (không có platform khác để fallback), nên
+      // hết lượt miễn phí bằng key chung thì báo lỗi rõ ràng luôn thay vì im
+      // lặng trả về rỗng — người dùng cần biết phải vào Cài đặt nhập key riêng.
+      if (keys.youtubeApiKeyIsShared && keys.youtubeFreeScanUsed) {
+        return NextResponse.json(
+          {
+            error: 'youtube_free_scan_used',
+            message: 'Bạn đã dùng hết lượt quét YouTube miễn phí bằng key chung. Vào Cài đặt để nhập YouTube API Key riêng rồi quét tiếp.'
+          },
+          { status: 403 }
+        )
+      }
+
+      // findCopies (search + hash + transcript + so khung hình trên YouTube,
+      // ~4-5s) và Dailymotion (~4s: search + hash thumbnail) không phụ thuộc
+      // nhau — cả hai chỉ cần metadata cơ bản của video gốc (tiêu đề/thumbnail
+      // hash/thời lượng). Trước đây gọi nối đuôi (đợi findCopies xong mới lấy
+      // metadata cho Dailymotion) tốn tổng ~8-9s; bắn song song rút còn
+      // ~max(hai bên) ≈ 4-5s. Đổi lại tốn thêm đúng 1 unit quota
+      // (`videos.list` gọi thêm 1 lần thay vì dùng chung kết quả của
+      // findCopies) — không đáng kể cạnh ~4s tiết kiệm được.
+      const usesDailymotion = platforms.includes('dailymotion')
+      const dailymotionPromise = usesDailymotion
+        ? fetchYouTubeVideoById(youtubeVideoId, { computeThumbnailHash: true, apiKey: keys.youtubeApiKey })
+            .then(original =>
+              findDailymotionCopies(
+                {
+                  title: original.candidate.title,
+                  thumbnailHash: original.candidate.media?.perceptualHash,
+                  publishedAt: original.candidate.publishedAt ? original.candidate.publishedAt.toISOString() : null,
+                  durationSec: parseIsoDuration(original.raw.duration)
+                },
+                { thumbnailMatch: true }
+              )
+            )
+            .catch(() => null)
+        : Promise.resolve(null)
+
       const result = await findCopies(youtubeVideoId, { ...resolveFindCopiesOptions(mode), apiKey: keys.youtubeApiKey })
+      const dmFinal = await dailymotionPromise
 
       // Ghi đúng số unit đã tiêu: 101 cho một truy vấn, 201 khi phải tìm thêm
-      // theo transcript. Dailymotion không tính quota nên không cộng vào đây.
-      await recordUsage(userId, result.quotaUnits)
-
-      // Dailymotion cần metadata (tiêu đề/thumbnail hash/thời lượng) của video
-      // gốc mà `findCopies` vừa lấy qua YouTube videos.list, nên chạy SAU chứ
-      // không song song — không có gì để tìm nếu chưa biết tìm cái gì.
-      const dmFinal = platforms.includes('dailymotion')
-        ? await findDailymotionCopies(
-            {
-              title: result.original.title,
-              thumbnailHash: result.original.thumbnailHash,
-              publishedAt: result.original.publishedAt,
-              durationSec: result.original.durationSec
-            },
-            { thumbnailMatch: true }
-          ).catch(() => null)
-        : null
+      // theo transcript, +1 nếu vừa gọi thêm videos.list cho Dailymotion ở
+      // trên. Dailymotion tự thân không tính quota nên không cộng phần đó.
+      await recordUsage(userId, result.quotaUnits + (usesDailymotion ? YOUTUBE_COST.videos : 0))
+      if (keys.youtubeApiKeyIsShared && !keys.youtubeFreeScanUsed) {
+        await markYoutubeFreeScanUsed(userId)
+      }
 
       const youtubeFindings = result.candidates.map(candidate => ({
         platform: 'youtube' as const,
@@ -360,6 +389,10 @@ export async function POST(request: NextRequest) {
         const candidates = await adapter.search(mockAsset, keys)
         if (platform === 'youtube') {
           await recordUsage(userId, countYoutubeQueries(mockAsset) * YOUTUBE_COST.search)
+          if (keys.youtubeApiKeyIsShared && !keys.youtubeFreeScanUsed) {
+            await markYoutubeFreeScanUsed(userId)
+            keys.youtubeFreeScanUsed = true
+          }
         }
         for (const candidate of candidates) {
           const dedupeKey = `${platform}:${candidate.externalId || candidate.url}`

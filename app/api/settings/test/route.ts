@@ -3,13 +3,13 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { initializeDatabase } from '@/lib/db'
 import { getConnectorStatuses } from '@/lib/copyright/adapters'
-import { mergeApiKeys, resolveApiKeys, type ScanApiKeys } from '@/lib/copyright/apiKeys'
+import { mergeApiKeys, resolveApiKeys, type ScanApiKeyField } from '@/lib/copyright/apiKeys'
 import { ConnectorStatus } from '@/types'
 
 export const dynamic = 'force-dynamic'
 
 /** Tên field ở form Cài đặt → field trong ScanApiKeys. */
-const FIELD_MAP: Record<string, keyof ScanApiKeys> = {
+const FIELD_MAP: Record<string, ScanApiKeyField> = {
   youtube_api_key: 'youtubeApiKey',
   google_search_api_key: 'googleSearchApiKey',
   google_search_engine_id: 'googleSearchEngineId',
@@ -20,9 +20,9 @@ const FIELD_MAP: Record<string, keyof ScanApiKeys> = {
 /** Video công khai lâu đời, dùng làm mẫu ping — `videos.list` chỉ tốn 1 quota unit. */
 const PING_VIDEO_ID = 'dQw4w9WgXcQ'
 
-function fromClientKeys(input: unknown): Partial<ScanApiKeys> {
+function fromClientKeys(input: unknown): Partial<Record<ScanApiKeyField, string>> {
   if (!input || typeof input !== 'object') return {}
-  const out: Partial<ScanApiKeys> = {}
+  const out: Partial<Record<ScanApiKeyField, string>> = {}
   for (const [field, value] of Object.entries(input as Record<string, unknown>)) {
     const target = FIELD_MAP[field]
     // Bỏ qua giá trị đã che (server trả về dạng AIza****abcd) — nó không phải key thật.
