@@ -5,105 +5,43 @@
  "elements": [
   {
    "type": "text",
-   "id": "n213",
+   "id": "n230",
    "x": 80,
    "y": 30,
-   "width": 508.20000000000005,
+   "width": 798.6,
    "height": 26.4,
-   "text": "LUỒNG KIỂM TRA URL & TÌM BẢN SAO (YouTube)",
+   "text": "LUỒNG TÌM BẢN SAO — findCopies() (YouTube) + Dailymotion song song",
    "fontSize": 22,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "left",
    "verticalAlign": "top",
-   "originalText": "LUỒNG KIỂM TRA URL & TÌM BẢN SAO (YouTube)",
+   "originalText": "LUỒNG TÌM BẢN SAO — findCopies() (YouTube) + Dailymotion song song",
    "autoResize": true
   },
   {
-   "type": "ellipse",
-   "id": "n214",
-   "x": 90,
-   "y": 110,
-   "width": 140,
-   "height": 60,
-   "strokeColor": "#1e1e1e",
-   "backgroundColor": "#c3fae8",
-   "fillStyle": "solid",
-   "strokeWidth": 2,
-   "roughness": 0,
-   "opacity": 100,
-   "boundElements": [
-    {
-     "id": "n215",
-     "type": "text"
-    }
-   ]
-  },
-  {
    "type": "text",
-   "id": "n215",
-   "x": 114.75,
-   "y": 128.625,
-   "width": 90.5,
-   "height": 22.75,
-   "text": "Người dùng",
-   "fontSize": 15,
-   "fontFamily": 2,
-   "strokeColor": "#1e1e1e",
-   "textAlign": "center",
-   "verticalAlign": "middle",
-   "originalText": "Người dùng",
-   "autoResize": true,
-   "containerId": "n214"
-  },
-  {
-   "type": "arrow",
-   "id": "n216",
-   "x": 230,
-   "y": 140,
-   "width": 130,
-   "height": 0,
-   "strokeColor": "#1e1e1e",
-   "backgroundColor": "transparent",
-   "fillStyle": "solid",
-   "strokeWidth": 2,
-   "roughness": 1,
-   "opacity": 100,
-   "points": [
-    [
-     0,
-     0
-    ],
-    [
-     130,
-     0
-    ]
-   ],
-   "endArrowhead": "arrow"
-  },
-  {
-   "type": "text",
-   "id": "n217",
-   "x": 233.8,
-   "y": 106.0,
-   "width": 122.4,
-   "height": 20,
-   "text": "dán link YouTube",
+   "id": "n231",
+   "x": 80,
+   "y": 66,
+   "width": 614.9000000000001,
+   "height": 15.6,
+   "text": "Chạy trong POST /api/scans/quick — thay thế /api/check-url + /api/find-copies (đã xoá)",
    "fontSize": 13,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
-   "textAlign": "center",
-   "verticalAlign": "middle",
-   "originalText": "dán link YouTube",
+   "textAlign": "left",
+   "verticalAlign": "top",
+   "originalText": "Chạy trong POST /api/scans/quick — thay thế /api/check-url + /api/find-copies (đã xoá)",
    "autoResize": true
   },
   {
    "type": "rectangle",
-   "id": "n218",
-   "x": 360,
+   "id": "n232",
+   "x": 90,
    "y": 110,
-   "width": 260,
-   "height": 60,
+   "width": 300,
+   "height": 70,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "#a5d8ff",
    "fillStyle": "solid",
@@ -115,33 +53,33 @@
    },
    "boundElements": [
     {
-     "id": "n219",
+     "id": "n233",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n219",
-   "x": 412.85,
-   "y": 120.5,
-   "width": 154.3,
-   "height": 39.0,
-   "text": "POST /api/check-url\n{url}",
-   "fontSize": 14,
+   "id": "n233",
+   "x": 125.175,
+   "y": 126.75,
+   "width": 229.65,
+   "height": 36.5,
+   "text": "POST /api/scans/quick\nFormData {url, mode, platforms}",
+   "fontSize": 13,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "center",
    "verticalAlign": "middle",
-   "originalText": "POST /api/check-url\n{url}",
+   "originalText": "POST /api/scans/quick\nFormData {url, mode, platforms}",
    "autoResize": true,
-   "containerId": "n218"
+   "containerId": "n232"
   },
   {
    "type": "arrow",
-   "id": "n220",
-   "x": 620,
-   "y": 140,
+   "id": "n234",
+   "x": 390,
+   "y": 145,
    "width": 130,
    "height": 0,
    "strokeColor": "#1e1e1e",
@@ -164,11 +102,11 @@
   },
   {
    "type": "rectangle",
-   "id": "n222",
-   "x": 750,
+   "id": "n236",
+   "x": 520,
    "y": 110,
    "width": 280,
-   "height": 60,
+   "height": 70,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "#d0bfff",
    "fillStyle": "solid",
@@ -180,16 +118,16 @@
    },
    "boundElements": [
     {
-     "id": "n223",
+     "id": "n237",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n223",
-   "x": 777.1,
-   "y": 123.0,
+   "id": "n237",
+   "x": 547.1,
+   "y": 128.0,
    "width": 225.8,
    "height": 34.0,
    "text": "extractYouTubeVideoId()\nwatch / youtu.be / shorts / embed",
@@ -200,13 +138,13 @@
    "verticalAlign": "middle",
    "originalText": "extractYouTubeVideoId()\nwatch / youtu.be / shorts / embed",
    "autoResize": true,
-   "containerId": "n222"
+   "containerId": "n236"
   },
   {
    "type": "arrow",
-   "id": "n224",
-   "x": 1030,
-   "y": 140,
+   "id": "n238",
+   "x": 800,
+   "y": 145,
    "width": 130,
    "height": 0,
    "strokeColor": "#1e1e1e",
@@ -229,8 +167,8 @@
   },
   {
    "type": "diamond",
-   "id": "n226",
-   "x": 1160,
+   "id": "n240",
+   "x": 930,
    "y": 110,
    "width": 160,
    "height": 70,
@@ -242,15 +180,15 @@
    "opacity": 100,
    "boundElements": [
     {
-     "id": "n227",
+     "id": "n241",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n227",
-   "x": 1207.4,
+   "id": "n241",
+   "x": 977.4,
    "y": 126.75,
    "width": 65.2,
    "height": 36.5,
@@ -262,15 +200,15 @@
    "verticalAlign": "middle",
    "originalText": "Có\nvideoId?",
    "autoResize": true,
-   "containerId": "n226"
+   "containerId": "n240"
   },
   {
    "type": "arrow",
-   "id": "n228",
-   "x": 1160,
+   "id": "n242",
+   "x": 930,
    "y": 180,
    "width": 0,
-   "height": 120,
+   "height": 100,
    "strokeColor": "#e03131",
    "backgroundColor": "transparent",
    "fillStyle": "solid",
@@ -284,7 +222,7 @@
     ],
     [
      0,
-     120
+     100
     ]
    ],
    "endArrowhead": "arrow",
@@ -292,9 +230,9 @@
   },
   {
    "type": "text",
-   "id": "n229",
-   "x": 1106.25,
-   "y": 230.0,
+   "id": "n243",
+   "x": 876.25,
+   "y": 220.0,
    "width": 43.75,
    "height": 20,
    "text": "không",
@@ -308,9 +246,9 @@
   },
   {
    "type": "rectangle",
-   "id": "n230",
-   "x": 1040,
-   "y": 300,
+   "id": "n244",
+   "x": 810,
+   "y": 280,
    "width": 240,
    "height": 56,
    "strokeColor": "#1e1e1e",
@@ -324,16 +262,16 @@
    },
    "boundElements": [
     {
-     "id": "n231",
+     "id": "n245",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n231",
-   "x": 1102.375,
-   "y": 317.875,
+   "id": "n245",
+   "x": 872.375,
+   "y": 297.875,
    "width": 115.25000000000001,
    "height": 20.25,
    "text": "400 invalid_url",
@@ -344,12 +282,12 @@
    "verticalAlign": "middle",
    "originalText": "400 invalid_url",
    "autoResize": true,
-   "containerId": "n230"
+   "containerId": "n244"
   },
   {
    "type": "arrow",
-   "id": "n232",
-   "x": 1320,
+   "id": "n246",
+   "x": 1090,
    "y": 145,
    "width": 130,
    "height": 0,
@@ -373,8 +311,8 @@
   },
   {
    "type": "text",
-   "id": "n233",
-   "x": 1373.85,
+   "id": "n247",
+   "x": 1143.85,
    "y": 111.0,
    "width": 22.3,
    "height": 20,
@@ -389,13 +327,13 @@
   },
   {
    "type": "rectangle",
-   "id": "n234",
-   "x": 1450,
-   "y": 110,
-   "width": 290,
-   "height": 70,
+   "id": "n248",
+   "x": 1220,
+   "y": 100,
+   "width": 320,
+   "height": 90,
    "strokeColor": "#1e1e1e",
-   "backgroundColor": "#c3fae8",
+   "backgroundColor": "#d0bfff",
    "fillStyle": "solid",
    "strokeWidth": 2,
    "roughness": 0,
@@ -405,35 +343,35 @@
    },
    "boundElements": [
     {
-     "id": "n235",
+     "id": "n249",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n235",
-   "x": 1508.775,
-   "y": 126.75,
-   "width": 172.45000000000002,
-   "height": 36.5,
-   "text": "findActiveAssetsByIds()\ntài sản active của user",
+   "id": "n249",
+   "x": 1250.875,
+   "y": 118.625,
+   "width": 258.25,
+   "height": 52.75,
+   "text": "fetchYouTubeVideoById()\n+ storyboard hash (innertube, free)\n+ thumbnail pHash",
    "fontSize": 13,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "center",
    "verticalAlign": "middle",
-   "originalText": "findActiveAssetsByIds()\ntài sản active của user",
+   "originalText": "fetchYouTubeVideoById()\n+ storyboard hash (innertube, free)\n+ thumbnail pHash",
    "autoResize": true,
-   "containerId": "n234"
+   "containerId": "n248"
   },
   {
    "type": "arrow",
-   "id": "n236",
-   "x": 1595,
-   "y": 180,
+   "id": "n250",
+   "x": 1380,
+   "y": 190,
    "width": 0,
-   "height": 120,
+   "height": 70,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "transparent",
    "fillStyle": "solid",
@@ -447,18 +385,83 @@
     ],
     [
      0,
-     120
+     70
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "rectangle",
+   "id": "n252",
+   "x": 1220,
+   "y": 260,
+   "width": 320,
+   "height": 70,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#a5d8ff",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n253",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n253",
+   "x": 1225.85,
+   "y": 276.75,
+   "width": 308.3,
+   "height": 36.5,
+   "text": "search.list vòng 1 (100 units)\ntheo tiêu đề + tags → tối đa 50 candidates",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "search.list vòng 1 (100 units)\ntheo tiêu đề + tags → tối đa 50 candidates",
+   "autoResize": true,
+   "containerId": "n252"
+  },
+  {
+   "type": "arrow",
+   "id": "n254",
+   "x": 1380,
+   "y": 330,
+   "width": 0,
+   "height": 70,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     70
     ]
    ],
    "endArrowhead": "arrow"
   },
   {
    "type": "diamond",
-   "id": "n238",
-   "x": 1510,
-   "y": 300,
-   "width": 170,
-   "height": 70,
+   "id": "n256",
+   "x": 1300,
+   "y": 400,
+   "width": 160,
+   "height": 80,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "#fff3bf",
    "fillStyle": "solid",
@@ -467,116 +470,34 @@
    "opacity": 100,
    "boundElements": [
     {
-     "id": "n239",
+     "id": "n257",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n239",
-   "x": 1569.55,
-   "y": 316.75,
-   "width": 50.900000000000006,
+   "id": "n257",
+   "x": 1340.25,
+   "y": 421.75,
+   "width": 79.5,
    "height": 36.5,
-   "text": "Có tài\nsản?",
+   "text": "Điểm cao\nnhất < 45?",
    "fontSize": 13,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "center",
    "verticalAlign": "middle",
-   "originalText": "Có tài\nsản?",
+   "originalText": "Điểm cao\nnhất < 45?",
    "autoResize": true,
-   "containerId": "n238"
+   "containerId": "n256"
   },
   {
    "type": "arrow",
-   "id": "n240",
-   "x": 1510,
-   "y": 370,
-   "width": 0,
-   "height": 110,
-   "strokeColor": "#e03131",
-   "backgroundColor": "transparent",
-   "fillStyle": "solid",
-   "strokeWidth": 2,
-   "roughness": 1,
-   "opacity": 100,
-   "points": [
-    [
-     0,
-     0
-    ],
-    [
-     0,
-     110
-    ]
-   ],
-   "endArrowhead": "arrow",
-   "strokeStyle": "dashed"
-  },
-  {
-   "type": "text",
-   "id": "n241",
-   "x": 1456.25,
-   "y": 415.0,
-   "width": 43.75,
-   "height": 20,
-   "text": "không",
-   "fontSize": 13,
-   "fontFamily": 2,
-   "strokeColor": "#e03131",
-   "textAlign": "center",
-   "verticalAlign": "middle",
-   "originalText": "không",
-   "autoResize": true
-  },
-  {
-   "type": "rectangle",
-   "id": "n242",
-   "x": 1370,
-   "y": 480,
-   "width": 280,
-   "height": 56,
-   "strokeColor": "#1e1e1e",
-   "backgroundColor": "#ffc9c9",
-   "fillStyle": "solid",
-   "strokeWidth": 2,
-   "roughness": 0,
-   "opacity": 100,
-   "roundness": {
-    "type": 3
-   },
-   "boundElements": [
-    {
-     "id": "n243",
-     "type": "text"
-    }
-   ]
-  },
-  {
-   "type": "text",
-   "id": "n243",
-   "x": 1459.525,
-   "y": 497.875,
-   "width": 100.95,
-   "height": 20.25,
-   "text": "400 no_assets",
-   "fontSize": 13,
-   "fontFamily": 2,
-   "strokeColor": "#1e1e1e",
-   "textAlign": "center",
-   "verticalAlign": "middle",
-   "originalText": "400 no_assets",
-   "autoResize": true,
-   "containerId": "n242"
-  },
-  {
-   "type": "arrow",
-   "id": "n244",
-   "x": 1595,
-   "y": 300,
-   "width": 145,
+   "id": "n258",
+   "x": 1460,
+   "y": 430,
+   "width": 160,
    "height": 0,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "transparent",
@@ -590,18 +511,17 @@
      0
     ],
     [
-     145,
+     160,
      0
     ]
    ],
-   "endArrowhead": "arrow",
-   "strokeStyle": "dashed"
+   "endArrowhead": "arrow"
   },
   {
    "type": "text",
-   "id": "n245",
-   "x": 1656.35,
-   "y": 266.0,
+   "id": "n259",
+   "x": 1528.85,
+   "y": 396.0,
    "width": 22.3,
    "height": 20,
    "text": "có",
@@ -615,220 +535,11 @@
   },
   {
    "type": "rectangle",
-   "id": "n246",
-   "x": 1740,
-   "y": 270,
-   "width": 300,
-   "height": 70,
-   "strokeColor": "#1e1e1e",
-   "backgroundColor": "#d0bfff",
-   "fillStyle": "solid",
-   "strokeWidth": 2,
-   "roughness": 0,
-   "opacity": 100,
-   "roundness": {
-    "type": 3
-   },
-   "boundElements": [
-    {
-     "id": "n247",
-     "type": "text"
-    }
-   ]
-  },
-  {
-   "type": "text",
-   "id": "n247",
-   "x": 1803.5,
-   "y": 288.0,
-   "width": 173.0,
-   "height": 34.0,
-   "text": "fetchYouTubeVideoById()\n+ thumbnail pHash nếu cần",
-   "fontSize": 12,
-   "fontFamily": 2,
-   "strokeColor": "#1e1e1e",
-   "textAlign": "center",
-   "verticalAlign": "middle",
-   "originalText": "fetchYouTubeVideoById()\n+ thumbnail pHash nếu cần",
-   "autoResize": true,
-   "containerId": "n246"
-  },
-  {
-   "type": "arrow",
-   "id": "n248",
-   "x": 1890,
-   "y": 340,
-   "width": 0,
-   "height": 110,
-   "strokeColor": "#1e1e1e",
-   "backgroundColor": "transparent",
-   "fillStyle": "solid",
-   "strokeWidth": 2,
-   "roughness": 1,
-   "opacity": 100,
-   "points": [
-    [
-     0,
-     0
-    ],
-    [
-     0,
-     110
-    ]
-   ],
-   "endArrowhead": "arrow"
-  },
-  {
-   "type": "rectangle",
-   "id": "n250",
-   "x": 1740,
-   "y": 450,
-   "width": 300,
-   "height": 70,
-   "strokeColor": "#1e1e1e",
-   "backgroundColor": "#d0bfff",
-   "fillStyle": "solid",
-   "strokeWidth": 2,
-   "roughness": 0,
-   "opacity": 100,
-   "roundness": {
-    "type": 3
-   },
-   "boundElements": [
-    {
-     "id": "n251",
-     "type": "text"
-    }
-   ]
-  },
-  {
-   "type": "text",
-   "id": "n251",
-   "x": 1766.65,
-   "y": 474.25,
-   "width": 246.70000000000002,
-   "height": 21.5,
-   "text": "scoreCandidate() với TỪNG asset",
-   "fontSize": 14,
-   "fontFamily": 2,
-   "strokeColor": "#1e1e1e",
-   "textAlign": "center",
-   "verticalAlign": "middle",
-   "originalText": "scoreCandidate() với TỪNG asset",
-   "autoResize": true,
-   "containerId": "n250"
-  },
-  {
-   "type": "arrow",
-   "id": "n252",
-   "x": 1890,
-   "y": 520,
-   "width": 0,
-   "height": 110,
-   "strokeColor": "#1e1e1e",
-   "backgroundColor": "transparent",
-   "fillStyle": "solid",
-   "strokeWidth": 2,
-   "roughness": 1,
-   "opacity": 100,
-   "points": [
-    [
-     0,
-     0
-    ],
-    [
-     0,
-     110
-    ]
-   ],
-   "endArrowhead": "arrow"
-  },
-  {
-   "type": "diamond",
-   "id": "n254",
-   "x": 1800,
-   "y": 630,
-   "width": 180,
-   "height": 70,
-   "strokeColor": "#1e1e1e",
-   "backgroundColor": "#fff3bf",
-   "fillStyle": "solid",
-   "strokeWidth": 2,
-   "roughness": 0,
-   "opacity": 100,
-   "boundElements": [
-    {
-     "id": "n255",
-     "type": "text"
-    }
-   ]
-  },
-  {
-   "type": "text",
-   "id": "n255",
-   "x": 1853.825,
-   "y": 646.75,
-   "width": 72.35000000000001,
-   "height": 36.5,
-   "text": "riskScore\n>= 30?",
-   "fontSize": 13,
-   "fontFamily": 2,
-   "strokeColor": "#1e1e1e",
-   "textAlign": "center",
-   "verticalAlign": "middle",
-   "originalText": "riskScore\n>= 30?",
-   "autoResize": true,
-   "containerId": "n254"
-  },
-  {
-   "type": "arrow",
-   "id": "n256",
-   "x": 1800,
-   "y": 700,
-   "width": -210,
-   "height": 240,
-   "strokeColor": "#e03131",
-   "backgroundColor": "transparent",
-   "fillStyle": "solid",
-   "strokeWidth": 2,
-   "roughness": 1,
-   "opacity": 100,
-   "points": [
-    [
-     0,
-     0
-    ],
-    [
-     -210,
-     240
-    ]
-   ],
-   "endArrowhead": "arrow",
-   "strokeStyle": "dashed"
-  },
-  {
-   "type": "text",
-   "id": "n257",
-   "x": 1641.25,
-   "y": 810.0,
-   "width": 43.75,
-   "height": 20,
-   "text": "không",
-   "fontSize": 13,
-   "fontFamily": 2,
-   "strokeColor": "#e03131",
-   "textAlign": "center",
-   "verticalAlign": "middle",
-   "originalText": "không",
-   "autoResize": true
-  },
-  {
-   "type": "rectangle",
-   "id": "n258",
-   "x": 1440,
-   "y": 940,
-   "width": 300,
-   "height": 60,
+   "id": "n260",
+   "x": 1620,
+   "y": 395,
+   "width": 340,
+   "height": 90,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "#ffd8a8",
    "fillStyle": "solid",
@@ -840,78 +551,78 @@
    },
    "boundElements": [
     {
-     "id": "n259",
+     "id": "n261",
      "type": "text"
     }
    ]
-  },
-  {
-   "type": "text",
-   "id": "n259",
-   "x": 1510.1,
-   "y": 953.0,
-   "width": 159.8,
-   "height": 34.0,
-   "text": "Chỉ trả thông tin video\n(không tạo finding)",
-   "fontSize": 12,
-   "fontFamily": 2,
-   "strokeColor": "#1e1e1e",
-   "textAlign": "center",
-   "verticalAlign": "middle",
-   "originalText": "Chỉ trả thông tin video\n(không tạo finding)",
-   "autoResize": true,
-   "containerId": "n258"
-  },
-  {
-   "type": "arrow",
-   "id": "n260",
-   "x": 1890,
-   "y": 700,
-   "width": 0,
-   "height": 120,
-   "strokeColor": "#1e1e1e",
-   "backgroundColor": "transparent",
-   "fillStyle": "solid",
-   "strokeWidth": 2,
-   "roughness": 1,
-   "opacity": 100,
-   "points": [
-    [
-     0,
-     0
-    ],
-    [
-     0,
-     120
-    ]
-   ],
-   "endArrowhead": "arrow"
   },
   {
    "type": "text",
    "id": "n261",
-   "x": 1857.7,
-   "y": 750.0,
-   "width": 22.3,
-   "height": 20,
-   "text": "có",
-   "fontSize": 13,
+   "x": 1677.1,
+   "y": 415.5,
+   "width": 225.8,
+   "height": 49.0,
+   "text": "Trích cụm từ transcript đặc trưng\n→ search.list vòng 2 (+100 units)\ngộp candidate mới vào danh sách",
+   "fontSize": 12,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "center",
    "verticalAlign": "middle",
-   "originalText": "có",
+   "originalText": "Trích cụm từ transcript đặc trưng\n→ search.list vòng 2 (+100 units)\ngộp candidate mới vào danh sách",
+   "autoResize": true,
+   "containerId": "n260"
+  },
+  {
+   "type": "arrow",
+   "id": "n262",
+   "x": 1380,
+   "y": 480,
+   "width": 0,
+   "height": 80,
+   "strokeColor": "#e03131",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     80
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "text",
+   "id": "n263",
+   "x": 1197.55,
+   "y": 510.0,
+   "width": 172.45000000000002,
+   "height": 20,
+   "text": "không\n(tiết kiệm quota)",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#e03131",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "không\n(tiết kiệm quota)",
    "autoResize": true
   },
   {
    "type": "rectangle",
-   "id": "n262",
-   "x": 1740,
-   "y": 820,
-   "width": 300,
-   "height": 70,
+   "id": "n264",
+   "x": 1220,
+   "y": 560,
+   "width": 320,
+   "height": 80,
    "strokeColor": "#1e1e1e",
-   "backgroundColor": "#b2f2bb",
+   "backgroundColor": "#d0bfff",
    "fillStyle": "solid",
    "strokeWidth": 2,
    "roughness": 0,
@@ -921,35 +632,35 @@
    },
    "boundElements": [
     {
-     "id": "n263",
+     "id": "n265",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n263",
-   "x": 1783.7,
-   "y": 838.0,
-   "width": 212.60000000000002,
-   "height": 34.0,
-   "text": "createScanRun → upsertFinding\n→ createEvidenceItem (snapshot)",
+   "id": "n265",
+   "x": 1283.6,
+   "y": 575.5,
+   "width": 192.8,
+   "height": 49.0,
+   "text": "scoreCandidate mỗi ứng viên\ntitle/tag/mô tả/thumbnail\n(hạng weak ≤35 / medium ≤70)",
    "fontSize": 12,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "center",
    "verticalAlign": "middle",
-   "originalText": "createScanRun → upsertFinding\n→ createEvidenceItem (snapshot)",
+   "originalText": "scoreCandidate mỗi ứng viên\ntitle/tag/mô tả/thumbnail\n(hạng weak ≤35 / medium ≤70)",
    "autoResize": true,
-   "containerId": "n262"
+   "containerId": "n264"
   },
   {
    "type": "arrow",
-   "id": "n264",
-   "x": 1890,
-   "y": 890,
+   "id": "n266",
+   "x": 1380,
+   "y": 640,
    "width": 0,
-   "height": 110,
+   "height": 80,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "transparent",
    "fillStyle": "solid",
@@ -963,60 +674,20 @@
     ],
     [
      0,
-     110
+     80
     ]
    ],
    "endArrowhead": "arrow"
   },
   {
    "type": "rectangle",
-   "id": "n266",
-   "x": 1740,
-   "y": 1000,
-   "width": 300,
-   "height": 70,
+   "id": "n268",
+   "x": 1220,
+   "y": 720,
+   "width": 320,
+   "height": 90,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "#b2f2bb",
-   "fillStyle": "solid",
-   "strokeWidth": 2,
-   "roughness": 0,
-   "opacity": 100,
-   "roundness": {
-    "type": 3
-   },
-   "boundElements": [
-    {
-     "id": "n267",
-     "type": "text"
-    }
-   ]
-  },
-  {
-   "type": "text",
-   "id": "n267",
-   "x": 1763.9,
-   "y": 1018.0,
-   "width": 252.20000000000002,
-   "height": 34.0,
-   "text": "updateScanRun completed\n+ createNotification(url_check_match)",
-   "fontSize": 12,
-   "fontFamily": 2,
-   "strokeColor": "#1e1e1e",
-   "textAlign": "center",
-   "verticalAlign": "middle",
-   "originalText": "updateScanRun completed\n+ createNotification(url_check_match)",
-   "autoResize": true,
-   "containerId": "n266"
-  },
-  {
-   "type": "rectangle",
-   "id": "n268",
-   "x": 360,
-   "y": 560,
-   "width": 560,
-   "height": 240,
-   "strokeColor": "#1e1e1e",
-   "backgroundColor": "#f8f9fa",
    "fillStyle": "solid",
    "strokeWidth": 2,
    "roughness": 0,
@@ -1029,14 +700,278 @@
      "id": "n269",
      "type": "text"
     }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n269",
+   "x": 1247.3,
+   "y": 740.5,
+   "width": 265.40000000000003,
+   "height": 49.0,
+   "text": "So khung hình qua storyboard\n(top 8, coverage >= 10%)\n→ video_frame_match (hạng strong = 100)",
+   "fontSize": 12,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "So khung hình qua storyboard\n(top 8, coverage >= 10%)\n→ video_frame_match (hạng strong = 100)",
+   "autoResize": true,
+   "containerId": "n268"
+  },
+  {
+   "type": "arrow",
+   "id": "n270",
+   "x": 1380,
+   "y": 810,
+   "width": 0,
+   "height": 80,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     80
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "diamond",
+   "id": "n272",
+   "x": 1300,
+   "y": 890,
+   "width": 160,
+   "height": 80,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#fff3bf",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "boundElements": [
+    {
+     "id": "n273",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n273",
+   "x": 1343.825,
+   "y": 911.75,
+   "width": 72.35000000000001,
+   "height": 36.5,
+   "text": "riskScore\n>= 40?",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "riskScore\n>= 40?",
+   "autoResize": true,
+   "containerId": "n272"
+  },
+  {
+   "type": "arrow",
+   "id": "n274",
+   "x": 1460,
+   "y": 920,
+   "width": 160,
+   "height": 0,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     160,
+     0
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "text",
+   "id": "n275",
+   "x": 1518.125,
+   "y": 886.0,
+   "width": 43.75,
+   "height": 20,
+   "text": "không",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "không",
+   "autoResize": true
+  },
+  {
+   "type": "rectangle",
+   "id": "n276",
+   "x": 1620,
+   "y": 890,
+   "width": 260,
+   "height": 60,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#ffd8a8",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n277",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n277",
+   "x": 1685.225,
+   "y": 909.875,
+   "width": 129.55,
+   "height": 20.25,
+   "text": "Loại khỏi kết quả",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "Loại khỏi kết quả",
+   "autoResize": true,
+   "containerId": "n276"
+  },
+  {
+   "type": "arrow",
+   "id": "n278",
+   "x": 1380,
+   "y": 970,
+   "width": 0,
+   "height": 80,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     80
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "text",
+   "id": "n279",
+   "x": 1347.7,
+   "y": 1000.0,
+   "width": 22.3,
+   "height": 20,
+   "text": "có",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "có",
+   "autoResize": true
+  },
+  {
+   "type": "rectangle",
+   "id": "n280",
+   "x": 1220,
+   "y": 1050,
+   "width": 320,
+   "height": 90,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#b2f2bb",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n281",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n281",
+   "x": 1257.2,
+   "y": 1070.5,
+   "width": 245.60000000000002,
+   "height": 49.0,
+   "text": "persistFindCopiesResult()\nupsertAdhocAsset + createScanRun\n+ upsertFinding + createEvidenceItem",
+   "fontSize": 12,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "persistFindCopiesResult()\nupsertAdhocAsset + createScanRun\n+ upsertFinding + createEvidenceItem",
+   "autoResize": true,
+   "containerId": "n280"
+  },
+  {
+   "type": "rectangle",
+   "id": "n282",
+   "x": 90,
+   "y": 400,
+   "width": 1000,
+   "height": 340,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#f8f9fa",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n283",
+     "type": "text"
+    }
    ],
    "strokeStyle": "dashed"
   },
   {
    "type": "text",
-   "id": "n269",
-   "x": 636.0,
-   "y": 668.625,
+   "id": "n283",
+   "x": 586.0,
+   "y": 558.625,
    "width": 10,
    "height": 22.75,
    "text": "",
@@ -1047,31 +982,96 @@
    "verticalAlign": "middle",
    "originalText": "",
    "autoResize": true,
-   "containerId": "n268"
+   "containerId": "n282"
   },
   {
    "type": "text",
-   "id": "n270",
-   "x": 374,
-   "y": 568,
-   "width": 560,
+   "id": "n284",
+   "x": 104,
+   "y": 408,
+   "width": 928,
    "height": 22,
-   "text": "FIND COPIES — POST /api/find-copies",
+   "text": "DAILYMOTION — song song, MIỄN PHÍ, không cần API key/quota",
    "fontSize": 15,
    "fontFamily": 2,
    "strokeColor": "#495057",
    "textAlign": "left",
    "verticalAlign": "top",
-   "originalText": "FIND COPIES — POST /api/find-copies",
+   "originalText": "DAILYMOTION — song song, MIỄN PHÍ, không cần API key/quota",
    "autoResize": true
   },
   {
    "type": "rectangle",
-   "id": "n271",
-   "x": 380,
-   "y": 615,
-   "width": 520,
-   "height": 44,
+   "id": "n285",
+   "x": 120,
+   "y": 460,
+   "width": 460,
+   "height": 60,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#a5d8ff",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n286",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n286",
+   "x": 204.1,
+   "y": 473.0,
+   "width": 291.8,
+   "height": 34.0,
+   "text": "findDailymotionCopies(title, thumbnailHash,\nduration) — từ dữ liệu findCopies vừa lấy",
+   "fontSize": 12,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "findDailymotionCopies(title, thumbnailHash,\nduration) — từ dữ liệu findCopies vừa lấy",
+   "autoResize": true,
+   "containerId": "n285"
+  },
+  {
+   "type": "arrow",
+   "id": "n287",
+   "x": 350,
+   "y": 520,
+   "width": 0,
+   "height": 60,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     60
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "rectangle",
+   "id": "n289",
+   "x": 120,
+   "y": 580,
+   "width": 460,
+   "height": 56,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "#d0bfff",
    "fillStyle": "solid",
@@ -1083,37 +1083,168 @@
    },
    "boundElements": [
     {
-     "id": "n272",
+     "id": "n290",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n272",
-   "x": 467.975,
-   "y": 626.875,
-   "width": 344.05,
-   "height": 20.25,
-   "text": "videoId → findCopies(videoId, {deepMediaCheck})",
+   "id": "n290",
+   "x": 233.8,
+   "y": 591.0,
+   "width": 232.4,
+   "height": 34.0,
+   "text": "Tìm kiếm công khai, không tính phí\n→ tối đa 30 candidates",
+   "fontSize": 12,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "Tìm kiếm công khai, không tính phí\n→ tối đa 30 candidates",
+   "autoResize": true,
+   "containerId": "n289"
+  },
+  {
+   "type": "arrow",
+   "id": "n291",
+   "x": 350,
+   "y": 636,
+   "width": 0,
+   "height": 54,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     54
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "rectangle",
+   "id": "n293",
+   "x": 120,
+   "y": 690,
+   "width": 460,
+   "height": 72,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#d0bfff",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n294",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n294",
+   "x": 204.1,
+   "y": 701.5,
+   "width": 291.8,
+   "height": 49.0,
+   "text": "scoreCandidate: title + thumbnail pHash\n(không có storyboard → trần hạng medium 70)\nđã tự lọc riskScore >= 40 bên trong",
+   "fontSize": 12,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "scoreCandidate: title + thumbnail pHash\n(không có storyboard → trần hạng medium 70)\nđã tự lọc riskScore >= 40 bên trong",
+   "autoResize": true,
+   "containerId": "n293"
+  },
+  {
+   "type": "arrow",
+   "id": "n295",
+   "x": 600,
+   "y": 726,
+   "width": 620,
+   "height": 369,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     620,
+     369
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "text",
+   "id": "n296",
+   "x": 845.225,
+   "y": 876.5,
+   "width": 129.55,
+   "height": 20,
+   "text": "gộp trước khi lưu",
    "fontSize": 13,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "center",
    "verticalAlign": "middle",
-   "originalText": "videoId → findCopies(videoId, {deepMediaCheck})",
-   "autoResize": true,
-   "containerId": "n271"
+   "originalText": "gộp trước khi lưu",
+   "autoResize": true
+  },
+  {
+   "type": "arrow",
+   "id": "n297",
+   "x": 1380,
+   "y": 1140,
+   "width": 0,
+   "height": 80,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     80
+    ]
+   ],
+   "endArrowhead": "arrow"
   },
   {
    "type": "rectangle",
-   "id": "n273",
-   "x": 380,
-   "y": 680,
-   "width": 520,
-   "height": 44,
+   "id": "n299",
+   "x": 1000,
+   "y": 1220,
+   "width": 760,
+   "height": 70,
    "strokeColor": "#1e1e1e",
-   "backgroundColor": "#d0bfff",
+   "backgroundColor": "#b2f2bb",
    "fillStyle": "solid",
    "strokeWidth": 2,
    "roughness": 0,
@@ -1123,67 +1254,27 @@
    },
    "boundElements": [
     {
-     "id": "n274",
+     "id": "n300",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n274",
-   "x": 447.9,
-   "y": 692.5,
-   "width": 384.20000000000005,
-   "height": 19.0,
-   "text": "fast: title/desc — deep: + transcript (transcriptFetcher)",
-   "fontSize": 12,
+   "id": "n300",
+   "x": 1100.725,
+   "y": 1236.75,
+   "width": 558.5500000000001,
+   "height": 36.5,
+   "text": "Trả JSON: findings YouTube + Dailymotion (đã gộp, sort)\n+ scanRunId, quotaUnits, frameChecked, transcriptChecked, dailymotionSearched",
+   "fontSize": 13,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "center",
    "verticalAlign": "middle",
-   "originalText": "fast: title/desc — deep: + transcript (transcriptFetcher)",
+   "originalText": "Trả JSON: findings YouTube + Dailymotion (đã gộp, sort)\n+ scanRunId, quotaUnits, frameChecked, transcriptChecked, dailymotionSearched",
    "autoResize": true,
-   "containerId": "n273"
-  },
-  {
-   "type": "rectangle",
-   "id": "n275",
-   "x": 380,
-   "y": 745,
-   "width": 520,
-   "height": 44,
-   "strokeColor": "#1e1e1e",
-   "backgroundColor": "#d0bfff",
-   "fillStyle": "solid",
-   "strokeWidth": 2,
-   "roughness": 0,
-   "opacity": 100,
-   "roundness": {
-    "type": 3
-   },
-   "boundElements": [
-    {
-     "id": "n276",
-     "type": "text"
-    }
-   ]
-  },
-  {
-   "type": "text",
-   "id": "n276",
-   "x": 451.2,
-   "y": 757.5,
-   "width": 377.6,
-   "height": 19.0,
-   "text": "+ mediaDeepCheck: so khớp thumbnail/audio từng candidate",
-   "fontSize": 12,
-   "fontFamily": 2,
-   "strokeColor": "#1e1e1e",
-   "textAlign": "center",
-   "verticalAlign": "middle",
-   "originalText": "+ mediaDeepCheck: so khớp thumbnail/audio từng candidate",
-   "autoResize": true,
-   "containerId": "n275"
+   "containerId": "n299"
   }
  ],
  "appState": {

@@ -152,27 +152,29 @@ els = []
 els += title(80, 30, "COPYRIGHT CHECKER — TỔNG QUAN KIẾN TRÚC HỆ THỐNG", 25)
 els += title(80, 70, "Hệ thống CHECK/SCAN bản quyền đa nền tảng — Next.js 16 + NextAuth + Neon Postgres", 14)
 
-# UI band
+# UI band — v3 (08/2026): /url-check, /find-copies, /text-check đã bị xoá;
+# /scans giờ là cửa quét duy nhất (auto-detect + Fast/Deep + platform chips).
 els += band(80, 120, 1180, 130, "UI LAYER — React 19 + Ant Design + Tailwind (app/*)")
 ui = [
     ("Landing / Login / Register", 100, 165), ("Dashboard (Scan Deck)", 300, 165),
-    ("Assets / Scans / Findings", 500, 165), ("URL Check", 700, 165),
-    ("Find Copies", 900, 165), ("Text Check / Settings", 1100, 165),
+    ("Assets", 500, 165), ("Scans (auto-detect,\nFast/Deep, platform chips)", 700, 165),
+    ("Findings", 900, 165), ("Settings", 1100, 165),
 ]
 ui_ids = []
 for txt, x, y in ui:
-    els += rect(x, y, 180, 44, txt, fill="#e5dbff", font=13)
+    els += rect(x, y, 180, 44, txt, fill="#e5dbff", font=12)
     # rectangle id = last-but-one created
     ui_ids.append(f"n{_id - 1}")
 
 els += arrow(670, 250, 670, 300, "HTTPS / JSON")
 
-# API band
+# API band — check-url/find-copies/text-check đã xoá; mọi link YouTube đi qua
+# scans/quick (findCopies + Dailymotion + persist trong 1 request).
 els += band(80, 300, 1180, 130, "API LAYER — Next.js App Router (app/api/*)  →  xác thực bằng getServerSession()")
 api = [
-    ("auth/[...nextauth], register", 100, 345), ("scans, scans/quick", 300, 345),
-    ("check-url, find-copies", 500, 345), ("text-check", 700, 345),
-    ("assets, findings, notifications", 900, 345), ("settings, extension/check, keygen", 1100, 345),
+    ("auth/[...nextauth], register", 100, 345), ("scans, scans/quick,\nscans/[id]", 300, 345),
+    ("assets, assets/[id]", 500, 345), ("findings, findings/[id]", 700, 345),
+    ("notifications, settings", 900, 345), ("extension/check, keygen", 1100, 345),
 ]
 api_ids = []
 for txt, x, y in api:
@@ -181,19 +183,20 @@ for txt, x, y in api:
 
 els += arrow(670, 430, 670, 480, "gọi service")
 
-# Service band
+# Service band — policies/textPolicy đã xoá cùng /text-check; thêm các module
+# mới của đợt rework (transcriptQuery, storyboard, dailymotion, reasons/risk).
 els += band(80, 480, 1180, 130, "SERVICE LAYER — lib/*")
 svc = [
-    ("copyright/scanner + scoring\n(chấm điểm rủi ro)", 100, 525),
-    ("copyright/adapters\n(youtube/google/fb/tiktok)", 300, 525),
-    ("copyright/findCopies\n(fast / deep media)", 500, 525),
-    ("policies/textPolicy", 700, 525),
+    ("copyright/scanner + scoring\n(hạng bằng chứng weak/medium/strong)", 100, 525),
+    ("copyright/adapters\n(youtube/google/fb/tiktok/dailymotion)", 300, 525),
+    ("copyright/findCopies +\ntranscriptQuery + storyboard", 500, 525),
+    ("copyright/dailymotion\n+ reasons.ts + risk.ts (mới)", 700, 525),
     ("models/ + db.ts (DDL + migrations)", 900, 525),
     ("auth.ts (NextAuth) + crypto.ts\n(AES-256-GCM)", 1100, 525),
 ]
 svc_ids = []
 for txt, x, y in svc:
-    els += rect(x, y, 180, 60, txt, fill="#d3f9d8", font=12)
+    els += rect(x, y, 180, 60, txt, fill="#d3f9d8", font=11)
     svc_ids.append(f"n{_id - 1}")
 
 els += arrow(670, 610, 670, 660, "SQL")
@@ -202,27 +205,31 @@ els += arrow(670, 610, 670, 660, "SQL")
 els += band(80, 660, 1180, 90, "DATA LAYER")
 els += ellipse(100, 705, 300, 40, "Neon Postgres: users, brand_assets, scan_runs, findings, evidence_items, user_settings, notifications, extension_api_keys", fill=C_DATA, font=12)
 els += rect(460, 705, 200, 40, "YOUTUBE_API_KEY", fill="#e6fcf5", font=13)
-els += rect(680, 705, 200, 40, "GOOGLE / FB / TIKTOK keys", fill="#e6fcf5", font=13)
+els += rect(680, 705, 200, 40, "GOOGLE/FB/TIKTOK keys\n(có nhưng chưa bật ở UI)", fill="#e6fcf5", font=10)
 els += rect(900, 705, 200, 40, "NEXTAUTH_SECRET", fill="#e6fcf5", font=13)
 
-# External column on right
-els += band(1340, 120, 360, 630, "NỀN TẢNG NGOÀI")
+# External column on right — Facebook không phải Graph API (Meta đã bỏ tìm
+# kiếm nội dung công khai) mà là Google CSE site:facebook.com; thêm
+# Dailymotion — nền tảng thứ 2 chạy thật, miễn phí, không cần key.
+els += band(1340, 120, 360, 545, "NỀN TẢNG NGOÀI")
 ext = [
-    ("YouTube Data API v3\n(videos, transcripts)", 1360, 175),
-    ("Google News / Search", 1360, 255),
-    ("Facebook Graph API", 1360, 335),
-    ("TikTok Research API", 1360, 415),
-    ("Browser Extension\n(extension/check)", 1360, 495),
+    ("YouTube Data API v3\n(videos, storyboard, captions)", 1360, 175),
+    ("Google Custom Search\n(Programmable Search)", 1360, 255),
+    ("Facebook — qua Google CSE\nsite:facebook.com (KHÔNG phải Graph API)", 1360, 335),
+    ("TikTok Research API\n(cần được duyệt)", 1360, 415),
+    ("Dailymotion — tìm kiếm công khai\n(miễn phí, không cần key)", 1360, 495),
+    ("Browser Extension\n(extension/check)", 1360, 575),
 ]
 ext_ids = []
 for txt, x, y in ext:
-    els += rect(x, y, 320, 60, txt, fill=C_WARNING, font=13)
+    els += rect(x, y, 320, 60, txt, fill=C_WARNING, font=11)
     ext_ids.append(f"n{_id - 1}")
 
 # arrows API band -> external (start at band right edge, end bound to ext box)
 els += arrow(1260, 370, 1340, 205, "", eb=(ext_ids[0], [0, 0.5]), dashed=True)
 els += arrow(1260, 390, 1340, 365, "", eb=(ext_ids[2], [0, 0.5]), dashed=True)
-els += arrow(1260, 410, 1340, 525, "", eb=(ext_ids[4], [0, 0.5]), dashed=True)
+els += arrow(1260, 400, 1340, 525, "", eb=(ext_ids[4], [0, 0.5]), dashed=True)
+els += arrow(1260, 410, 1340, 605, "", eb=(ext_ids[5], [0, 0.5]), dashed=True)
 save("01-tong-quan-kien-truc.excalidraw", els)
 
 # ================================================================ DIAGRAM 2
@@ -270,87 +277,108 @@ els += rect(1620, 1120, 260, 70, "throw 'Invalid credentials'\n→ /api/auth/err
 save("02-luong-xac-thuc.excalidraw", els)
 
 # ================================================================ DIAGRAM 3
+# v3 (08/2026): endpoint /api/check-url + /api/find-copies + /url-check +
+# /find-copies đã bị xoá — mọi link YouTube đi qua một cửa duy nhất
+# POST /api/scans/quick, luôn lưu kết quả (không còn nhánh "chỉ trả JSON").
 els = []
-els += title(80, 30, "LUỒNG QUÉT BẢN QUYỀN — QUICK SCAN & BATCH SCAN", 22)
+els += title(80, 30, "LUỒNG QUÉT BẢN QUYỀN — TRANG /scans (auto-detect + lưu kết quả)", 22)
+els += title(80, 66, "Một cửa duy nhất: POST /api/scans/quick — chi tiết findCopies() xem Hình 5", 13)
 
-els += rect(90, 110, 300, 70, "Ô 'Quét ngay'\nURL YouTube / domain /\ntên thương hiệu", fill=C_PRIMARY, font=13)
+els += rect(90, 110, 300, 70, "Ô 'Quét ngay' trên /scans\nURL YouTube / domain /\ntừ khóa thương hiệu", fill=C_PRIMARY, font=13)
 els += arrow(390, 145, 520, 145)
 els += rect(520, 110, 260, 70, "detectScanInput()\nphân loại assetType + name", fill=C_PROCESS, font=14)
 els += arrow(780, 145, 910, 145)
 els += diamond(910, 110, 170, 70, "Là URL\nYouTube?", font=13)
-els += arrow(1080, 145, 1210, 145, "có")
-els += rect(1210, 110, 330, 70, "findCopies(videoId, mode)\nfast: title/desc\ndeep: + transcript + media", fill=C_PROCESS, font=13)
-els += arrow(1540, 145, 1660, 145)
-els += rect(1660, 110, 300, 70, "Candidates YouTube\n(title, kênh, thumbnail)", fill=C_SUCCESS, font=14)
 
-# no branch
+# nhánh "có" — findCopies + Dailymotion + lưu kết quả (YouTube + Dailymotion)
+els += arrow(1080, 145, 1210, 145, "có")
+els += rect(1210, 100, 340, 90, "findCopies(videoId, mode)\n2 vòng search + storyboard\n+ transcript — xem Hình 5", fill=C_PROCESS, font=13)
+els += arrow(1380, 190, 1380, 260)
+els += rect(1210, 260, 340, 70, "+ Dailymotion song song nếu chọn\n(miễn phí, không tốn quota YouTube)", fill=C_PRIMARY, font=13)
+els += arrow(1380, 330, 1380, 400)
+els += rect(1210, 400, 340, 60, "Lọc riskScore >= 40, gộp 2 nguồn\nsort theo điểm giảm dần", fill=C_PROCESS, font=13)
+els += arrow(1380, 460, 1380, 530)
+els += rect(1210, 530, 340, 90, "persistFindCopiesResult()\nupsertAdhocAsset → createScanRun\n→ upsertFinding + createEvidenceItem", fill=C_SUCCESS, font=13)
+els += arrow(1380, 620, 1380, 690)
+els += rect(1190, 690, 380, 70, "Trả JSON: findings (đã lưu, có scanRunId)\n+ quotaUnits, frameChecked, dailymotionSearched", fill=C_SUCCESS, font=13)
+
+# nhánh "không" — quét theo tài sản đã lưu / từ khóa, KHÔNG đổi trong đợt rework
+# này: vẫn dùng scoreCandidate + ngưỡng riêng 22 (khác 40 của findCopies).
 els += arrow(995, 180, 995, 300, "không", color="#e03131", dashed=True)
-els += rect(850, 300, 290, 70, "Tạo mock BrandAsset\n(name, keywords, domains,\npHash từ file/thumbnail)", fill=C_PROCESS, font=13)
+els += rect(850, 300, 290, 70, "Tạo/khớp BrandAsset\n(name, keywords, domains,\npHash từ file/thumbnail)", fill=C_PROCESS, font=13)
 els += arrow(995, 370, 995, 470)
-els += rect(850, 470, 290, 70, "Lặp từng platform\nyoutube, google, facebook, tiktok", fill=C_PROCESS, font=14)
-els += arrow(995, 540, 995, 640)
-els += diamond(910, 640, 170, 70, "Adapter\nsẵn sàng?", font=13)
-els += arrow(910, 675, 760, 675, "chưa", color="#e03131")
-els += rect(540, 640, 220, 70, "Bỏ qua platform\n(ghi connector status)", fill=C_WARNING, font=13)
-els += arrow(995, 710, 995, 810, "có")
-els += rect(850, 810, 290, 70, "adapter.search(asset)\ncandidates từ nền tảng", fill=C_PRIMARY, font=14)
-els += arrow(995, 880, 995, 980)
-els += rect(850, 980, 290, 70, "scoreCandidate(asset, candidate)\nđiểm rủi ro + lý do", fill=C_PROCESS, font=14)
-els += arrow(995, 1050, 995, 1150)
-els += diamond(910, 1150, 170, 70, "riskScore\n>= 22?", font=13)
-els += arrow(910, 1185, 760, 1185, "không", color="#e03131")
-els += rect(540, 1150, 220, 70, "Loại bỏ candidate", fill=C_WARNING, font=13)
-els += arrow(995, 1220, 995, 1320, "có")
-els += rect(850, 1320, 290, 70, "Gom findings\nsort theo riskScore desc", fill=C_SUCCESS, font=14)
-els += arrow(995, 1390, 995, 1480)
-els += rect(790, 1480, 410, 60, "Trả JSON: findings + mode\n(youtube_fast_url / deep / quick_scan)", fill=C_SUCCESS, font=14)
+els += rect(850, 470, 290, 80, "Lặp từng platform\nyoutube, google, facebook,\ntiktok, dailymotion", fill=C_PROCESS, font=14)
+els += arrow(995, 550, 995, 650)
+els += diamond(910, 650, 170, 70, "Adapter\nsẵn sàng?", font=13)
+els += arrow(910, 685, 760, 685, "chưa", color="#e03131")
+els += rect(540, 650, 220, 70, "Bỏ qua platform\n(ghi connector status)", fill=C_WARNING, font=13)
+els += arrow(995, 720, 995, 820, "có")
+els += rect(850, 820, 290, 70, "adapter.search(asset)\ncandidates từ nền tảng", fill=C_PRIMARY, font=14)
+els += arrow(995, 890, 995, 990)
+els += rect(850, 990, 290, 80, "scoreCandidate(asset, candidate)\nđiểm theo hạng bằng chứng\n(weak/medium/strong)", fill=C_PROCESS, font=13)
+els += arrow(995, 1070, 995, 1170)
+els += diamond(910, 1170, 170, 70, "riskScore\n>= 22?", font=13)
+els += arrow(910, 1205, 760, 1205, "không", color="#e03131")
+els += rect(540, 1170, 220, 70, "Loại bỏ candidate", fill=C_WARNING, font=13)
+els += arrow(995, 1240, 995, 1340, "có")
+els += rect(850, 1340, 290, 70, "Gom findings\nsort theo riskScore desc", fill=C_SUCCESS, font=14)
+els += arrow(995, 1410, 995, 1500)
+els += rect(790, 1500, 410, 60, "Trả JSON: findings + mode\n(quét theo tài sản đã lưu)", fill=C_SUCCESS, font=14)
 
 # batch scan note
-els += band(1500, 300, 520, 260, "BATCH SCAN — /api/scans")
-els += rect(1520, 355, 480, 44, "runCopyrightScan()\ncreateScanRun → lặp adapters → score → upsertFinding", fill=C_PROCESS, font=12)
-els += rect(1520, 420, 480, 44, "createNotification khi có finding mới", fill=C_WARNING, font=12)
-els += rect(1520, 485, 480, 44, "updateScanRun('completed', connector status)", fill=C_DATA, font=12)
+els += band(1500, 940, 560, 260, "BATCH SCAN — /api/scans (không đổi trong đợt rework này)")
+els += rect(1520, 995, 520, 44, "runCopyrightScan()\ncreateScanRun → lặp adapters → score → upsertFinding", fill=C_PROCESS, font=12)
+els += rect(1520, 1060, 520, 44, "Ngưỡng riêng 22 — KHÁC ngưỡng 40 của findCopies", fill=C_WARNING, font=12)
+els += rect(1520, 1125, 520, 44, "updateScanRun('completed', connector status)", fill=C_DATA, font=12)
 save("03-luong-quet-ban-quyen.excalidraw", els)
 
 # ================================================================ DIAGRAM 4
+# v3 (08/2026): /api/check-url và /api/find-copies đã bị xoá. Đây là chi tiết
+# findCopies() thật đang chạy trong /api/scans/quick, cộng nhánh Dailymotion
+# chạy song song. Không còn nhánh "đối chiếu với tài sản đã lưu của tôi".
 els = []
-els += title(80, 30, "LUỒNG KIỂM TRA URL & TÌM BẢN SAO (YouTube)", 22)
+els += title(80, 30, "LUỒNG TÌM BẢN SAO — findCopies() (YouTube) + Dailymotion song song", 22)
+els += title(80, 66, "Chạy trong POST /api/scans/quick — thay thế /api/check-url + /api/find-copies (đã xoá)", 13)
 
-els += ellipse(90, 110, 140, 60, "Người dùng", font=15)
-els += arrow(230, 140, 360, 140, "dán link YouTube")
-els += rect(360, 110, 260, 60, "POST /api/check-url\n{url}", fill=C_PRIMARY, font=14)
-els += arrow(620, 140, 750, 140)
-els += rect(750, 110, 280, 60, "extractYouTubeVideoId()\nwatch / youtu.be / shorts / embed", fill=C_PROCESS, font=12)
-els += arrow(1030, 140, 1160, 140)
-els += diamond(1160, 110, 160, 70, "Có\nvideoId?", font=13)
-els += arrow(1160, 180, 1160, 300, "không", color="#e03131", dashed=True)
-els += rect(1040, 300, 240, 56, "400 invalid_url", fill=C_ERROR, font=13)
+els += rect(90, 110, 300, 70, "POST /api/scans/quick\nFormData {url, mode, platforms}", fill=C_PRIMARY, font=13)
+els += arrow(390, 145, 520, 145)
+els += rect(520, 110, 280, 70, "extractYouTubeVideoId()\nwatch / youtu.be / shorts / embed", fill=C_PROCESS, font=12)
+els += arrow(800, 145, 930, 145)
+els += diamond(930, 110, 160, 70, "Có\nvideoId?", font=13)
+els += arrow(930, 180, 930, 280, "không", color="#e03131", dashed=True)
+els += rect(810, 280, 240, 56, "400 invalid_url", fill=C_ERROR, font=13)
 
-els += arrow(1320, 145, 1450, 145, "có")
-els += rect(1450, 110, 290, 70, "findActiveAssetsByIds()\ntài sản active của user", fill=C_DATA, font=13)
-els += arrow(1595, 180, 1595, 300)
-els += diamond(1510, 300, 170, 70, "Có tài\nsản?", font=13)
-els += arrow(1510, 370, 1510, 480, "không", color="#e03131", dashed=True)
-els += rect(1370, 480, 280, 56, "400 no_assets", fill=C_ERROR, font=13)
+els += arrow(1090, 145, 1220, 145, "có")
+els += rect(1220, 100, 320, 90, "fetchYouTubeVideoById()\n+ storyboard hash (innertube, free)\n+ thumbnail pHash", fill=C_PROCESS, font=13)
+els += arrow(1380, 190, 1380, 260)
+els += rect(1220, 260, 320, 70, "search.list vòng 1 (100 units)\ntheo tiêu đề + tags → tối đa 50 candidates", fill=C_PRIMARY, font=13)
+els += arrow(1380, 330, 1380, 400)
+els += diamond(1300, 400, 160, 80, "Điểm cao\nnhất < 45?", font=13)
+els += arrow(1460, 430, 1620, 430, "có")
+els += rect(1620, 395, 340, 90, "Trích cụm từ transcript đặc trưng\n→ search.list vòng 2 (+100 units)\ngộp candidate mới vào danh sách", fill=C_WARNING, font=12)
+els += arrow(1380, 480, 1380, 560, "không\n(tiết kiệm quota)", color="#e03131")
 
-els += arrow(1595, 300, 1740, 300, "có", dashed=True)
-els += rect(1740, 270, 300, 70, "fetchYouTubeVideoById()\n+ thumbnail pHash nếu cần", fill=C_PROCESS, font=12)
-els += arrow(1890, 340, 1890, 450)
-els += rect(1740, 450, 300, 70, "scoreCandidate() với TỪNG asset", fill=C_PROCESS, font=14)
-els += arrow(1890, 520, 1890, 630)
-els += diamond(1800, 630, 180, 70, "riskScore\n>= 30?", font=13)
-els += arrow(1800, 700, 1590, 940, "không", color="#e03131", dashed=True)
-els += rect(1440, 940, 300, 60, "Chỉ trả thông tin video\n(không tạo finding)", fill=C_WARNING, font=12)
-els += arrow(1890, 700, 1890, 820, "có")
-els += rect(1740, 820, 300, 70, "createScanRun → upsertFinding\n→ createEvidenceItem (snapshot)", fill=C_SUCCESS, font=12)
-els += arrow(1890, 890, 1890, 1000)
-els += rect(1740, 1000, 300, 70, "updateScanRun completed\n+ createNotification(url_check_match)", fill=C_SUCCESS, font=12)
+els += rect(1220, 560, 320, 80, "scoreCandidate mỗi ứng viên\ntitle/tag/mô tả/thumbnail\n(hạng weak ≤35 / medium ≤70)", fill=C_PROCESS, font=12)
+els += arrow(1380, 640, 1380, 720)
+els += rect(1220, 720, 320, 90, "So khung hình qua storyboard\n(top 8, coverage >= 10%)\n→ video_frame_match (hạng strong = 100)", fill=C_SUCCESS, font=12)
+els += arrow(1380, 810, 1380, 890)
+els += diamond(1300, 890, 160, 80, "riskScore\n>= 40?", font=13)
+els += arrow(1460, 920, 1620, 920, "không")
+els += rect(1620, 890, 260, 60, "Loại khỏi kết quả", fill=C_WARNING, font=13)
+els += arrow(1380, 970, 1380, 1050, "có")
+els += rect(1220, 1050, 320, 90, "persistFindCopiesResult()\nupsertAdhocAsset + createScanRun\n+ upsertFinding + createEvidenceItem", fill=C_SUCCESS, font=12)
 
-# find-copies note
-els += band(360, 560, 560, 240, "FIND COPIES — POST /api/find-copies")
-els += rect(380, 615, 520, 44, "videoId → findCopies(videoId, {deepMediaCheck})", fill=C_PROCESS, font=13)
-els += rect(380, 680, 520, 44, "fast: title/desc — deep: + transcript (transcriptFetcher)", fill=C_PROCESS, font=12)
-els += rect(380, 745, 520, 44, "+ mediaDeepCheck: so khớp thumbnail/audio từng candidate", fill=C_PROCESS, font=12)
+# Dailymotion — song song, miễn phí
+els += band(90, 400, 1000, 340, "DAILYMOTION — song song, MIỄN PHÍ, không cần API key/quota")
+els += rect(120, 460, 460, 60, "findDailymotionCopies(title, thumbnailHash,\nduration) — từ dữ liệu findCopies vừa lấy", fill=C_PRIMARY, font=12)
+els += arrow(350, 520, 350, 580)
+els += rect(120, 580, 460, 56, "Tìm kiếm công khai, không tính phí\n→ tối đa 30 candidates", fill=C_PROCESS, font=12)
+els += arrow(350, 636, 350, 690)
+els += rect(120, 690, 460, 72, "scoreCandidate: title + thumbnail pHash\n(không có storyboard → trần hạng medium 70)\nđã tự lọc riskScore >= 40 bên trong", fill=C_PROCESS, font=12)
+els += arrow(600, 726, 1220, 1095, "gộp trước khi lưu", sb=None)
+
+els += arrow(1380, 1140, 1380, 1220)
+els += rect(1000, 1220, 760, 70, "Trả JSON: findings YouTube + Dailymotion (đã gộp, sort)\n+ scanRunId, quotaUnits, frameChecked, transcriptChecked, dailymotionSearched", fill=C_SUCCESS, font=13)
 save("04-luong-url-check-find-copies.excalidraw", els)
 
 # ================================================================ DIAGRAM 5 — MÔ HÌNH DỮ LIỆU (ERD)
@@ -390,7 +418,9 @@ els += acc_els
 acc_els, ba_box = entity(80, 300, 300, "brand_assets", [
     "id PK, user_id FK",
     "name, asset_type", "keywords[], official_domains[]",
-    "file_hash, perceptual_hash", "audio_metadata, status"
+    "file_hash, perceptual_hash", "audio_metadata, status",
+    "origin ('user'/'adhoc'), source_url",
+    "UNIQUE(user_id, source_url) WHERE NOT NULL"
 ])
 els += acc_els
 
@@ -426,7 +456,8 @@ acc_els, fi_box = entity(200, 560, 400, "findings", [
 els += acc_els
 
 acc_els, ev_box = entity(200, 830, 400, "evidence_items", [
-    "id PK, finding_id FK", "evidence_type, excerpt", "metadata, thumbnail_url", "file_hash, fetched_at"
+    "id PK, finding_id FK", "evidence_type, excerpt", "metadata, thumbnail_url", "file_hash, fetched_at",
+    "UNIQUE(finding_id, evidence_type) — upsert, không nhân bản"
 ])
 els += acc_els
 
@@ -456,9 +487,10 @@ els += edge(ba_box, fi_box, "1—N (asset_id)")
 els += edge(sr_box, fi_box, "1—N (scan_run_id)")
 els += edge(fi_box, ev_box, "1—N (finding_id)")
 
-els += band(700, 830, 660, 130, "GHI CHÚ INDEXES")
+els += band(700, 830, 660, 170, "GHI CHÚ INDEXES")
 els += rect(720, 875, 620, 34, "idx_brand_assets_user_id, idx_scan_runs_user_id, idx_findings_user_id/asset_id", fill=C_BAND, font=11)
 els += rect(720, 915, 620, 34, "idx_evidence_items_finding_id, idx_notifications_user_id(created_at DESC)", fill=C_BAND, font=11)
+els += rect(720, 955, 620, 34, "idx_brand_assets_source (mới) — cho phép upsert asset ad-hoc theo URL", fill=C_BAND, font=11)
 save("05-mo-hinh-du-lieu-erd.excalidraw", els)
 
 # ================================================================ DIAGRAM 6

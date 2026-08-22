@@ -5,23 +5,39 @@
  "elements": [
   {
    "type": "text",
-   "id": "n145",
+   "id": "n149",
    "x": 80,
    "y": 30,
-   "width": 556.6,
+   "width": 762.3000000000001,
    "height": 26.4,
-   "text": "LUỒNG QUÉT BẢN QUYỀN — QUICK SCAN & BATCH SCAN",
+   "text": "LUỒNG QUÉT BẢN QUYỀN — TRANG /scans (auto-detect + lưu kết quả)",
    "fontSize": 22,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "left",
    "verticalAlign": "top",
-   "originalText": "LUỒNG QUÉT BẢN QUYỀN — QUICK SCAN & BATCH SCAN",
+   "originalText": "LUỒNG QUÉT BẢN QUYỀN — TRANG /scans (auto-detect + lưu kết quả)",
+   "autoResize": true
+  },
+  {
+   "type": "text",
+   "id": "n150",
+   "x": 80,
+   "y": 66,
+   "width": 529.1,
+   "height": 15.6,
+   "text": "Một cửa duy nhất: POST /api/scans/quick — chi tiết findCopies() xem Hình 5",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "left",
+   "verticalAlign": "top",
+   "originalText": "Một cửa duy nhất: POST /api/scans/quick — chi tiết findCopies() xem Hình 5",
    "autoResize": true
   },
   {
    "type": "rectangle",
-   "id": "n146",
+   "id": "n151",
    "x": 90,
    "y": 110,
    "width": 300,
@@ -37,31 +53,31 @@
    },
    "boundElements": [
     {
-     "id": "n147",
+     "id": "n152",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n147",
-   "x": 157.35,
+   "id": "n152",
+   "x": 146.625,
    "y": 118.625,
-   "width": 165.3,
+   "width": 186.75000000000003,
    "height": 52.75,
-   "text": "Ô 'Quét ngay'\nURL YouTube / domain /\ntên thương hiệu",
+   "text": "Ô 'Quét ngay' trên /scans\nURL YouTube / domain /\ntừ khóa thương hiệu",
    "fontSize": 13,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "center",
    "verticalAlign": "middle",
-   "originalText": "Ô 'Quét ngay'\nURL YouTube / domain /\ntên thương hiệu",
+   "originalText": "Ô 'Quét ngay' trên /scans\nURL YouTube / domain /\ntừ khóa thương hiệu",
    "autoResize": true,
-   "containerId": "n146"
+   "containerId": "n151"
   },
   {
    "type": "arrow",
-   "id": "n148",
+   "id": "n153",
    "x": 390,
    "y": 145,
    "width": 130,
@@ -86,7 +102,7 @@
   },
   {
    "type": "rectangle",
-   "id": "n150",
+   "id": "n155",
    "x": 520,
    "y": 110,
    "width": 260,
@@ -102,14 +118,14 @@
    },
    "boundElements": [
     {
-     "id": "n151",
+     "id": "n156",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n151",
+   "id": "n156",
    "x": 545.9,
    "y": 125.5,
    "width": 208.20000000000002,
@@ -122,11 +138,11 @@
    "verticalAlign": "middle",
    "originalText": "detectScanInput()\nphân loại assetType + name",
    "autoResize": true,
-   "containerId": "n150"
+   "containerId": "n155"
   },
   {
    "type": "arrow",
-   "id": "n152",
+   "id": "n157",
    "x": 780,
    "y": 145,
    "width": 130,
@@ -151,7 +167,7 @@
   },
   {
    "type": "diamond",
-   "id": "n154",
+   "id": "n159",
    "x": 910,
    "y": 110,
    "width": 170,
@@ -164,14 +180,14 @@
    "opacity": 100,
    "boundElements": [
     {
-     "id": "n155",
+     "id": "n160",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n155",
+   "id": "n160",
    "x": 962.4,
    "y": 126.75,
    "width": 65.2,
@@ -184,11 +200,11 @@
    "verticalAlign": "middle",
    "originalText": "Là URL\nYouTube?",
    "autoResize": true,
-   "containerId": "n154"
+   "containerId": "n159"
   },
   {
    "type": "arrow",
-   "id": "n156",
+   "id": "n161",
    "x": 1080,
    "y": 145,
    "width": 130,
@@ -213,7 +229,7 @@
   },
   {
    "type": "text",
-   "id": "n157",
+   "id": "n162",
    "x": 1133.85,
    "y": 111.0,
    "width": 22.3,
@@ -229,11 +245,11 @@
   },
   {
    "type": "rectangle",
-   "id": "n158",
+   "id": "n163",
    "x": 1210,
-   "y": 110,
-   "width": 330,
-   "height": 70,
+   "y": 100,
+   "width": 340,
+   "height": 90,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "#d0bfff",
    "fillStyle": "solid",
@@ -245,35 +261,35 @@
    },
    "boundElements": [
     {
-     "id": "n159",
+     "id": "n164",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n159",
-   "x": 1278.05,
+   "id": "n164",
+   "x": 1283.05,
    "y": 118.625,
    "width": 193.9,
    "height": 52.75,
-   "text": "findCopies(videoId, mode)\nfast: title/desc\ndeep: + transcript + media",
+   "text": "findCopies(videoId, mode)\n2 vòng search + storyboard\n+ transcript — xem Hình 5",
    "fontSize": 13,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "center",
    "verticalAlign": "middle",
-   "originalText": "findCopies(videoId, mode)\nfast: title/desc\ndeep: + transcript + media",
+   "originalText": "findCopies(videoId, mode)\n2 vòng search + storyboard\n+ transcript — xem Hình 5",
    "autoResize": true,
-   "containerId": "n158"
+   "containerId": "n163"
   },
   {
    "type": "arrow",
-   "id": "n160",
-   "x": 1540,
-   "y": 145,
-   "width": 120,
-   "height": 0,
+   "id": "n165",
+   "x": 1380,
+   "y": 190,
+   "width": 0,
+   "height": 70,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "transparent",
    "fillStyle": "solid",
@@ -286,18 +302,213 @@
      0
     ],
     [
-     120,
-     0
+     0,
+     70
     ]
    ],
    "endArrowhead": "arrow"
   },
   {
    "type": "rectangle",
-   "id": "n162",
-   "x": 1660,
-   "y": 110,
-   "width": 300,
+   "id": "n167",
+   "x": 1210,
+   "y": 260,
+   "width": 340,
+   "height": 70,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#a5d8ff",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n168",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n168",
+   "x": 1250.875,
+   "y": 276.75,
+   "width": 258.25,
+   "height": 36.5,
+   "text": "+ Dailymotion song song nếu chọn\n(miễn phí, không tốn quota YouTube)",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "+ Dailymotion song song nếu chọn\n(miễn phí, không tốn quota YouTube)",
+   "autoResize": true,
+   "containerId": "n167"
+  },
+  {
+   "type": "arrow",
+   "id": "n169",
+   "x": 1380,
+   "y": 330,
+   "width": 0,
+   "height": 70,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     70
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "rectangle",
+   "id": "n171",
+   "x": 1210,
+   "y": 400,
+   "width": 340,
+   "height": 60,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#d0bfff",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n172",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n172",
+   "x": 1261.6,
+   "y": 411.75,
+   "width": 236.8,
+   "height": 36.5,
+   "text": "Lọc riskScore >= 40, gộp 2 nguồn\nsort theo điểm giảm dần",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "Lọc riskScore >= 40, gộp 2 nguồn\nsort theo điểm giảm dần",
+   "autoResize": true,
+   "containerId": "n171"
+  },
+  {
+   "type": "arrow",
+   "id": "n173",
+   "x": 1380,
+   "y": 460,
+   "width": 0,
+   "height": 70,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     70
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "rectangle",
+   "id": "n175",
+   "x": 1210,
+   "y": 530,
+   "width": 340,
+   "height": 90,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "#b2f2bb",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 0,
+   "opacity": 100,
+   "roundness": {
+    "type": 3
+   },
+   "boundElements": [
+    {
+     "id": "n176",
+     "type": "text"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "id": "n176",
+   "x": 1247.3,
+   "y": 548.625,
+   "width": 265.40000000000003,
+   "height": 52.75,
+   "text": "persistFindCopiesResult()\nupsertAdhocAsset → createScanRun\n→ upsertFinding + createEvidenceItem",
+   "fontSize": 13,
+   "fontFamily": 2,
+   "strokeColor": "#1e1e1e",
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "originalText": "persistFindCopiesResult()\nupsertAdhocAsset → createScanRun\n→ upsertFinding + createEvidenceItem",
+   "autoResize": true,
+   "containerId": "n175"
+  },
+  {
+   "type": "arrow",
+   "id": "n177",
+   "x": 1380,
+   "y": 620,
+   "width": 0,
+   "height": 70,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "strokeWidth": 2,
+   "roughness": 1,
+   "opacity": 100,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     70
+    ]
+   ],
+   "endArrowhead": "arrow"
+  },
+  {
+   "type": "rectangle",
+   "id": "n179",
+   "x": 1190,
+   "y": 690,
+   "width": 380,
    "height": 70,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "#b2f2bb",
@@ -310,31 +521,31 @@
    },
    "boundElements": [
     {
-     "id": "n163",
+     "id": "n180",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n163",
-   "x": 1713.6,
-   "y": 125.5,
-   "width": 192.8,
-   "height": 39.0,
-   "text": "Candidates YouTube\n(title, kênh, thumbnail)",
-   "fontSize": 14,
+   "id": "n180",
+   "x": 1207.975,
+   "y": 706.75,
+   "width": 344.05,
+   "height": 36.5,
+   "text": "Trả JSON: findings (đã lưu, có scanRunId)\n+ quotaUnits, frameChecked, dailymotionSearched",
+   "fontSize": 13,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "center",
    "verticalAlign": "middle",
-   "originalText": "Candidates YouTube\n(title, kênh, thumbnail)",
+   "originalText": "Trả JSON: findings (đã lưu, có scanRunId)\n+ quotaUnits, frameChecked, dailymotionSearched",
    "autoResize": true,
-   "containerId": "n162"
+   "containerId": "n179"
   },
   {
    "type": "arrow",
-   "id": "n164",
+   "id": "n181",
    "x": 995,
    "y": 180,
    "width": 0,
@@ -360,7 +571,7 @@
   },
   {
    "type": "text",
-   "id": "n165",
+   "id": "n182",
    "x": 941.25,
    "y": 230.0,
    "width": 43.75,
@@ -376,7 +587,7 @@
   },
   {
    "type": "rectangle",
-   "id": "n166",
+   "id": "n183",
    "x": 850,
    "y": 300,
    "width": 290,
@@ -392,31 +603,31 @@
    },
    "boundElements": [
     {
-     "id": "n167",
+     "id": "n184",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n167",
+   "id": "n184",
    "x": 901.625,
    "y": 308.625,
    "width": 186.75000000000003,
    "height": 52.75,
-   "text": "Tạo mock BrandAsset\n(name, keywords, domains,\npHash từ file/thumbnail)",
+   "text": "Tạo/khớp BrandAsset\n(name, keywords, domains,\npHash từ file/thumbnail)",
    "fontSize": 13,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "center",
    "verticalAlign": "middle",
-   "originalText": "Tạo mock BrandAsset\n(name, keywords, domains,\npHash từ file/thumbnail)",
+   "originalText": "Tạo/khớp BrandAsset\n(name, keywords, domains,\npHash từ file/thumbnail)",
    "autoResize": true,
-   "containerId": "n166"
+   "containerId": "n183"
   },
   {
    "type": "arrow",
-   "id": "n168",
+   "id": "n185",
    "x": 995,
    "y": 370,
    "width": 0,
@@ -441,11 +652,11 @@
   },
   {
    "type": "rectangle",
-   "id": "n170",
+   "id": "n187",
    "x": 850,
    "y": 470,
    "width": 290,
-   "height": 70,
+   "height": 80,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "#d0bfff",
    "fillStyle": "solid",
@@ -457,33 +668,33 @@
    },
    "boundElements": [
     {
-     "id": "n171",
+     "id": "n188",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n171",
-   "x": 863.95,
-   "y": 485.5,
-   "width": 262.1,
-   "height": 39.0,
-   "text": "Lặp từng platform\nyoutube, google, facebook, tiktok",
+   "id": "n188",
+   "x": 890.9,
+   "y": 481.75,
+   "width": 208.20000000000002,
+   "height": 56.5,
+   "text": "Lặp từng platform\nyoutube, google, facebook,\ntiktok, dailymotion",
    "fontSize": 14,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "center",
    "verticalAlign": "middle",
-   "originalText": "Lặp từng platform\nyoutube, google, facebook, tiktok",
+   "originalText": "Lặp từng platform\nyoutube, google, facebook,\ntiktok, dailymotion",
    "autoResize": true,
-   "containerId": "n170"
+   "containerId": "n187"
   },
   {
    "type": "arrow",
-   "id": "n172",
+   "id": "n189",
    "x": 995,
-   "y": 540,
+   "y": 550,
    "width": 0,
    "height": 100,
    "strokeColor": "#1e1e1e",
@@ -506,9 +717,9 @@
   },
   {
    "type": "diamond",
-   "id": "n174",
+   "id": "n191",
    "x": 910,
-   "y": 640,
+   "y": 650,
    "width": 170,
    "height": 70,
    "strokeColor": "#1e1e1e",
@@ -519,16 +730,16 @@
    "opacity": 100,
    "boundElements": [
     {
-     "id": "n175",
+     "id": "n192",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n175",
+   "id": "n192",
    "x": 958.825,
-   "y": 656.75,
+   "y": 666.75,
    "width": 72.35000000000001,
    "height": 36.5,
    "text": "Adapter\nsẵn sàng?",
@@ -539,13 +750,13 @@
    "verticalAlign": "middle",
    "originalText": "Adapter\nsẵn sàng?",
    "autoResize": true,
-   "containerId": "n174"
+   "containerId": "n191"
   },
   {
    "type": "arrow",
-   "id": "n176",
+   "id": "n193",
    "x": 910,
-   "y": 675,
+   "y": 685,
    "width": -150,
    "height": 0,
    "strokeColor": "#e03131",
@@ -568,9 +779,9 @@
   },
   {
    "type": "text",
-   "id": "n177",
+   "id": "n194",
    "x": 816.7,
-   "y": 641.0,
+   "y": 651.0,
    "width": 36.6,
    "height": 20,
    "text": "chưa",
@@ -584,9 +795,9 @@
   },
   {
    "type": "rectangle",
-   "id": "n178",
+   "id": "n195",
    "x": 540,
-   "y": 640,
+   "y": 650,
    "width": 220,
    "height": 70,
    "strokeColor": "#1e1e1e",
@@ -600,16 +811,16 @@
    },
    "boundElements": [
     {
-     "id": "n179",
+     "id": "n196",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n179",
+   "id": "n196",
    "x": 567.35,
-   "y": 656.75,
+   "y": 666.75,
    "width": 165.3,
    "height": 36.5,
    "text": "Bỏ qua platform\n(ghi connector status)",
@@ -620,13 +831,13 @@
    "verticalAlign": "middle",
    "originalText": "Bỏ qua platform\n(ghi connector status)",
    "autoResize": true,
-   "containerId": "n178"
+   "containerId": "n195"
   },
   {
    "type": "arrow",
-   "id": "n180",
+   "id": "n197",
    "x": 995,
-   "y": 710,
+   "y": 720,
    "width": 0,
    "height": 100,
    "strokeColor": "#1e1e1e",
@@ -649,9 +860,9 @@
   },
   {
    "type": "text",
-   "id": "n181",
+   "id": "n198",
    "x": 962.7,
-   "y": 750.0,
+   "y": 760.0,
    "width": 22.3,
    "height": 20,
    "text": "có",
@@ -665,9 +876,9 @@
   },
   {
    "type": "rectangle",
-   "id": "n182",
+   "id": "n199",
    "x": 850,
-   "y": 810,
+   "y": 820,
    "width": 290,
    "height": 70,
    "strokeColor": "#1e1e1e",
@@ -681,16 +892,16 @@
    },
    "boundElements": [
     {
-     "id": "n183",
+     "id": "n200",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n183",
+   "id": "n200",
    "x": 906.3,
-   "y": 825.5,
+   "y": 835.5,
    "width": 177.4,
    "height": 39.0,
    "text": "adapter.search(asset)\ncandidates từ nền tảng",
@@ -701,13 +912,13 @@
    "verticalAlign": "middle",
    "originalText": "adapter.search(asset)\ncandidates từ nền tảng",
    "autoResize": true,
-   "containerId": "n182"
+   "containerId": "n199"
   },
   {
    "type": "arrow",
-   "id": "n184",
+   "id": "n201",
    "x": 995,
-   "y": 880,
+   "y": 890,
    "width": 0,
    "height": 100,
    "strokeColor": "#1e1e1e",
@@ -730,11 +941,11 @@
   },
   {
    "type": "rectangle",
-   "id": "n186",
+   "id": "n203",
    "x": 850,
-   "y": 980,
+   "y": 990,
    "width": 290,
-   "height": 70,
+   "height": 80,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "#d0bfff",
    "fillStyle": "solid",
@@ -746,33 +957,33 @@
    },
    "boundElements": [
     {
-     "id": "n187",
+     "id": "n204",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n187",
-   "x": 867.8,
-   "y": 995.5,
-   "width": 254.40000000000003,
-   "height": 39.0,
-   "text": "scoreCandidate(asset, candidate)\nđiểm rủi ro + lý do",
-   "fontSize": 14,
+   "id": "n204",
+   "x": 876.6,
+   "y": 1003.625,
+   "width": 236.8,
+   "height": 52.75,
+   "text": "scoreCandidate(asset, candidate)\nđiểm theo hạng bằng chứng\n(weak/medium/strong)",
+   "fontSize": 13,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "center",
    "verticalAlign": "middle",
-   "originalText": "scoreCandidate(asset, candidate)\nđiểm rủi ro + lý do",
+   "originalText": "scoreCandidate(asset, candidate)\nđiểm theo hạng bằng chứng\n(weak/medium/strong)",
    "autoResize": true,
-   "containerId": "n186"
+   "containerId": "n203"
   },
   {
    "type": "arrow",
-   "id": "n188",
+   "id": "n205",
    "x": 995,
-   "y": 1050,
+   "y": 1070,
    "width": 0,
    "height": 100,
    "strokeColor": "#1e1e1e",
@@ -795,9 +1006,9 @@
   },
   {
    "type": "diamond",
-   "id": "n190",
+   "id": "n207",
    "x": 910,
-   "y": 1150,
+   "y": 1170,
    "width": 170,
    "height": 70,
    "strokeColor": "#1e1e1e",
@@ -808,16 +1019,16 @@
    "opacity": 100,
    "boundElements": [
     {
-     "id": "n191",
+     "id": "n208",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n191",
+   "id": "n208",
    "x": 958.825,
-   "y": 1166.75,
+   "y": 1186.75,
    "width": 72.35000000000001,
    "height": 36.5,
    "text": "riskScore\n>= 22?",
@@ -828,13 +1039,13 @@
    "verticalAlign": "middle",
    "originalText": "riskScore\n>= 22?",
    "autoResize": true,
-   "containerId": "n190"
+   "containerId": "n207"
   },
   {
    "type": "arrow",
-   "id": "n192",
+   "id": "n209",
    "x": 910,
-   "y": 1185,
+   "y": 1205,
    "width": -150,
    "height": 0,
    "strokeColor": "#e03131",
@@ -857,9 +1068,9 @@
   },
   {
    "type": "text",
-   "id": "n193",
+   "id": "n210",
    "x": 813.125,
-   "y": 1151.0,
+   "y": 1171.0,
    "width": 43.75,
    "height": 20,
    "text": "không",
@@ -873,9 +1084,9 @@
   },
   {
    "type": "rectangle",
-   "id": "n194",
+   "id": "n211",
    "x": 540,
-   "y": 1150,
+   "y": 1170,
    "width": 220,
    "height": 70,
    "strokeColor": "#1e1e1e",
@@ -889,16 +1100,16 @@
    },
    "boundElements": [
     {
-     "id": "n195",
+     "id": "n212",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n195",
+   "id": "n212",
    "x": 585.225,
-   "y": 1174.875,
+   "y": 1194.875,
    "width": 129.55,
    "height": 20.25,
    "text": "Loại bỏ candidate",
@@ -909,13 +1120,13 @@
    "verticalAlign": "middle",
    "originalText": "Loại bỏ candidate",
    "autoResize": true,
-   "containerId": "n194"
+   "containerId": "n211"
   },
   {
    "type": "arrow",
-   "id": "n196",
+   "id": "n213",
    "x": 995,
-   "y": 1220,
+   "y": 1240,
    "width": 0,
    "height": 100,
    "strokeColor": "#1e1e1e",
@@ -938,9 +1149,9 @@
   },
   {
    "type": "text",
-   "id": "n197",
+   "id": "n214",
    "x": 962.7,
-   "y": 1260.0,
+   "y": 1280.0,
    "width": 22.3,
    "height": 20,
    "text": "có",
@@ -954,9 +1165,9 @@
   },
   {
    "type": "rectangle",
-   "id": "n198",
+   "id": "n215",
    "x": 850,
-   "y": 1320,
+   "y": 1340,
    "width": 290,
    "height": 70,
    "strokeColor": "#1e1e1e",
@@ -970,16 +1181,16 @@
    },
    "boundElements": [
     {
-     "id": "n199",
+     "id": "n216",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n199",
+   "id": "n216",
    "x": 898.6,
-   "y": 1335.5,
+   "y": 1355.5,
    "width": 192.8,
    "height": 39.0,
    "text": "Gom findings\nsort theo riskScore desc",
@@ -990,13 +1201,13 @@
    "verticalAlign": "middle",
    "originalText": "Gom findings\nsort theo riskScore desc",
    "autoResize": true,
-   "containerId": "n198"
+   "containerId": "n215"
   },
   {
    "type": "arrow",
-   "id": "n200",
+   "id": "n217",
    "x": 995,
-   "y": 1390,
+   "y": 1410,
    "width": 0,
    "height": 90,
    "strokeColor": "#1e1e1e",
@@ -1019,9 +1230,9 @@
   },
   {
    "type": "rectangle",
-   "id": "n202",
+   "id": "n219",
    "x": 790,
-   "y": 1480,
+   "y": 1500,
    "width": 410,
    "height": 60,
    "strokeColor": "#1e1e1e",
@@ -1035,34 +1246,34 @@
    },
    "boundElements": [
     {
-     "id": "n203",
+     "id": "n220",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n203",
-   "x": 844.7,
-   "y": 1490.5,
-   "width": 300.6,
+   "id": "n220",
+   "x": 890.9,
+   "y": 1510.5,
+   "width": 208.20000000000002,
    "height": 39.0,
-   "text": "Trả JSON: findings + mode\n(youtube_fast_url / deep / quick_scan)",
+   "text": "Trả JSON: findings + mode\n(quét theo tài sản đã lưu)",
    "fontSize": 14,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "center",
    "verticalAlign": "middle",
-   "originalText": "Trả JSON: findings + mode\n(youtube_fast_url / deep / quick_scan)",
+   "originalText": "Trả JSON: findings + mode\n(quét theo tài sản đã lưu)",
    "autoResize": true,
-   "containerId": "n202"
+   "containerId": "n219"
   },
   {
    "type": "rectangle",
-   "id": "n204",
+   "id": "n221",
    "x": 1500,
-   "y": 300,
-   "width": 520,
+   "y": 940,
+   "width": 560,
    "height": 260,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "#f8f9fa",
@@ -1075,7 +1286,7 @@
    },
    "boundElements": [
     {
-     "id": "n205",
+     "id": "n222",
      "type": "text"
     }
    ],
@@ -1083,9 +1294,9 @@
   },
   {
    "type": "text",
-   "id": "n205",
-   "x": 1756.0,
-   "y": 418.625,
+   "id": "n222",
+   "x": 1776.0,
+   "y": 1058.625,
    "width": 10,
    "height": 22.75,
    "text": "",
@@ -1096,30 +1307,30 @@
    "verticalAlign": "middle",
    "originalText": "",
    "autoResize": true,
-   "containerId": "n204"
+   "containerId": "n221"
   },
   {
    "type": "text",
-   "id": "n206",
+   "id": "n223",
    "x": 1514,
-   "y": 308,
-   "width": 368,
+   "y": 948,
+   "width": 896,
    "height": 22,
-   "text": "BATCH SCAN — /api/scans",
+   "text": "BATCH SCAN — /api/scans (không đổi trong đợt rework này)",
    "fontSize": 15,
    "fontFamily": 2,
    "strokeColor": "#495057",
    "textAlign": "left",
    "verticalAlign": "top",
-   "originalText": "BATCH SCAN — /api/scans",
+   "originalText": "BATCH SCAN — /api/scans (không đổi trong đợt rework này)",
    "autoResize": true
   },
   {
    "type": "rectangle",
-   "id": "n207",
+   "id": "n224",
    "x": 1520,
-   "y": 355,
-   "width": 480,
+   "y": 995,
+   "width": 520,
    "height": 44,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "#d0bfff",
@@ -1132,16 +1343,16 @@
    },
    "boundElements": [
     {
-     "id": "n208",
+     "id": "n225",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n208",
-   "x": 1584.4,
-   "y": 360.0,
+   "id": "n225",
+   "x": 1604.4,
+   "y": 1000.0,
    "width": 351.20000000000005,
    "height": 34.0,
    "text": "runCopyrightScan()\ncreateScanRun → lặp adapters → score → upsertFinding",
@@ -1152,14 +1363,14 @@
    "verticalAlign": "middle",
    "originalText": "runCopyrightScan()\ncreateScanRun → lặp adapters → score → upsertFinding",
    "autoResize": true,
-   "containerId": "n207"
+   "containerId": "n224"
   },
   {
    "type": "rectangle",
-   "id": "n209",
+   "id": "n226",
    "x": 1520,
-   "y": 420,
-   "width": 480,
+   "y": 1060,
+   "width": 520,
    "height": 44,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "#ffd8a8",
@@ -1172,34 +1383,34 @@
    },
    "boundElements": [
     {
-     "id": "n210",
+     "id": "n227",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n210",
-   "x": 1633.9,
-   "y": 432.5,
-   "width": 252.20000000000002,
+   "id": "n227",
+   "x": 1620.9,
+   "y": 1072.5,
+   "width": 318.20000000000005,
    "height": 19.0,
-   "text": "createNotification khi có finding mới",
+   "text": "Ngưỡng riêng 22 — KHÁC ngưỡng 40 của findCopies",
    "fontSize": 12,
    "fontFamily": 2,
    "strokeColor": "#1e1e1e",
    "textAlign": "center",
    "verticalAlign": "middle",
-   "originalText": "createNotification khi có finding mới",
+   "originalText": "Ngưỡng riêng 22 — KHÁC ngưỡng 40 của findCopies",
    "autoResize": true,
-   "containerId": "n209"
+   "containerId": "n226"
   },
   {
    "type": "rectangle",
-   "id": "n211",
+   "id": "n228",
    "x": 1520,
-   "y": 485,
-   "width": 480,
+   "y": 1125,
+   "width": 520,
    "height": 44,
    "strokeColor": "#1e1e1e",
    "backgroundColor": "#c3fae8",
@@ -1212,16 +1423,16 @@
    },
    "boundElements": [
     {
-     "id": "n212",
+     "id": "n229",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n212",
-   "x": 1610.8,
-   "y": 497.5,
+   "id": "n229",
+   "x": 1630.8,
+   "y": 1137.5,
    "width": 298.40000000000003,
    "height": 19.0,
    "text": "updateScanRun('completed', connector status)",
@@ -1232,7 +1443,7 @@
    "verticalAlign": "middle",
    "originalText": "updateScanRun('completed', connector status)",
    "autoResize": true,
-   "containerId": "n211"
+   "containerId": "n228"
   }
  ],
  "appState": {

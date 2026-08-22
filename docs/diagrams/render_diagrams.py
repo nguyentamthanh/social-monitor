@@ -16,8 +16,8 @@ os.makedirs(OUT_DIR, exist_ok=True)
 SCALE = 1.6
 PAD = 40
 
-FONT_REGULAR = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
-FONT_BOLD = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+FONT_REGULAR = os.environ.get("DIAGRAM_FONT_REGULAR", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
+FONT_BOLD = os.environ.get("DIAGRAM_FONT_BOLD", "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf")
 
 _font_cache = {}
 def get_font(size, bold=False):

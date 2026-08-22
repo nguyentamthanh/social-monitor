@@ -5,7 +5,7 @@
  "elements": [
   {
    "type": "text",
-   "id": "n334",
+   "id": "n360",
    "x": 80,
    "y": 30,
    "width": 617.1,
@@ -21,7 +21,7 @@
   },
   {
    "type": "ellipse",
-   "id": "n335",
+   "id": "n361",
    "x": 90,
    "y": 110,
    "width": 160,
@@ -34,14 +34,14 @@
    "opacity": 100,
    "boundElements": [
     {
-     "id": "n336",
+     "id": "n362",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n336",
+   "id": "n362",
    "x": 131.35,
    "y": 120.5,
    "width": 77.30000000000001,
@@ -54,11 +54,11 @@
    "verticalAlign": "middle",
    "originalText": "Browser\nExtension",
    "autoResize": true,
-   "containerId": "n335"
+   "containerId": "n361"
   },
   {
    "type": "arrow",
-   "id": "n337",
+   "id": "n363",
    "x": 250,
    "y": 140,
    "width": 130,
@@ -83,7 +83,7 @@
   },
   {
    "type": "text",
-   "id": "n338",
+   "id": "n364",
    "x": 246.64999999999998,
    "y": 106.0,
    "width": 136.70000000000002,
@@ -99,7 +99,7 @@
   },
   {
    "type": "rectangle",
-   "id": "n339",
+   "id": "n365",
    "x": 380,
    "y": 110,
    "width": 290,
@@ -115,14 +115,14 @@
    },
    "boundElements": [
     {
-     "id": "n340",
+     "id": "n366",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n340",
+   "id": "n366",
    "x": 424.75,
    "y": 120.5,
    "width": 200.50000000000003,
@@ -135,11 +135,11 @@
    "verticalAlign": "middle",
    "originalText": "POST /api/extension/check\n(CORS mở)",
    "autoResize": true,
-   "containerId": "n339"
+   "containerId": "n365"
   },
   {
    "type": "arrow",
-   "id": "n341",
+   "id": "n367",
    "x": 670,
    "y": 140,
    "width": 130,
@@ -164,7 +164,7 @@
   },
   {
    "type": "rectangle",
-   "id": "n343",
+   "id": "n369",
    "x": 800,
    "y": 110,
    "width": 290,
@@ -180,14 +180,14 @@
    },
    "boundElements": [
     {
-     "id": "n344",
+     "id": "n370",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n344",
+   "id": "n370",
    "x": 869.5,
    "y": 121.75,
    "width": 151.0,
@@ -200,11 +200,11 @@
    "verticalAlign": "middle",
    "originalText": "sha256(apiKey) → tra\nextension_api_keys",
    "autoResize": true,
-   "containerId": "n343"
+   "containerId": "n369"
   },
   {
    "type": "arrow",
-   "id": "n345",
+   "id": "n371",
    "x": 1090,
    "y": 140,
    "width": 130,
@@ -229,7 +229,7 @@
   },
   {
    "type": "diamond",
-   "id": "n347",
+   "id": "n373",
    "x": 1220,
    "y": 110,
    "width": 170,
@@ -242,14 +242,14 @@
    "opacity": 100,
    "boundElements": [
     {
-     "id": "n348",
+     "id": "n374",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n348",
+   "id": "n374",
    "x": 1275.975,
    "y": 126.75,
    "width": 58.050000000000004,
@@ -262,11 +262,11 @@
    "verticalAlign": "middle",
    "originalText": "Key\nhợp lệ?",
    "autoResize": true,
-   "containerId": "n347"
+   "containerId": "n373"
   },
   {
    "type": "arrow",
-   "id": "n349",
+   "id": "n375",
    "x": 1220,
    "y": 180,
    "width": 0,
@@ -292,7 +292,7 @@
   },
   {
    "type": "text",
-   "id": "n350",
+   "id": "n376",
    "x": 1166.25,
    "y": 230.0,
    "width": 43.75,
@@ -308,7 +308,7 @@
   },
   {
    "type": "rectangle",
-   "id": "n351",
+   "id": "n377",
    "x": 1090,
    "y": 300,
    "width": 260,
@@ -324,14 +324,14 @@
    },
    "boundElements": [
     {
-     "id": "n352",
+     "id": "n378",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n352",
+   "id": "n378",
    "x": 1148.075,
    "y": 317.875,
    "width": 143.85000000000002,
@@ -344,11 +344,11 @@
    "verticalAlign": "middle",
    "originalText": "401 invalid_api_key",
    "autoResize": true,
-   "containerId": "n351"
+   "containerId": "n377"
   },
   {
    "type": "arrow",
-   "id": "n353",
+   "id": "n379",
    "x": 1390,
    "y": 145,
    "width": 130,
@@ -373,7 +373,7 @@
   },
   {
    "type": "text",
-   "id": "n354",
+   "id": "n380",
    "x": 1443.85,
    "y": 111.0,
    "width": 22.3,
@@ -389,7 +389,7 @@
   },
   {
    "type": "rectangle",
-   "id": "n355",
+   "id": "n381",
    "x": 1520,
    "y": 110,
    "width": 300,
@@ -405,14 +405,14 @@
    },
    "boundElements": [
     {
-     "id": "n356",
+     "id": "n382",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n356",
+   "id": "n382",
    "x": 1576.625,
    "y": 126.75,
    "width": 186.75000000000003,
@@ -425,11 +425,11 @@
    "verticalAlign": "middle",
    "originalText": "extractYouTubeVideoId()\n+ findActiveAssetsByIds()",
    "autoResize": true,
-   "containerId": "n355"
+   "containerId": "n381"
   },
   {
    "type": "arrow",
-   "id": "n357",
+   "id": "n383",
    "x": 1670,
    "y": 180,
    "width": 0,
@@ -454,7 +454,7 @@
   },
   {
    "type": "diamond",
-   "id": "n359",
+   "id": "n385",
    "x": 1580,
    "y": 300,
    "width": 180,
@@ -467,14 +467,14 @@
    "opacity": 100,
    "boundElements": [
     {
-     "id": "n360",
+     "id": "n386",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n360",
+   "id": "n386",
    "x": 1630.25,
    "y": 316.75,
    "width": 79.5,
@@ -487,11 +487,11 @@
    "verticalAlign": "middle",
    "originalText": "Có tài sản\nactive?",
    "autoResize": true,
-   "containerId": "n359"
+   "containerId": "n385"
   },
   {
    "type": "arrow",
-   "id": "n361",
+   "id": "n387",
    "x": 1580,
    "y": 370,
    "width": 0,
@@ -517,7 +517,7 @@
   },
   {
    "type": "text",
-   "id": "n362",
+   "id": "n388",
    "x": 1526.25,
    "y": 415.0,
    "width": 43.75,
@@ -533,7 +533,7 @@
   },
   {
    "type": "rectangle",
-   "id": "n363",
+   "id": "n389",
    "x": 1430,
    "y": 480,
    "width": 300,
@@ -549,14 +549,14 @@
    },
    "boundElements": [
     {
-     "id": "n364",
+     "id": "n390",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n364",
+   "id": "n390",
    "x": 1467.1,
    "y": 498.5,
    "width": 225.8,
@@ -569,11 +569,11 @@
    "verticalAlign": "middle",
    "originalText": "200 {noAssets: true, matches: []}",
    "autoResize": true,
-   "containerId": "n363"
+   "containerId": "n389"
   },
   {
    "type": "arrow",
-   "id": "n365",
+   "id": "n391",
    "x": 1670,
    "y": 300,
    "width": 150,
@@ -599,7 +599,7 @@
   },
   {
    "type": "text",
-   "id": "n366",
+   "id": "n392",
    "x": 1733.85,
    "y": 266.0,
    "width": 22.3,
@@ -615,7 +615,7 @@
   },
   {
    "type": "rectangle",
-   "id": "n367",
+   "id": "n393",
    "x": 1820,
    "y": 270,
    "width": 290,
@@ -631,14 +631,14 @@
    },
    "boundElements": [
     {
-     "id": "n368",
+     "id": "n394",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n368",
+   "id": "n394",
    "x": 1878.5,
    "y": 288.0,
    "width": 173.0,
@@ -651,11 +651,11 @@
    "verticalAlign": "middle",
    "originalText": "fetchYouTubeVideoById()\n+ thumbnail pHash nếu cần",
    "autoResize": true,
-   "containerId": "n367"
+   "containerId": "n393"
   },
   {
    "type": "arrow",
-   "id": "n369",
+   "id": "n395",
    "x": 1965,
    "y": 340,
    "width": 0,
@@ -680,7 +680,7 @@
   },
   {
    "type": "rectangle",
-   "id": "n371",
+   "id": "n397",
    "x": 1820,
    "y": 450,
    "width": 290,
@@ -696,14 +696,14 @@
    },
    "boundElements": [
     {
-     "id": "n372",
+     "id": "n398",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n372",
+   "id": "n398",
    "x": 1850.175,
    "y": 466.75,
    "width": 229.65,
@@ -716,11 +716,11 @@
    "verticalAlign": "middle",
    "originalText": "scoreCandidate() với từng asset\nngưỡng >= 30",
    "autoResize": true,
-   "containerId": "n371"
+   "containerId": "n397"
   },
   {
    "type": "arrow",
-   "id": "n373",
+   "id": "n399",
    "x": 1965,
    "y": 520,
    "width": 0,
@@ -745,7 +745,7 @@
   },
   {
    "type": "rectangle",
-   "id": "n375",
+   "id": "n401",
    "x": 1820,
    "y": 630,
    "width": 290,
@@ -761,14 +761,14 @@
    },
    "boundElements": [
     {
-     "id": "n376",
+     "id": "n402",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n376",
+   "id": "n402",
    "x": 1868.05,
    "y": 646.75,
    "width": 193.9,
@@ -781,11 +781,11 @@
    "verticalAlign": "middle",
    "originalText": "Trả video info + matches\n+ topScore + assetsChecked",
    "autoResize": true,
-   "containerId": "n375"
+   "containerId": "n401"
   },
   {
    "type": "rectangle",
-   "id": "n377",
+   "id": "n403",
    "x": 380,
    "y": 560,
    "width": 560,
@@ -801,7 +801,7 @@
    },
    "boundElements": [
     {
-     "id": "n378",
+     "id": "n404",
      "type": "text"
     }
    ],
@@ -809,7 +809,7 @@
   },
   {
    "type": "text",
-   "id": "n378",
+   "id": "n404",
    "x": 656.0,
    "y": 648.625,
    "width": 10,
@@ -822,11 +822,11 @@
    "verticalAlign": "middle",
    "originalText": "",
    "autoResize": true,
-   "containerId": "n377"
+   "containerId": "n403"
   },
   {
    "type": "text",
-   "id": "n379",
+   "id": "n405",
    "x": 394,
    "y": 568,
    "width": 560,
@@ -842,7 +842,7 @@
   },
   {
    "type": "rectangle",
-   "id": "n380",
+   "id": "n406",
    "x": 400,
    "y": 615,
    "width": 520,
@@ -858,14 +858,14 @@
    },
    "boundElements": [
     {
-     "id": "n381",
+     "id": "n407",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n381",
+   "id": "n407",
    "x": 495.125,
    "y": 626.875,
    "width": 329.75,
@@ -878,11 +878,11 @@
    "verticalAlign": "middle",
    "originalText": "User tạo key trong Settings → lưu hash vào DB",
    "autoResize": true,
-   "containerId": "n380"
+   "containerId": "n406"
   },
   {
    "type": "rectangle",
-   "id": "n382",
+   "id": "n408",
    "x": 400,
    "y": 680,
    "width": 520,
@@ -898,14 +898,14 @@
    },
    "boundElements": [
     {
-     "id": "n383",
+     "id": "n409",
      "type": "text"
     }
    ]
   },
   {
    "type": "text",
-   "id": "n383",
+   "id": "n409",
    "x": 491.54999999999995,
    "y": 691.875,
    "width": 336.90000000000003,
@@ -918,7 +918,7 @@
    "verticalAlign": "middle",
    "originalText": "Chỉ lưu sha256 — key gốc không bao giờ lưu trữ",
    "autoResize": true,
-   "containerId": "n382"
+   "containerId": "n408"
   }
  ],
  "appState": {

@@ -29,3 +29,5 @@ Checker/
 
 __pycache__/
 *.pyc
+.env*
+.mimosa/
